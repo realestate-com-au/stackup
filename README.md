@@ -15,21 +15,17 @@ deployment environments to wait until deployment is successful).
 
 The entry-point is the "stackup" command.
 
-### CloudFormation
-
-Use the "cloudformation" (or "cf") subcommand to manage CloudFormation stacks.
-
 The "stack" subcommand lists stacks:
 
-    $ stackup cf stacks
+    $ stackup stacks
 
 Most other commands operate in the context of a named stack:
 
-    $ stackup cf stack STACK-NAME ...
+    $ stackup stack STACK-NAME ...
 
 To create or update a stack, based on a template, use "apply":
 
-    $ stackup cf stack myapp-test apply
+    $ stackup stack myapp-test apply
 
 This will:
 
@@ -39,6 +35,6 @@ This will:
 
 Other stack subcommands include:
 
-    $ stackup cf stack myapp-test outputs
-    $ stackup cf stack myapp-test resources
-    $ stackup cf stack myapp-test delete
+    $ stackup stack myapp-test outputs
+    $ stackup stack myapp-test resources
+    $ stackup stack myapp-test delete
