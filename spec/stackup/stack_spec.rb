@@ -10,6 +10,21 @@ describe Stackup::Stack do
     allow(cf).to receive(:stacks).and_return({'stack_name' => cf_stack})
   end
 
+  context 'create' do
+    let(:response) {Seahorse::Client::Http::Response.new}
+    it 'should create stack if all is well' do
+      allow(response).to receive(:[]).with(:stack_id).and_return('1')
+      allow(cf).to receive(:create_stack).and_return(response)
+      expect(stack.create).to be true
+    end
+
+    it 'should return nil if stack was not created' do
+      allow(response).to receive(:[]).with(:stack_id).and_return(nil)
+      allow(cf).to receive(:create_stack).and_return(response)
+      expect(stack.create).to be false
+    end
+  end
+
   context 'validate' do
     it 'should be valid if cf validate say so' do
       allow(cf).to receive(:validate_template).and_return({})
