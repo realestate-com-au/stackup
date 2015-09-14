@@ -15,12 +15,14 @@ describe Stackup::Stack do
     it 'should create stack if all is well' do
       allow(response).to receive(:[]).with(:stack_id).and_return('1')
       allow(cf).to receive(:create_stack).and_return(response)
+      allow(cf_stack).to receive(:wait_until).and_return(true)
       expect(stack.create).to be true
     end
 
     it 'should return nil if stack was not created' do
       allow(response).to receive(:[]).with(:stack_id).and_return(nil)
       allow(cf).to receive(:create_stack).and_return(response)
+      allow(cf_stack).to receive(:wait_until).and_return(false)
       expect(stack.create).to be false
     end
   end

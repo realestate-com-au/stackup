@@ -2,7 +2,10 @@ require 'set'
 
 module Stackup
   class Stack
-    attr_accessor :stack, :name, :cf, :template
+    attr_reader :stack, :name, :cf, :template, :monitor
+    SUCESS_STATES = ["CREATE_COMPLETE", "UPDATE_COMPLETE"]
+    FAILURE_STATES = ["CREATE_FAILED", "DELETE_FAILED", "UPDATE_ROLLBACK_FAILED", "ROLLBACK_FAILED", "ROLLBACK_COMPLETE","ROLLBACK_FAILED","UPDATE_ROLLBACK_COMPLETE","UPDATE_ROLLBACK_FAILED"]
+    END_STATES = SUCESS_STATES + FAILURE_STATES
 
     def initialize(name, template)
       @cf = Aws::CloudFormation::Client.new
@@ -19,6 +22,15 @@ module Stackup
         disable_rollback: true
         })
       !response[:stack_id].nil?
+      stack.wait_until(max_attempts: 1000, delay: 10) { |resource| display_events ; END_STATES.include?(resource.stack_status) }
+    end
+
+    def display_events
+      monitor.new_events.each do |e|
+        ts = e.timestamp.localtime.strftime("%H:%M:%S")
+        fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
+        puts("[#{ts}] #{fields.compact.join(' - ')}")
+      end
     end
 
     def deployed?
