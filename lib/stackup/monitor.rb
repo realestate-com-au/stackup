@@ -10,7 +10,7 @@ module Stackup
       stack.events.take_while do |event|
         !seen?(event)
       end.reverse
-    rescue ::AWS::CloudFormation::Errors::ValidationError => e
+    rescue ::Aws::CloudFormation::Errors::ValidationError => e
       []
     end
 
