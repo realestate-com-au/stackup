@@ -1,16 +1,19 @@
+require 'set'
+
 module Stackup
   class Stack
     attr_accessor :stack, :name, :cf, :template
 
     def initialize(name, template)
-      @cf = Aws::CloudFormation.new
-      @stack = cf.stacks[name]
+      @cf = Aws::CloudFormation::Client.new
+      @stack = Aws::CloudFormation::Stack.new(name: name, client: cf)
+      @monitor = Stackup::Monitor.new(@stack)
       @template = template
       @name = name
     end
 
     def create
-      response = @cf.create_stack({
+      response = cf.create_stack({
         stack_name: name,
         template_body: template,
         disable_rollback: true
@@ -19,7 +22,9 @@ module Stackup
     end
 
     def deployed?
-      stack.exists?
+      !stack.stack_status.nil?
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      false
     end
 
     def valid?

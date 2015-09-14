@@ -3,11 +3,11 @@ require 'spec_helper'
 describe Stackup::Stack do
   let(:stack) { Stackup::Stack.new('stack_name', double(String)) }
   let(:cf_stack) { double(Aws::CloudFormation::Stack) }
-  let(:cf) {double(Aws::CloudFormation)}
+  let(:cf) {double(Aws::CloudFormation::Client)}
 
   before do
-    allow(Aws::CloudFormation).to receive(:new).and_return(cf)
-    allow(cf).to receive(:stacks).and_return({'stack_name' => cf_stack})
+    allow(Aws::CloudFormation::Client).to receive(:new).and_return(cf)
+    allow(Aws::CloudFormation::Stack).to receive(:new).and_return(cf_stack)
   end
 
   context 'create' do
@@ -40,12 +40,12 @@ describe Stackup::Stack do
 
   context 'deployed' do
     it 'should be true if it is already deployed' do
-      allow(cf_stack).to receive(:exists?).and_return(true)
+      allow(cf_stack).to receive(:stack_status).and_return('CREATE_COMPLETE')
       expect(stack.deployed?).to be true
     end
 
     it 'should be false if it is not deployed' do
-      allow(cf_stack).to receive(:exists?).and_return(false)
+      allow(cf_stack).to receive(:stack_status).and_raise(Aws::CloudFormation::Errors::ValidationError.new('1', '2'))
       expect(stack.deployed?).to be false
     end
   end
