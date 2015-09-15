@@ -7,7 +7,7 @@ describe Stackup::Monitor do
   let(:events) { [event] }
 
   before do
-    Aws.config[:region] = 'ap-southeast-2'
+    Aws.config[:region] = "ap-southeast-2"
     allow(event).to receive(:event_id).and_return("1")
     allow(stack).to receive(:events).and_return(events)
   end

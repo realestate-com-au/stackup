@@ -25,10 +25,10 @@ module Stackup
     end
 
     def delete
-      response = cf.delete_stack(stack_name: name)
+      response = cf.delete_stack(:stack_name => name)
       stack.wait_until(:max_attempts => 1000, :delay => 10) { |resource| display_events; END_STATES.include?(resource.stack_status) }
     rescue Aws::CloudFormation::Errors::ValidationError
-      puts 'Stack does not exist.'
+      puts "Stack does not exist."
     end
 
     def display_events
