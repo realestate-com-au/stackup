@@ -1,8 +1,11 @@
-source 'https://rubygems.org' do
+source "https://rubygems.org" do
   gemspec
 
+  gem "rake", "~> 10.0"
+
   group :test do
-    gem 'rspec'
-    gem 'byebug'
+    gem "rspec", "~> 3.3"
+    gem "byebug"
   end
+
 end
