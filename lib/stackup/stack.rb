@@ -3,20 +3,19 @@ require "set"
 module Stackup
   class Stack
 
-    attr_reader :stack, :name, :cf, :template, :monitor
+    attr_reader :stack, :name, :cf, :monitor
     SUCESS_STATES = ["CREATE_COMPLETE", "UPDATE_COMPLETE"]
     FAILURE_STATES = ["CREATE_FAILED", "DELETE_COMPLETE", "DELETE_FAILED", "UPDATE_ROLLBACK_FAILED", "ROLLBACK_FAILED", "ROLLBACK_COMPLETE", "ROLLBACK_FAILED", "UPDATE_ROLLBACK_COMPLETE", "UPDATE_ROLLBACK_FAILED"]
     END_STATES = SUCESS_STATES + FAILURE_STATES
 
-    def initialize(name, template)
+    def initialize(name)
       @cf = Aws::CloudFormation::Client.new
       @stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf)
       @monitor = Stackup::Monitor.new(@stack)
-      @template = template
       @name = name
     end
 
-    def create
+    def create(template)
       response = cf.create_stack(:stack_name => name,
                                  :template_body => template,
                                  :disable_rollback => true)
@@ -45,7 +44,7 @@ module Stackup
       false
     end
 
-    def valid?
+    def valid?(template)
       response = cf.validate_template(template)
       response[:code].nil?
     end

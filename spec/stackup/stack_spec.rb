@@ -1,7 +1,8 @@
 require "spec_helper"
 
 describe Stackup::Stack do
-  let(:stack) { Stackup::Stack.new("stack_name", double(String)) }
+  let(:stack) { Stackup::Stack.new("stack_name") }
+  let(:template) { double(String) }
   let(:cf_stack) { double(Aws::CloudFormation::Stack) }
   let(:cf) { double(Aws::CloudFormation::Client) }
 
@@ -25,26 +26,26 @@ describe Stackup::Stack do
       allow(response).to receive(:[]).with(:stack_id).and_return("1")
       allow(cf).to receive(:create_stack).and_return(response)
       allow(cf_stack).to receive(:wait_until).and_return(true)
-      expect(stack.create).to be true
+      expect(stack.create(template)).to be true
     end
 
     it "should return nil if stack was not created" do
       allow(response).to receive(:[]).with(:stack_id).and_return(nil)
       allow(cf).to receive(:create_stack).and_return(response)
       allow(cf_stack).to receive(:wait_until).and_return(false)
-      expect(stack.create).to be false
+      expect(stack.create(template)).to be false
     end
   end
 
   context "validate" do
     it "should be valid if cf validate say so" do
       allow(cf).to receive(:validate_template).and_return({})
-      expect(stack.valid?).to be true
+      expect(stack.valid?(template)).to be true
     end
 
     it "should be invalid if cf validate say so" do
       allow(cf).to receive(:validate_template).and_return(:code => "404")
-      expect(stack.valid?).to be false
+      expect(stack.valid?(template)).to be false
     end
 
   end
