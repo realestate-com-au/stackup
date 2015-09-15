@@ -1,11 +1,10 @@
-# coding: utf-8
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
 
   spec.name          = "stackup"
-  spec.version       = '0.0.1'
+  spec.version       = "0.0.1"
   spec.authors       = ["Arvind Kunday", "Mike Williams"]
   spec.email         = ["arvind.kunday@rea-group.com", "mike.williams@rea-group.com"]
   spec.summary       = "Tools for deployment to AWS"

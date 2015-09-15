@@ -1,5 +1,6 @@
 module Stackup
   class Monitor
+
     attr_accessor :stack, :events
     def initialize(stack)
       @stack = stack
@@ -15,6 +16,7 @@ module Stackup
     end
 
     private
+
     def seen?(event)
       event_id = event.event_id
       if events.include?(event_id)
