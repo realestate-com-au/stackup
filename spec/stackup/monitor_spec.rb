@@ -4,7 +4,7 @@ describe Stackup::Monitor do
   let(:stack) { Stackup::Stack.new("name", "template") }
   let(:monitor) { Stackup::Monitor.new(stack) }
   let(:event) { double(Aws::CloudFormation::Event.new(:id => "1")) }
-  let(:events) { [event]  }
+  let(:events) { [event] }
 
   it "should add the event if it is non-existent" do
     allow(event).to receive(:event_id).and_return("1")
