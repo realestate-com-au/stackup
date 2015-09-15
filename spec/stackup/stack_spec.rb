@@ -10,6 +10,12 @@ describe Stackup::Stack do
     allow(Aws::CloudFormation::Stack).to receive(:new).and_return(cf_stack)
   end
 
+  context "delete" do
+    xit 'should delete the stack if it exists?' do
+        expect(stack.delete).to be true
+    end
+  end
+
   context "create" do
     let(:response) { Seahorse::Client::Http::Response.new }
     it "should create stack if all is well" do
