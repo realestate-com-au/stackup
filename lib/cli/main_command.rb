@@ -12,6 +12,13 @@ module Stackup
           stack.create
         end
       end
+
+      subcommand "delete", "Remove the stack." do
+        def execute
+          stack = Stackup::Stack.new(stack_name, nil)
+          stack.delete
+        end
+      end
     end
 
   end

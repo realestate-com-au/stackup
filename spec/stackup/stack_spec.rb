@@ -11,8 +11,10 @@ describe Stackup::Stack do
   end
 
   context "delete" do
-    xit 'should delete the stack if it exists?' do
-        expect(stack.delete).to be true
+    it 'should delete the stack if it exists?' do
+      response = double(Struct)
+      allow(cf).to receive(:delete_stack).and_return(response)
+      expect(stack.delete).to be response
     end
   end
 
