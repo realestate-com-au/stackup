@@ -2,6 +2,6 @@
 require "clamp"
 $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 require File.expand_path("../../lib/stackup", __FILE__)
-require File.expand_path("../../lib/cli/main_command", __FILE__)
+require File.expand_path("../../lib/stackup/cli", __FILE__)
 
 Stackup::CLI.run
