@@ -8,3 +8,7 @@ RSpec::Core::RakeTask.new do |t|
 end
 
 task "default" => "spec"
+
+require "rubocop/rake_task"
+
+RuboCop::RakeTask.new

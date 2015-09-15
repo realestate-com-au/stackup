@@ -1,0 +1,47 @@
+Eval:
+  Exclude:
+    - "Rakefile"
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 30
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: nested
+  Exclude:
+    - "spec/**/*"
+
+Style/Documentation:
+  Exclude:
+    - "spec/**/*"
+
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Style/EmptyLinesAroundClassBody:
+  EnforcedStyle: empty_lines
+
+Style/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+Style/Encoding:
+  EnforcedStyle: when_needed
+  Enabled: true
+
+Style/FileName:
+  Exclude:
+    - "bin/*"
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/WordArray:
+  Enabled: false
