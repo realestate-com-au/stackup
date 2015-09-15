@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Stackup::Monitor do
-  let(:stack) { Stackup::Stack.new("name", "template") }
+  let(:stack) { Stackup::Stack.new("name") }
   let(:monitor) { Stackup::Monitor.new(stack) }
   let(:event) { double(Aws::CloudFormation::Event.new(:id => "1")) }
   let(:events) { [event] }
