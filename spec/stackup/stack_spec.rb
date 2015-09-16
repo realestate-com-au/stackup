@@ -11,6 +11,36 @@ describe Stackup::Stack do
     allow(Aws::CloudFormation::Stack).to receive(:new).and_return(cf_stack)
   end
 
+  context "deploy" do
+
+    it "should call create if stack is not deployed" do
+      allow(stack).to receive(:deployed?).and_return(false)
+      expect(stack).to receive(:create).and_return(true)
+      expect(stack.deploy(template)).to be true
+    end
+    it "should call update if stack is deployed" do
+      allow(stack).to receive(:deployed?).and_return(true)
+      expect(stack).to receive(:update).and_return(true)
+      expect(stack.deploy(template)).to be true
+    end
+  end
+
+  context "update" do
+    it "should allow stack update" do
+      allow(cf_stack).to receive(:stack_status).and_return("1")
+      response = Seahorse::Client::Http::Response.new
+      allow(response).to receive(:[]).with(:stack_id).and_return("1")
+      allow(cf).to receive(:update_stack).and_return(response)
+      allow(cf_stack).to receive(:wait_until).and_return(true)
+      expect(stack.update(template)).to be true
+    end
+
+    it "should not update if the stack is not deployed" do
+      allow(cf_stack).to receive(:stack_status).and_raise(Aws::CloudFormation::Errors::ValidationError.new("1", "2"))
+      expect(stack.update(template)).to be false
+    end
+  end
+
   context "delete" do
     it "should delete the stack if it exists?" do
       response = double(Struct)
