@@ -23,9 +23,17 @@ module Stackup
       !response[:stack_id].nil?
     end
 
+    def deploy(template)
+      if deployed?
+        update(template)
+      else
+        create(template)
+      end
+    end
+
     def update(template)
-      return false if !deployed?
-      response = cf.update_stack(stack_name: name, template_body: template)
+      return false unless deployed?
+      response = cf.update_stack(:stack_name => name, :template_body => template)
       wait_till_end
       !response[:stack_id].nil?
     end
@@ -61,7 +69,6 @@ module Stackup
     def wait_till_end
       stack.wait_until(:max_attempts => 1000, :delay => 10) { |resource| display_events; END_STATES.include?(resource.stack_status) }
     end
-
 
   end
 end
