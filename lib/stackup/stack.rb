@@ -15,25 +15,28 @@ module Stackup
       @name = name
     end
 
-    def create(template)
+    def create(template, parameters)
       response = cf.create_stack(:stack_name => name,
                                  :template_body => template,
-                                 :disable_rollback => true)
+                                 :disable_rollback => true,
+                                 :parameters => parameters)
       wait_till_end
       !response[:stack_id].nil?
     end
 
-    def deploy(template)
+    def deploy(template, parameters = [])
       if deployed?
-        update(template)
+        update(template, parameters)
       else
-        create(template)
+        create(template, parameters)
       end
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      puts e.message
     end
 
-    def update(template)
+    def update(template, parameters)
       return false unless deployed?
-      response = cf.update_stack(:stack_name => name, :template_body => template)
+      response = cf.update_stack(:stack_name => name, :template_body => template, :parameters => parameters)
       wait_till_end
       !response[:stack_id].nil?
     end
@@ -43,6 +46,10 @@ module Stackup
       stack.wait_until(:max_attempts => 1000, :delay => 10) { |resource| display_events; END_STATES.include?(resource.stack_status) }
     rescue Aws::CloudFormation::Errors::ValidationError
       puts "Stack does not exist."
+    end
+
+    def outputs
+      puts stack.outputs.flat_map { |output| "#{output.output_key} - #{output.output_value}" }
     end
 
     def display_events
