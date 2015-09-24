@@ -5,6 +5,7 @@ describe Stackup::Stack do
   let(:template) { double(String) }
   let(:cf_stack) { double(Aws::CloudFormation::Stack) }
   let(:cf) { double(Aws::CloudFormation::Client) }
+  let(:parameters) { [] }
 
   before do
     allow(Aws::CloudFormation::Client).to receive(:new).and_return(cf)
@@ -16,12 +17,12 @@ describe Stackup::Stack do
     it "should call create if stack is not deployed" do
       allow(stack).to receive(:deployed?).and_return(false)
       expect(stack).to receive(:create).and_return(true)
-      expect(stack.deploy(template)).to be true
+      expect(stack.deploy(template, parameters)).to be true
     end
     it "should call update if stack is deployed" do
       allow(stack).to receive(:deployed?).and_return(true)
       expect(stack).to receive(:update).and_return(true)
-      expect(stack.deploy(template)).to be true
+      expect(stack.deploy(template, parameters)).to be true
     end
   end
 
@@ -32,12 +33,12 @@ describe Stackup::Stack do
       allow(response).to receive(:[]).with(:stack_id).and_return("1")
       allow(cf).to receive(:update_stack).and_return(response)
       allow(cf_stack).to receive(:wait_until).and_return(true)
-      expect(stack.update(template)).to be true
+      expect(stack.update(template, parameters)).to be true
     end
 
     it "should not update if the stack is not deployed" do
       allow(cf_stack).to receive(:stack_status).and_raise(Aws::CloudFormation::Errors::ValidationError.new("1", "2"))
-      expect(stack.update(template)).to be false
+      expect(stack.update(template, parameters)).to be false
     end
   end
 
@@ -56,14 +57,14 @@ describe Stackup::Stack do
       allow(response).to receive(:[]).with(:stack_id).and_return("1")
       allow(cf).to receive(:create_stack).and_return(response)
       allow(cf_stack).to receive(:wait_until).and_return(true)
-      expect(stack.create(template)).to be true
+      expect(stack.create(template, parameters)).to be true
     end
 
     it "should return nil if stack was not created" do
       allow(response).to receive(:[]).with(:stack_id).and_return(nil)
       allow(cf).to receive(:create_stack).and_return(response)
       allow(cf_stack).to receive(:wait_until).and_return(false)
-      expect(stack.create(template)).to be false
+      expect(stack.create(template, parameters)).to be false
     end
   end
 
