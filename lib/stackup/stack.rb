@@ -19,6 +19,7 @@ module Stackup
       response = cf.create_stack(:stack_name => name,
                                  :template_body => template,
                                  :disable_rollback => true,
+                                 :capabilities => ["CAPABILITY_IAM"],
                                  :parameters => parameters)
       wait_till_end
       !response[:stack_id].nil?
@@ -36,7 +37,7 @@ module Stackup
 
     def update(template, parameters)
       return false unless deployed?
-      response = cf.update_stack(:stack_name => name, :template_body => template, :parameters => parameters)
+      response = cf.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
       wait_till_end
       !response[:stack_id].nil?
     end
