@@ -1,5 +1,3 @@
-require "forwardable"
-
 module Stackup
   class Stack
 
@@ -7,7 +5,7 @@ module Stackup
     FAILURE_STATES = ["CREATE_FAILED", "DELETE_FAILED", "ROLLBACK_COMPLETE", "ROLLBACK_FAILED", "UPDATE_ROLLBACK_COMPLETE", "UPDATE_ROLLBACK_FAILED"]
     END_STATES = SUCESS_STATES + FAILURE_STATES
 
-    def initialize(name)
+    def initialize(name, client_options = {})
       @cf = Aws::CloudFormation::Client.new
       @stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf)
       @monitor = Stackup::Monitor.new(@stack)
@@ -16,14 +14,14 @@ module Stackup
 
     attr_reader :stack, :name, :cf, :monitor
 
-    extend Forwardable
-
-    def_delegators :stack, :exists?
-
     def status
       stack.stack_status
     rescue Aws::CloudFormation::Errors::ValidationError => e
       nil
+    end
+
+    def exists?
+      !!status
     end
 
     def create(template, parameters)

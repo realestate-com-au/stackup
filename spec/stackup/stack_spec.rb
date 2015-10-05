@@ -224,12 +224,12 @@ describe Stackup::Stack do
 
   context "deployed" do
     it "should be true if it is already deployed" do
-      allow(cf_stack).to receive(:exists?).and_return(true)
+      allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
       expect(stack.exists?).to be true
     end
 
     it "should be false if it is not deployed" do
-      allow(cf_stack).to receive(:exists?).and_return(false)
+      allow(cf_stack).to receive(:stack_status).and_raise(Aws::CloudFormation::Errors::ValidationError.new("1", "2"))
       expect(stack.exists?).to be false
     end
   end
