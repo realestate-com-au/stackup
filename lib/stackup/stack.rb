@@ -1,9 +1,8 @@
-require "set"
+require "forwardable"
 
 module Stackup
   class Stack
 
-    attr_reader :stack, :name, :cf, :monitor
     SUCESS_STATES = ["CREATE_COMPLETE", "DELETE_COMPLETE", "UPDATE_COMPLETE"]
     FAILURE_STATES = ["CREATE_FAILED", "DELETE_FAILED", "ROLLBACK_COMPLETE", "ROLLBACK_FAILED", "UPDATE_ROLLBACK_COMPLETE", "UPDATE_ROLLBACK_FAILED"]
     END_STATES = SUCESS_STATES + FAILURE_STATES
@@ -14,6 +13,12 @@ module Stackup
       @monitor = Stackup::Monitor.new(@stack)
       @name = name
     end
+
+    attr_reader :stack, :name, :cf, :monitor
+
+    extend Forwardable
+
+    def_delegators :stack, :exists?
 
     def status
       stack.stack_status
@@ -32,7 +37,7 @@ module Stackup
     end
 
     def update(template, parameters)
-      return false unless deployed?
+      return false unless exists?
       if stack.stack_status == "CREATE_FAILED"
         puts "Stack is in CREATE_FAILED state so must be manually deleted before it can be updated"
         return false
@@ -47,7 +52,7 @@ module Stackup
     end
 
     def delete
-      return false unless deployed?
+      return false unless exists?
       cf.delete_stack(:stack_name => name)
       status = wait_for_events
       fail UpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
@@ -57,7 +62,7 @@ module Stackup
     end
 
     def deploy(template, parameters = [])
-      if deployed?
+      if exists?
         update(template, parameters)
       else
         create(template, parameters)
@@ -68,12 +73,6 @@ module Stackup
 
     def outputs
       puts stack.outputs.flat_map { |output| "#{output.output_key} - #{output.output_value}" }
-    end
-
-    def deployed?
-      !stack.stack_status.nil?
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      false
     end
 
     def valid?(template)

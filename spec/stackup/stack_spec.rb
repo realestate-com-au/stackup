@@ -47,14 +47,14 @@ describe Stackup::Stack do
 
     context "when there is no existing stack" do
       before do
-        allow(stack).to receive(:deployed?).and_return(false)
+        allow(stack).to receive(:exists?).and_return(false)
       end
       it { expect(updated).to be false }
     end
 
     context "when there is an existing stack" do
       before do
-        allow(stack).to receive(:deployed?).and_return(true)
+        allow(stack).to receive(:exists?).and_return(true)
         allow(cf_client).to receive(:update_stack).and_return(response)
         allow(stack).to receive(:wait_for_events).and_return(true)
       end
@@ -144,7 +144,7 @@ describe Stackup::Stack do
     context "when stack already exists" do
 
       before do
-        allow(stack).to receive(:deployed?).and_return(true)
+        allow(stack).to receive(:exists?).and_return(true)
         allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
         allow(cf_client).to receive(:update_stack).and_return({ stack_id: "stack-name" })
       end
@@ -158,7 +158,7 @@ describe Stackup::Stack do
     context "when stack does not exist" do
 
       before do
-        allow(stack).to receive(:deployed?).and_return(false)
+        allow(stack).to receive(:exists?).and_return(false)
         allow(cf_client).to receive(:create_stack).and_return({ stack_id: "stack-name" })
       end
 
@@ -176,7 +176,7 @@ describe Stackup::Stack do
 
     context "there is no existing stack" do
       before do
-        allow(stack).to receive(:deployed?).and_return false
+        allow(stack).to receive(:exists?).and_return false
       end
 
       it { expect(deleted).to be false }
@@ -188,7 +188,7 @@ describe Stackup::Stack do
 
     context "there is an existing stack" do
       before do
-        allow(stack).to receive(:deployed?).and_return true
+        allow(stack).to receive(:exists?).and_return true
         allow(cf_client).to receive(:delete_stack)
       end
 
@@ -224,13 +224,13 @@ describe Stackup::Stack do
 
   context "deployed" do
     it "should be true if it is already deployed" do
-      allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
-      expect(stack.deployed?).to be true
+      allow(cf_stack).to receive(:exists?).and_return(true)
+      expect(stack.exists?).to be true
     end
 
     it "should be false if it is not deployed" do
-      allow(cf_stack).to receive(:stack_status).and_raise(Aws::CloudFormation::Errors::ValidationError.new("1", "2"))
-      expect(stack.deployed?).to be false
+      allow(cf_stack).to receive(:exists?).and_return(false)
+      expect(stack.exists?).to be false
     end
   end
 end
