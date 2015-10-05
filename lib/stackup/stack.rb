@@ -1,3 +1,6 @@
+require "aws-sdk-resources"
+require "stackup/monitor"
+
 module Stackup
   class Stack
 

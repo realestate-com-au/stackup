@@ -1,3 +1,5 @@
+require "aws-sdk-core"
+
 module Stackup
   class Monitor
 

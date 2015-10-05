@@ -1,3 +1,7 @@
+require "clamp"
+require "json"
+require "stackup/stack"
+
 module Stackup
 
   class CLI < Clamp::Command
