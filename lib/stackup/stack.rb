@@ -85,9 +85,9 @@ module Stackup
     def wait_for_events
       loop do
         display_new_events
-        status = stack_status
+        status = stack.stack_status
         return status if status =~ /_(COMPLETE|FAILED)$/
-        sleep(poll_interval)
+        sleep(5)
       end
     end
 
