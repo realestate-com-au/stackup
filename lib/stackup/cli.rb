@@ -4,6 +4,15 @@ module Stackup
     subcommand ["stack"], "Manage a stack." do
       parameter "STACK-NAME", "Name of stack", :attribute_name => :stack_name
 
+      subcommand "status", "Print stack status." do
+
+        def execute
+          stack = Stackup::Stack.new(stack_name)
+          puts stack.status
+        end
+
+      end
+
       subcommand "deploy", "Create/update the stack" do
         parameter "TEMPLATE", "CloudFormation template (.json)", :attribute_name => :template
         parameter "PARAMETERS", "CloudFormation parameters (.json)", :attribute_name => :parameters

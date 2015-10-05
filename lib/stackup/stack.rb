@@ -15,6 +15,12 @@ module Stackup
       @name = name
     end
 
+    def status
+      stack.stack_status
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      nil
+    end
+
     def create(template, parameters)
       response = cf.create_stack(:stack_name => name,
                                  :template_body => template,
