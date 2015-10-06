@@ -12,6 +12,7 @@ module Stackup
       @cf = Aws::CloudFormation::Client.new
       @stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf)
       @monitor = Stackup::Monitor.new(@stack)
+      @monitor.new_events # drain previous events
       @name = name
     end
 
