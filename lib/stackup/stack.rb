@@ -8,9 +8,13 @@ module Stackup
     FAILURE_STATES = ["CREATE_FAILED", "DELETE_FAILED", "ROLLBACK_COMPLETE", "ROLLBACK_FAILED", "UPDATE_ROLLBACK_COMPLETE", "UPDATE_ROLLBACK_FAILED"]
     END_STATES = SUCESS_STATES + FAILURE_STATES
 
-    def initialize(name, client_options = {})
+    def initialize(name, client_or_options = {})
       @name = name
-      @cf_client = Aws::CloudFormation::Client.new
+      if client_or_options.is_a?(Hash)
+        @cf_client = Aws::CloudFormation::Client.new(client_or_options)
+      else
+        @cf_client = client_or_options
+      end
       @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
       @monitor = Stackup::Monitor.new(@cf_stack)
       @monitor.new_events # drain previous events
