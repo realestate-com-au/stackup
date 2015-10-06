@@ -24,12 +24,46 @@ describe Stackup::Stack do
       )
     end
 
-    describe "#status" do
-
-      it "raises a NoSuchStack error" do
-        expect { subject.status }.to raise_error(Stackup::NoSuchStack)
+    describe "#exists?" do
+      it "is false" do
+        expect(stack.exists?).to be false
       end
+    end
 
+    describe "#status" do
+      it "raises a NoSuchStack error" do
+        expect { stack.status }.to raise_error(Stackup::NoSuchStack)
+      end
+    end
+
+  end
+
+  context "with existing stack" do
+
+    let(:stack_status) { "CREATE_COMPLETE" }
+
+    let(:stub_stack_data) do
+      {
+        :creation_time => Time.now - 100,
+        :stack_name => stack_name,
+        :stack_status => stack_status
+      }
+    end
+
+    before do
+      cf_client.stub_responses(:describe_stacks, :stacks => [stub_stack_data])
+    end
+
+    describe "#exists?" do
+      it "is true" do
+        expect(stack.exists?).to be true
+      end
+    end
+
+    describe "#status" do
+      it "returns the stack status" do
+        expect(stack.status).to eq("CREATE_COMPLETE")
+      end
     end
 
   end
@@ -225,22 +259,6 @@ describe Stackup::Stack do
   #   it "should be invalid if cf validate say so" do
   #     allow(cf_client).to receive(:validate_template).and_return(:code => "404")
   #     expect(stack.valid?(template)).to be false
-  #   end
-  #
-  # end
-  #
-  # context "#exists?" do
-  #
-  #   it "is true if stack exists" do
-  #     allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
-  #     expect(stack.exists?).to be true
-  #   end
-  #
-  #   it "is false if stack doesn't exist" do
-  #     allow(cf_stack).to receive(:stack_status) do
-  #       fail Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
-  #     end
-  #     expect(stack.exists?).to be false
   #   end
   #
   # end
