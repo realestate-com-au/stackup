@@ -1,10 +1,12 @@
 require "clamp"
-require "json"
+require "stackup/data_display_options"
 require "stackup/stack"
 
 module Stackup
 
   class CLI < Clamp::Command
+
+    include DataDisplayOptions
 
     subcommand "stack", "Manage a stack." do
 
@@ -54,7 +56,7 @@ module Stackup
       subcommand "outputs", "Stack outputs." do
 
         def execute
-          stack.outputs
+          display_data(stack.outputs)
         end
 
       end

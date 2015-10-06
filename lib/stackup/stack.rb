@@ -99,8 +99,14 @@ module Stackup
       handle_validation_error(e)
     end
 
+    # Returns a Hash of stack outputs.
+    #
     def outputs
-      puts cf_stack.outputs.flat_map { |output| "#{output.output_key} - #{output.output_value}" }
+      {}.tap do |h|
+        cf_stack.outputs.each do |output|
+          h[output.output_key] = output.output_value
+        end
+      end
     rescue Aws::CloudFormation::Errors::ValidationError => e
       handle_validation_error(e)
     end
