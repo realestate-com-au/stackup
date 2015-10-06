@@ -1,5 +1,5 @@
 require "aws-sdk-resources"
-require "console_logger"
+require "logger"
 require "stackup/errors"
 require "stackup/stack_event_monitor"
 
@@ -112,7 +112,7 @@ module Stackup
     private
 
     def logger
-      @logger ||= (cf_client.config[:logger] || ConsoleLogger.new($stdout))
+      @logger ||= (cf_client.config[:logger] || Logger.new($stdout))
     end
 
     def event_handler
