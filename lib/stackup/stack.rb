@@ -9,17 +9,17 @@ module Stackup
     END_STATES = SUCESS_STATES + FAILURE_STATES
 
     def initialize(name, client_options = {})
-      @cf = Aws::CloudFormation::Client.new
-      @stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf)
-      @monitor = Stackup::Monitor.new(@stack)
-      @monitor.new_events # drain previous events
       @name = name
+      @cf_client = Aws::CloudFormation::Client.new
+      @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
+      @monitor = Stackup::Monitor.new(@cf_stack)
+      @monitor.new_events # drain previous events
     end
 
-    attr_reader :stack, :name, :cf, :monitor
+    attr_reader :name, :cf_client, :cf_stack, :monitor
 
     def status
-      stack.stack_status
+      cf_stack.stack_status
     rescue Aws::CloudFormation::Errors::ValidationError
       nil
     end
@@ -29,11 +29,13 @@ module Stackup
     end
 
     def create(template, parameters)
-      cf.create_stack(:stack_name => name,
-                      :template_body => template,
-                      :disable_rollback => true,
-                      :capabilities => ["CAPABILITY_IAM"],
-                      :parameters => parameters)
+      cf_client.create_stack(
+        :stack_name => name,
+        :template_body => template,
+        :disable_rollback => true,
+        :capabilities => ["CAPABILITY_IAM"],
+        :parameters => parameters
+      )
       status = wait_for_events
 
       fail CreateError, "stack creation failed" unless status == "CREATE_COMPLETE"
@@ -48,15 +50,15 @@ module Stackup
 
     def update(template, parameters)
       return false unless exists?
-      if stack.stack_status == "CREATE_FAILED"
+      if cf_stack.stack_status == "CREATE_FAILED"
         puts "Stack is in CREATE_FAILED state so must be manually deleted before it can be updated"
         return false
       end
-      if stack.stack_status == "ROLLBACK_COMPLETE"
+      if cf_stack.stack_status == "ROLLBACK_COMPLETE"
         deleted = delete
         return false if !deleted
       end
-      cf.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
+      cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
 
       status = wait_for_events
       fail UpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
@@ -75,7 +77,7 @@ module Stackup
 
     def delete
       return false unless exists?
-      cf.delete_stack(:stack_name => name)
+      cf_client.delete_stack(:stack_name => name)
       status = wait_for_events
       fail UpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
       true
@@ -94,11 +96,11 @@ module Stackup
     end
 
     def outputs
-      puts stack.outputs.flat_map { |output| "#{output.output_key} - #{output.output_value}" }
+      puts cf_stack.outputs.flat_map { |output| "#{output.output_key} - #{output.output_value}" }
     end
 
     def valid?(template)
-      response = cf.validate_template(template)
+      response = cf_client.validate_template(template)
       response[:code].nil?
     end
 
@@ -109,7 +111,7 @@ module Stackup
     def wait_for_events
       loop do
         display_new_events
-        stack.reload
+        cf_stack.reload
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(2)
       end
