@@ -47,7 +47,8 @@ module Stackup
 
         def execute
           template = File.read(template_file)
-          stack.deploy(template)
+          updated = stack.deploy(template)
+          puts "No updates required" if !updated
         end
 
       end

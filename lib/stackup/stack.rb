@@ -18,7 +18,6 @@ module Stackup
       end
       @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
       @event_monitor = Stackup::StackEventMonitor.new(@cf_stack)
-      @event_monitor.zero # drain previous events
     end
 
     attr_reader :name, :cf_client, :cf_stack, :event_monitor
@@ -37,24 +36,20 @@ module Stackup
     end
 
     def create(template, parameters)
-      cf_client.create_stack(
-        :stack_name => name,
-        :template_body => template,
-        :disable_rollback => true,
-        :capabilities => ["CAPABILITY_IAM"],
-        :parameters => parameters
-      )
-      status = wait_for_events
-
+      status = modify_stack do
+        cf_client.create_stack(
+          :stack_name => name,
+          :template_body => template,
+          :disable_rollback => true,
+          :capabilities => ["CAPABILITY_IAM"],
+          :parameters => parameters
+        )
+      end
       fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
       true
-
-    rescue ::Aws::CloudFormation::Errors::ValidationError
-      return false
     end
 
     def update(template, parameters)
-      return false unless exists?
       if cf_stack.stack_status == "CREATE_FAILED"
         puts "Stack is in CREATE_FAILED state so must be manually deleted before it can be updated"
         return false
@@ -63,23 +58,22 @@ module Stackup
         deleted = delete
         return false if !deleted
       end
-      cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
-
-      status = wait_for_events
+      status = modify_stack do
+        cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
+      end
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
       true
-
     rescue ::Aws::CloudFormation::Errors::ValidationError => e
       if e.message == "No updates are to be performed."
-        puts e.message
         return false
       end
-      raise e
+      handle_validation_error(e)
     end
 
     def delete
-      cf_client.delete_stack(:stack_name => name)
-      status = wait_for_events
+      status = modify_stack do
+        cf_client.delete_stack(:stack_name => name)
+      end
       fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
       true
     rescue Aws::CloudFormation::Errors::ValidationError => e
@@ -87,13 +81,9 @@ module Stackup
     end
 
     def deploy(template, parameters = [])
-      if exists?
-        update(template, parameters)
-      else
-        create(template, parameters)
-      end
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      handle_validation_error(e)
+      update(template, parameters)
+    rescue NoSuchStack
+      create(template, parameters)
     end
 
     # Returns a Hash of stack outputs.
@@ -119,14 +109,23 @@ module Stackup
       @logger ||= (cf_client.config[:logger] || ConsoleLogger.new($stdout))
     end
 
+    # Execute a block, reporting stack events, until the stack is stable.
+    # @return the final stack status
+    def modify_stack
+      event_monitor.zero
+      yield
+      wait_until_stable
+    end
+
     # Wait (displaying stack events) until the stack reaches a stable state.
-    #
-    def wait_for_events
+    # @return the final stack status
+    def wait_until_stable
+      # event_monitor.zero # drain previous events
       loop do
         display_new_events
         cf_stack.reload
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
-        sleep(2)
+        sleep(5)
       end
     end
 

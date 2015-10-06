@@ -30,14 +30,14 @@ describe Stackup::Stack do
 
     context "when stack gets successfully created" do
       before do
-        allow(stack).to receive(:wait_for_events).and_return("CREATE_COMPLETE")
+        allow(stack).to receive(:wait_until_stable).and_return("CREATE_COMPLETE")
       end
       it { expect(created).to be true }
     end
 
     context "when stack creation fails" do
       before do
-        allow(stack).to receive(:wait_for_events).and_return("CREATE_FAILED")
+        allow(stack).to receive(:wait_until_stable).and_return("CREATE_FAILED")
       end
       it { expect{ created }.to raise_error Stackup::StackUpdateError }
     end
@@ -48,17 +48,22 @@ describe Stackup::Stack do
     subject(:updated) { stack.update(template, parameters) }
 
     context "when there is no existing stack" do
+
       before do
-        allow(stack).to receive(:exists?).and_return(false)
+        allow(cf_client).to receive(:update_stack) do
+          fail Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
+        end
       end
-      it { expect(updated).to be false }
+
+      it { expect{ updated }.to raise_error Stackup::NoSuchStack }
+
     end
 
     context "when there is an existing stack" do
+
       before do
-        allow(stack).to receive(:exists?).and_return(true)
         allow(cf_client).to receive(:update_stack).and_return(response)
-        allow(stack).to receive(:wait_for_events).and_return("UPDATE_COMPLETE")
+        allow(stack).to receive(:wait_until_stable).and_return("UPDATE_COMPLETE")
       end
 
       context "in a successfully deployed state" do
@@ -72,7 +77,7 @@ describe Stackup::Stack do
 
         context "when stack update fails" do
           before do
-            allow(stack).to receive(:wait_for_events).and_return("UPDATE_FAILED")
+            allow(stack).to receive(:wait_until_stable).and_return("UPDATE_FAILED")
           end
           it { expect{ updated }.to raise_error Stackup::StackUpdateError }
         end
@@ -143,7 +148,6 @@ describe Stackup::Stack do
     context "when stack already exists" do
 
       before do
-        allow(stack).to receive(:exists?).and_return(true)
         allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
         allow(cf_client).to receive(:update_stack).and_return({ stack_id: "stack-name" })
       end
@@ -157,7 +161,9 @@ describe Stackup::Stack do
     context "when stack does not exist" do
 
       before do
-        allow(stack).to receive(:exists?).and_return(false)
+        allow(cf_client).to receive(:update_stack) do
+          fail Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
+        end
         allow(cf_client).to receive(:create_stack).and_return({ stack_id: "stack-name" })
       end
 
@@ -165,7 +171,9 @@ describe Stackup::Stack do
         expect(stack).to receive(:create)
         deploy
       end
+
     end
+
   end
 
 
@@ -181,14 +189,14 @@ describe Stackup::Stack do
 
       context "deleting the stack succeeds" do
         before do
-          allow(stack).to receive(:wait_for_events).and_return("DELETE_COMPLETE")
+          allow(stack).to receive(:wait_until_stable).and_return("DELETE_COMPLETE")
         end
         it { expect(deleted).to be true }
       end
 
       context "deleting the stack fails" do
         before do
-          allow(stack).to receive(:wait_for_events).and_return("DELETE_FAILED")
+          allow(stack).to receive(:wait_until_stable).and_return("DELETE_FAILED")
         end
         it { expect{ deleted }.to raise_error(Stackup::StackUpdateError) }
       end
