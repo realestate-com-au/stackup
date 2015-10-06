@@ -16,7 +16,7 @@ module Stackup
 
     def status
       stack.stack_status
-    rescue Aws::CloudFormation::Errors::ValidationError => e
+    rescue Aws::CloudFormation::Errors::ValidationError
       nil
     end
 
@@ -25,13 +25,21 @@ module Stackup
     end
 
     def create(template, parameters)
-      response = cf.create_stack(:stack_name => name,
-                                 :template_body => template,
-                                 :disable_rollback => true,
-                                 :capabilities => ["CAPABILITY_IAM"],
-                                 :parameters => parameters)
-      wait_for_events
-      !response[:stack_id].nil?
+      cf.create_stack(:stack_name => name,
+                      :template_body => template,
+                      :disable_rollback => true,
+                      :capabilities => ["CAPABILITY_IAM"],
+                      :parameters => parameters)
+      status = wait_for_events
+
+      fail CreateError, "stack creation failed" unless status == "CREATE_COMPLETE"
+      true
+
+    rescue ::Aws::CloudFormation::Errors::ValidationError
+      return false
+    end
+
+    class CreateError < StandardError
     end
 
     def update(template, parameters)
@@ -44,9 +52,21 @@ module Stackup
         deleted = delete
         return false if !deleted
       end
-      response = cf.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
-      wait_for_events
-      !response[:stack_id].nil?
+      cf.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
+
+      status = wait_for_events
+      fail UpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
+      true
+
+    rescue ::Aws::CloudFormation::Errors::ValidationError => e
+      if e.message == "No updates are to be performed."
+        puts e.message
+        return false
+      end
+      raise e
+    end
+
+    class UpdateError < StandardError
     end
 
     def delete
@@ -76,9 +96,6 @@ module Stackup
     def valid?(template)
       response = cf.validate_template(template)
       response[:code].nil?
-    end
-
-    class UpdateError < StandardError
     end
 
     private
