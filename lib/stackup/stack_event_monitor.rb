@@ -4,31 +4,38 @@ module Stackup
 
   class StackEventMonitor
 
-    attr_accessor :stack, :events
     def initialize(stack)
       @stack = stack
-      @events = Set.new
+      @processed_event_ids = Set.new
     end
 
+    attr_accessor :stack
+
+    # Yield all events since the last call
+    #
     def new_events
-      stack.events.take_while do |event|
-        !seen?(event)
-      end.reverse
+      [].tap do |events|
+        stack.events.each do |event|
+          break if @processed_event_ids.include?(event.event_id)
+          events.unshift(event)
+          @processed_event_ids.add(event.event_id)
+        end
+      end
     rescue ::Aws::CloudFormation::Errors::ValidationError
       []
     end
 
-    private
-
-    def seen?(event)
-      event_id = event.event_id
-      if events.include?(event_id)
-        true
-      else
-        events.add(event_id)
-        false
-      end
+    # Consume all new events
+    #
+    def zero
+      new_events
+      nil
     end
 
+    private
+
+    attr_accessor :processed_event_ids
+
   end
+
 end

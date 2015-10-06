@@ -2,6 +2,9 @@ require "aws-sdk-resources"
 require "stackup/stack_event_monitor"
 
 module Stackup
+
+  # An abstraction of a CloudFormation stack.
+  #
   class Stack
 
     SUCESS_STATES = ["CREATE_COMPLETE", "DELETE_COMPLETE", "UPDATE_COMPLETE"]
@@ -16,11 +19,11 @@ module Stackup
         @cf_client = client_or_options
       end
       @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
-      @monitor = Stackup::StackEventMonitor.new(@cf_stack)
-      @monitor.new_events # drain previous events
+      @event_monitor = Stackup::StackEventMonitor.new(@cf_stack)
+      @event_monitor.zero # drain previous events
     end
 
-    attr_reader :name, :cf_client, :cf_stack, :monitor
+    attr_reader :name, :cf_client, :cf_stack, :event_monitor
 
     def status
       cf_stack.stack_status
@@ -122,11 +125,13 @@ module Stackup
     end
 
     def display_new_events
-      monitor.new_events.each do |e|
+      event_monitor.new_events.each do |e|
         ts = e.timestamp.localtime.strftime("%H:%M:%S")
         fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
         puts("[#{ts}] #{fields.compact.join(' - ')}")
       end
     end
+
   end
+
 end
