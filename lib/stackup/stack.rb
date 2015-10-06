@@ -9,18 +9,24 @@ module Stackup
   #
   class Stack
 
-    def initialize(name, client_or_options = {})
+    def initialize(name, client = {}, options = {})
+      client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
       @name = name
-      if client_or_options.is_a?(Hash)
-        @cf_client = Aws::CloudFormation::Client.new(client_or_options)
-      else
-        @cf_client = client_or_options
-      end
+      @cf_client = client
       @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
       @event_monitor = Stackup::StackEventMonitor.new(@cf_stack)
+      options.each do |key, value|
+        public_send("#{key}=", value)
+      end
     end
 
     attr_reader :name, :cf_client, :cf_stack, :event_monitor
+
+    def on_event(event_handler = nil, &block)
+      event_handler ||= block
+      raise ArgumentError, "no event_handler provided" if event_handler.nil?
+      @event_handler = event_handler
+    end
 
     def status
       cf_stack.stack_status
@@ -109,6 +115,13 @@ module Stackup
       @logger ||= (cf_client.config[:logger] || ConsoleLogger.new($stdout))
     end
 
+    def event_handler
+      @event_handler ||= ->(e) do
+        fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
+        logger.info(fields.compact.join(' - '))
+      end
+    end
+
     # Execute a block, reporting stack events, until the stack is stable.
     # @return the final stack status
     def modify_stack
@@ -122,18 +135,16 @@ module Stackup
     def wait_until_stable
       # event_monitor.zero # drain previous events
       loop do
-        display_new_events
+        report_new_events
         cf_stack.reload
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)
       end
     end
 
-    def display_new_events
+    def report_new_events
       event_monitor.new_events.each do |e|
-        ts = e.timestamp.localtime.strftime("%H:%M:%S")
-        fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
-        logger.info(fields.compact.join(' - '))
+        event_handler.call(e)
       end
     end
 
