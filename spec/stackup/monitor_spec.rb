@@ -1,15 +1,15 @@
 require "spec_helper"
 
 describe Stackup::Monitor do
-  let(:stack) { Stackup::Stack.new("name") }
-  let(:monitor) { Stackup::Monitor.new(stack) }
-  let(:event) { double(Aws::CloudFormation::Event.new(:id => "1")) }
+
+  let(:stack) { instance_double(Aws::CloudFormation::Stack, :events => events) }
+  let(:monitor) { described_class.new(stack) }
+
+  let(:event) { instance_double(Aws::CloudFormation::Event, :id => "1") }
   let(:events) { [event] }
 
   before do
-    Aws.config[:region] = "ap-southeast-2"
     allow(event).to receive(:event_id).and_return("1")
-    allow(stack).to receive(:events).and_return(events)
   end
 
   it "should add the event if it is non-existent" do
@@ -20,4 +20,5 @@ describe Stackup::Monitor do
     expect(monitor.new_events.size).to eq(1)
     expect(monitor.new_events.size).to eq(0)
   end
+
 end
