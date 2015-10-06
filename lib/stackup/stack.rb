@@ -1,4 +1,5 @@
 require "aws-sdk-resources"
+require "stackup/errors"
 require "stackup/stack_event_monitor"
 
 module Stackup
@@ -27,12 +28,15 @@ module Stackup
 
     def status
       cf_stack.stack_status
-    rescue Aws::CloudFormation::Errors::ValidationError
-      nil
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      handle_validation_error(e)
     end
 
     def exists?
-      !!status
+      cf_stack.stack_status
+      true
+    rescue Aws::CloudFormation::Errors::ValidationError
+      false
     end
 
     def create(template, parameters)
@@ -45,14 +49,11 @@ module Stackup
       )
       status = wait_for_events
 
-      fail CreateError, "stack creation failed" unless status == "CREATE_COMPLETE"
+      fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
       true
 
     rescue ::Aws::CloudFormation::Errors::ValidationError
       return false
-    end
-
-    class CreateError < StandardError
     end
 
     def update(template, parameters)
@@ -68,7 +69,7 @@ module Stackup
       cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
 
       status = wait_for_events
-      fail UpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
+      fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
       true
 
     rescue ::Aws::CloudFormation::Errors::ValidationError => e
@@ -79,17 +80,13 @@ module Stackup
       raise e
     end
 
-    class UpdateError < StandardError
-    end
-
     def delete
-      return false unless exists?
       cf_client.delete_stack(:stack_name => name)
       status = wait_for_events
-      fail UpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
+      fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
       true
-    rescue Aws::CloudFormation::Errors::ValidationError
-      puts "Stack does not exist."
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      handle_validation_error(e)
     end
 
     def deploy(template, parameters = [])
@@ -99,11 +96,13 @@ module Stackup
         create(template, parameters)
       end
     rescue Aws::CloudFormation::Errors::ValidationError => e
-      puts e.message
+      handle_validation_error(e)
     end
 
     def outputs
       puts cf_stack.outputs.flat_map { |output| "#{output.output_key} - #{output.output_value}" }
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      handle_validation_error(e)
     end
 
     def valid?(template)
@@ -130,6 +129,11 @@ module Stackup
         fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
         puts("[#{ts}] #{fields.compact.join(' - ')}")
       end
+    end
+
+    def handle_validation_error(e)
+      fail NoSuchStack, "no such stack: #{name}" if e.message.end_with?(" does not exist")
+      raise e
     end
 
   end

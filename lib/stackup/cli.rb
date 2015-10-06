@@ -10,6 +10,12 @@ module Stackup
 
       parameter "NAME", "Name of stack", :attribute_name => :stack_name
 
+      def run(*args)
+        super(*args)
+      rescue Stackup::NoSuchStack => e
+        signal_error "stack '#{stack_name}' does not exist"
+      end
+
       private
 
       def stack
@@ -36,15 +42,21 @@ module Stackup
       end
 
       subcommand "delete", "Remove the stack." do
+
         def execute
           stack.delete
+        rescue Stackup::NoSuchStack
+          # that's okay
         end
+
       end
 
       subcommand "outputs", "Stack outputs." do
+
         def execute
           stack.outputs
         end
+
       end
 
     end

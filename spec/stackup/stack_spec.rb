@@ -39,7 +39,7 @@ describe Stackup::Stack do
       before do
         allow(stack).to receive(:wait_for_events).and_return("CREATE_FAILED")
       end
-      it { expect{ created }.to raise_error Stackup::Stack::CreateError }
+      it { expect{ created }.to raise_error Stackup::StackUpdateError }
     end
 
   end
@@ -74,7 +74,7 @@ describe Stackup::Stack do
           before do
             allow(stack).to receive(:wait_for_events).and_return("UPDATE_FAILED")
           end
-          it { expect{ updated }.to raise_error Stackup::Stack::UpdateError }
+          it { expect{ updated }.to raise_error Stackup::StackUpdateError }
         end
       end
 
@@ -173,18 +173,6 @@ describe Stackup::Stack do
 
     subject(:deleted) { stack.delete }
 
-    context "there is no existing stack" do
-      before do
-        allow(stack).to receive(:exists?).and_return false
-      end
-
-      it { expect(deleted).to be false }
-
-      it "does not try to delete the stack" do
-        expect(cf_client).not_to receive(:delete_stack)
-      end
-    end
-
     context "there is an existing stack" do
       before do
         allow(stack).to receive(:exists?).and_return true
@@ -202,7 +190,7 @@ describe Stackup::Stack do
         before do
           allow(stack).to receive(:wait_for_events).and_return("DELETE_FAILED")
         end
-        it { expect{ deleted }.to raise_error(Stackup::Stack::UpdateError) }
+        it { expect{ deleted }.to raise_error(Stackup::StackUpdateError) }
       end
     end
   end
@@ -221,15 +209,20 @@ describe Stackup::Stack do
 
   end
 
-  context "deployed" do
-    it "should be true if it is already deployed" do
+  context "#exists?" do
+
+    it "is true if stack exists" do
       allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
       expect(stack.exists?).to be true
     end
 
-    it "should be false if it is not deployed" do
-      allow(cf_stack).to receive(:stack_status).and_raise(Aws::CloudFormation::Errors::ValidationError.new("1", "2"))
+    it "is false if stack doesn't exist" do
+      allow(cf_stack).to receive(:stack_status) do
+        fail Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
+      end
       expect(stack.exists?).to be false
     end
+
   end
+
 end
