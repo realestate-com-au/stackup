@@ -1,5 +1,5 @@
 require "aws-sdk-resources"
-require "stackup/monitor"
+require "stackup/stack_event_monitor"
 
 module Stackup
   class Stack
@@ -16,7 +16,7 @@ module Stackup
         @cf_client = client_or_options
       end
       @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
-      @monitor = Stackup::Monitor.new(@cf_stack)
+      @monitor = Stackup::StackEventMonitor.new(@cf_stack)
       @monitor.new_events # drain previous events
     end
 

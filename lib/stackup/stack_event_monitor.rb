@@ -1,7 +1,8 @@
 require "aws-sdk-core"
 
 module Stackup
-  class Monitor
+
+  class StackEventMonitor
 
     attr_accessor :stack, :events
     def initialize(stack)
@@ -13,7 +14,7 @@ module Stackup
       stack.events.take_while do |event|
         !seen?(event)
       end.reverse
-    rescue ::Aws::CloudFormation::Errors::ValidationError => e
+    rescue ::Aws::CloudFormation::Errors::ValidationError
       []
     end
 

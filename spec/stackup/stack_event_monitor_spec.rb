@@ -1,6 +1,8 @@
 require "spec_helper"
 
-describe Stackup::Monitor do
+require "stackup/stack_event_monitor"
+
+describe Stackup::StackEventMonitor do
 
   let(:stack) { instance_double(Aws::CloudFormation::Stack, :events => events) }
   let(:events) { [] }
