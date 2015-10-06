@@ -20,7 +20,7 @@ module Stackup
     private
 
     def seen?(event)
-      event_id = event.id
+      event_id = event.event_id
       if events.include?(event_id)
         true
       else
