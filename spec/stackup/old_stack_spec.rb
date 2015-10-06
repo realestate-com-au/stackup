@@ -176,7 +176,6 @@ describe Stackup::Stack do
 
   end
 
-
   describe "#delete" do
 
     subject(:deleted) { stack.delete }
@@ -201,22 +200,6 @@ describe Stackup::Stack do
         it { expect{ deleted }.to raise_error(Stackup::StackUpdateError) }
       end
     end
-  end
-
-  context "#exists?" do
-
-    it "is true if stack exists" do
-      allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
-      expect(stack.exists?).to be true
-    end
-
-    it "is false if stack doesn't exist" do
-      allow(cf_stack).to receive(:stack_status) do
-        fail Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
-      end
-      expect(stack.exists?).to be false
-    end
-
   end
 
 end
