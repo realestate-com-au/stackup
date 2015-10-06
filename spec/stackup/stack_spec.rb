@@ -17,6 +17,7 @@ describe Stackup::Stack do
   before do
     allow(Aws::CloudFormation::Client).to receive(:new).and_return(cf_client)
     allow(Aws::CloudFormation::Stack).to receive(:new).and_return(cf_stack)
+    allow(cf_stack).to receive(:events).and_return([])
   end
 
   describe "#create" do
