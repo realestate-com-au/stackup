@@ -133,7 +133,6 @@ module Stackup
     # Wait (displaying stack events) until the stack reaches a stable state.
     # @return the final stack status
     def wait_until_stable
-      # event_monitor.zero # drain previous events
       loop do
         report_new_events
         cf_stack.reload
