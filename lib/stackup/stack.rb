@@ -8,10 +8,6 @@ module Stackup
   #
   class Stack
 
-    SUCESS_STATES = ["CREATE_COMPLETE", "DELETE_COMPLETE", "UPDATE_COMPLETE"]
-    FAILURE_STATES = ["CREATE_FAILED", "DELETE_FAILED", "ROLLBACK_COMPLETE", "ROLLBACK_FAILED", "UPDATE_ROLLBACK_COMPLETE", "UPDATE_ROLLBACK_FAILED"]
-    END_STATES = SUCESS_STATES + FAILURE_STATES
-
     def initialize(name, client_or_options = {})
       @name = name
       if client_or_options.is_a?(Hash)
