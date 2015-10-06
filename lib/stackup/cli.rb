@@ -26,12 +26,11 @@ module Stackup
 
       subcommand "deploy", "Create/update the stack" do
 
-        parameter "TEMPLATE", "CloudFormation template (.json)", :attribute_name => :template
-        parameter "PARAMETERS", "CloudFormation parameters (.json)", :attribute_name => :parameters
+        parameter "TEMPLATE", "CloudFormation template (.json)", :attribute_name => :template_file
 
         def execute
-          params = JSON.parse(parameters)
-          stack.create(template, {})
+          template = File.read(template_file)
+          stack.deploy(template)
         end
 
       end
