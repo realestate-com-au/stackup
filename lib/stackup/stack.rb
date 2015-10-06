@@ -109,9 +109,9 @@ module Stackup
     def wait_for_events
       loop do
         display_new_events
-        status = stack.stack_status
-        return status if status =~ /_(COMPLETE|FAILED)$/
-        sleep(5)
+        stack.reload
+        return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
+        sleep(2)
       end
     end
 
