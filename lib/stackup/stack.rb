@@ -104,11 +104,6 @@ module Stackup
       handle_validation_error(e)
     end
 
-    def valid?(template)
-      response = cf_client.validate_template(template)
-      response[:code].nil?
-    end
-
     private
 
     def logger

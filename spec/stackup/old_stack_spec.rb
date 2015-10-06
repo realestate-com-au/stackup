@@ -203,20 +203,6 @@ describe Stackup::Stack do
     end
   end
 
-
-  context "validate" do
-    it "should be valid if cf validate say so" do
-      allow(cf_client).to receive(:validate_template).and_return({})
-      expect(stack.valid?(template)).to be true
-    end
-
-    it "should be invalid if cf validate say so" do
-      allow(cf_client).to receive(:validate_template).and_return(:code => "404")
-      expect(stack.valid?(template)).to be false
-    end
-
-  end
-
   context "#exists?" do
 
     it "is true if stack exists" do
