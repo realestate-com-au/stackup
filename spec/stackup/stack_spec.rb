@@ -4,11 +4,13 @@ describe Stackup::Stack do
 
   let(:stack) { described_class.new("stack_name") }
 
-  let(:cf_stack) { instance_double("Aws::CloudFormation::Stack") }
+  let(:cf_stack) { instance_double("Aws::CloudFormation::Stack",
+                                  :stack_status => stack_status) }
   let(:cf_client) { instance_double("Aws::CloudFormation::Client") }
 
   let(:template) { double(String) }
   let(:parameters) { [] }
+  let(:stack_status) { nil }
 
   let(:response) { Seahorse::Client::Http::Response.new }
 
@@ -23,21 +25,20 @@ describe Stackup::Stack do
 
     before do
       allow(cf_client).to receive(:create_stack).and_return(response)
-      allow(stack).to receive(:wait_for_events).and_return(true)
     end
 
     context "when stack gets successfully created" do
       before do
-        allow(response).to receive(:[]).with(:stack_id).and_return("1")
+        allow(stack).to receive(:wait_for_events).and_return("CREATE_COMPLETE")
       end
       it { expect(created).to be true }
     end
 
     context "when stack creation fails" do
       before do
-        allow(response).to receive(:[]).with(:stack_id).and_return(nil)
+        allow(stack).to receive(:wait_for_events).and_return("CREATE_FAILED")
       end
-      it { expect(created).to be false }
+      it { expect{ created }.to raise_error Stackup::Stack::CreateError }
     end
 
   end
@@ -56,7 +57,7 @@ describe Stackup::Stack do
       before do
         allow(stack).to receive(:exists?).and_return(true)
         allow(cf_client).to receive(:update_stack).and_return(response)
-        allow(stack).to receive(:wait_for_events).and_return(true)
+        allow(stack).to receive(:wait_for_events).and_return("UPDATE_COMPLETE")
       end
 
       context "in a successfully deployed state" do
@@ -65,17 +66,14 @@ describe Stackup::Stack do
         end
 
         context "when stack gets successfully updated" do
-          before do
-            allow(response).to receive(:[]).with(:stack_id).and_return("1")
-          end
           it { expect(updated).to be true }
         end
 
         context "when stack update fails" do
           before do
-            allow(response).to receive(:[]).with(:stack_id).and_return(nil)
+            allow(stack).to receive(:wait_for_events).and_return("UPDATE_FAILED")
           end
-          it { expect(updated).to be false }
+          it { expect{ updated }.to raise_error Stackup::Stack::UpdateError }
         end
       end
 
