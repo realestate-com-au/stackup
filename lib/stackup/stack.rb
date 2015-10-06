@@ -1,4 +1,5 @@
 require "aws-sdk-resources"
+require "console_logger"
 require "stackup/errors"
 require "stackup/stack_event_monitor"
 
@@ -114,6 +115,10 @@ module Stackup
 
     private
 
+    def logger
+      @logger ||= (cf_client.config[:logger] || ConsoleLogger.new($stdout))
+    end
+
     # Wait (displaying stack events) until the stack reaches a stable state.
     #
     def wait_for_events
@@ -129,7 +134,7 @@ module Stackup
       event_monitor.new_events.each do |e|
         ts = e.timestamp.localtime.strftime("%H:%M:%S")
         fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
-        puts("[#{ts}] #{fields.compact.join(' - ')}")
+        logger.info(fields.compact.join(' - '))
       end
     end
 

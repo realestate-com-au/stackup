@@ -1,4 +1,5 @@
 require "clamp"
+require "console_logger"
 require "stackup/data_display_options"
 require "stackup/stack"
 
@@ -7,6 +8,14 @@ module Stackup
   class CLI < Clamp::Command
 
     include DataDisplayOptions
+
+    option "--debug", :flag, "enable debugging"
+
+    protected
+
+    def logger
+      @logger ||= ConsoleLogger.new($stdout, debug?)
+    end
 
     subcommand "stack", "Manage a stack." do
 
@@ -21,7 +30,7 @@ module Stackup
       private
 
       def stack
-        Stackup::Stack.new(stack_name)
+        Stackup::Stack.new(stack_name, :logger => logger, :log_level => :debug)
       end
 
       subcommand "status", "Print stack status." do
