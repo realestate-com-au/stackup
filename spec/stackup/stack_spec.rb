@@ -8,6 +8,13 @@ describe Stackup::Stack do
 
   subject(:stack) { described_class.new(stack_name, cf_client) }
 
+  before do
+    # partial stubbing, to support spying
+    allow(cf_client).to receive(:create_stack).and_call_original
+    allow(cf_client).to receive(:delete_stack).and_call_original
+    allow(stack).to receive(:sleep)
+  end
+
   def service_error(code, message)
     {
       :status_code => 400,
@@ -81,10 +88,6 @@ describe Stackup::Stack do
 
     describe "#delete" do
 
-      before do
-        cf_client.stub_responses(:delete_stack)
-      end
-
       context "if successful" do
 
         before do
@@ -95,12 +98,15 @@ describe Stackup::Stack do
           )
         end
 
-        # it "calls delete_stack" do
-        #   expect(cf_client).to have_received(:delete_stack)
-        # end
+        let!(:return_value) { stack.delete }
+
+        it "calls delete_stack" do
+          expect(cf_client).to have_received(:delete_stack)
+            .with(hash_including(:stack_name => stack_name))
+        end
 
         it "returns true" do
-          expect(stack.delete).to be true
+          expect(return_value).to be true
         end
 
       end
