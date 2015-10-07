@@ -36,6 +36,12 @@ describe Stackup::Stack do
       end
     end
 
+    describe "#delete" do
+      it "returns false" do
+        expect(stack.delete).to be false
+      end
+    end
+
   end
 
   context "with existing stack" do

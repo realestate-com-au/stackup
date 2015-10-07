@@ -69,11 +69,8 @@ module Stackup
       end
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
       true
-    rescue ::Aws::CloudFormation::Errors::ValidationError => e
-      if e.message == "No updates are to be performed."
-        return false
-      end
-      handle_validation_error(e)
+    rescue NoUpdateRequired
+      false
     end
 
     def delete
@@ -82,8 +79,8 @@ module Stackup
       end
       fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
       true
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      handle_validation_error(e)
+    rescue NoSuchStack
+      false
     end
 
     def deploy(template, parameters = [])
@@ -123,6 +120,8 @@ module Stackup
       event_monitor.zero
       yield
       wait_until_stable
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      handle_validation_error(e)
     end
 
     # Wait (displaying stack events) until the stack reaches a stable state.
@@ -143,8 +142,18 @@ module Stackup
     end
 
     def handle_validation_error(e)
-      fail NoSuchStack, "no such stack: #{name}" if e.message.end_with?(" does not exist")
-      raise e
+      case e.message
+      when "No updates are to be performed."
+        fail NoUpdateRequired, "no updates are required"
+      when / does not exist$/
+        fail NoSuchStack, "no such stack: #{name}"
+      else
+        raise e
+      end
+    end
+
+    # Raised when a stack is already up-to-date
+    class NoUpdateRequired < StandardError
     end
 
   end
