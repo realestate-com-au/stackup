@@ -1,7 +1,7 @@
 require "aws-sdk-resources"
 require "logger"
 require "stackup/errors"
-require "stackup/stack_event_monitor"
+require "stackup/stack_watcher"
 
 module Stackup
 
@@ -14,13 +14,13 @@ module Stackup
       @name = name
       @cf_client = client
       @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
-      @event_monitor = Stackup::StackEventMonitor.new(@cf_stack)
+      @watcher = Stackup::StackWatcher.new(@cf_stack)
       options.each do |key, value|
         public_send("#{key}=", value)
       end
     end
 
-    attr_reader :name, :cf_client, :cf_stack, :event_monitor
+    attr_reader :name, :cf_client, :cf_stack, :watcher
 
     def on_event(event_handler = nil, &block)
       event_handler ||= block
@@ -116,7 +116,7 @@ module Stackup
     # Execute a block, reporting stack events, until the stack is stable.
     # @return the final stack status
     def modify_stack
-      event_monitor.zero
+      watcher.zero
       yield
       wait_until_stable
     rescue Aws::CloudFormation::Errors::ValidationError => e
@@ -135,7 +135,7 @@ module Stackup
     end
 
     def report_new_events
-      event_monitor.new_events.each do |e|
+      watcher.new_events.each do |e|
         event_handler.call(e)
       end
     end

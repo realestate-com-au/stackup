@@ -2,7 +2,7 @@ require "aws-sdk-core"
 
 module Stackup
 
-  class StackEventMonitor
+  class StackWatcher
 
     def initialize(stack)
       @stack = stack
