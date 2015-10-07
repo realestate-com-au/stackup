@@ -41,19 +41,6 @@ module Stackup
       false
     end
 
-    def create(template, parameters)
-      status = modify_stack do
-        cf_client.create_stack(
-          :stack_name => name,
-          :template_body => template,
-          :disable_rollback => true,
-          :capabilities => ["CAPABILITY_IAM"],
-          :parameters => parameters
-        )
-      end
-      fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
-      true
-    end
 
     def update(template, parameters)
       if status == "CREATE_FAILED"
@@ -102,6 +89,20 @@ module Stackup
     end
 
     private
+
+    def create(template, parameters)
+      status = modify_stack do
+        cf_client.create_stack(
+          :stack_name => name,
+          :template_body => template,
+          :disable_rollback => true,
+          :capabilities => ["CAPABILITY_IAM"],
+          :parameters => parameters
+        )
+      end
+      fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
+      :created
+    end
 
     def logger
       @logger ||= (cf_client.config[:logger] || Logger.new($stdout))

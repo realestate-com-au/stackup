@@ -17,14 +17,11 @@ describe Stackup::Stack do
   subject(:stack) { described_class.new(stack_name, cf_client) }
 
   before do
+    cf_client.stub_responses(:describe_stacks, *describe_stacks_responses)
+    allow(stack).to receive(:sleep).at_most(5).times
     # partial stubbing, to support spying
     allow(cf_client).to receive(:create_stack).and_call_original
     allow(cf_client).to receive(:delete_stack).and_call_original
-    allow(stack).to receive(:sleep).at_most(5).times
-  end
-
-  before do
-    cf_client.stub_responses(:describe_stacks, *describe_stacks_responses)
   end
 
   def service_error(code, message)
@@ -96,7 +93,32 @@ describe Stackup::Stack do
         end
 
         it "calls :create_stack" do
+          expected_args = {
+            :stack_name => stack_name,
+            :template_body => template
+          }
           expect(cf_client).to have_received(:create_stack)
+            .with(hash_including(expected_args))
+        end
+
+        it "returns :created" do
+          expect(return_value).to eq(:created)
+        end
+
+      end
+
+      context "unsuccessful" do
+
+        let(:describe_stacks_responses) do
+          super() + [
+            stack_description("CREATE_IN_PROGRESS"),
+            stack_description("CREATE_FAILED")
+          ]
+        end
+
+        it "raises a StackUpdateError" do
+          expect { stack.deploy(template) }
+            .to raise_error(Stackup::StackUpdateError)
         end
 
       end

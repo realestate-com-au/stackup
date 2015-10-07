@@ -20,30 +20,6 @@ describe Stackup::Stack do
     allow(cf_stack).to receive(:events).and_return([])
   end
 
-  describe "#create" do
-
-    subject(:created) { stack.create(template, parameters) }
-
-    before do
-      allow(cf_client).to receive(:create_stack).and_return(response)
-    end
-
-    context "when stack gets successfully created" do
-      before do
-        allow(stack).to receive(:wait_until_stable).and_return("CREATE_COMPLETE")
-      end
-      it { expect(created).to be true }
-    end
-
-    context "when stack creation fails" do
-      before do
-        allow(stack).to receive(:wait_until_stable).and_return("CREATE_FAILED")
-      end
-      it { expect{ created }.to raise_error Stackup::StackUpdateError }
-    end
-
-  end
-
   def stack_does_not_exist
     Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
   end
