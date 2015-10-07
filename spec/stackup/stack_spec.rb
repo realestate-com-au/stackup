@@ -2,7 +2,15 @@ require "spec_helper"
 
 describe Stackup::Stack do
 
-  let(:cf_client) { Aws::CloudFormation::Client.new(:stub_responses => true) }
+  let(:cf_client) do
+    client_options = { :stub_responses => true }
+    if ENV.key?("AWS_DEBUG")
+      client_options[:logger] = Logger.new(STDOUT)
+      client_options[:log_level] = :debug
+    end
+    Aws::CloudFormation::Client.new(client_options)
+  end
+
   let(:stack_name) { "stack_name" }
   let(:unique_stack_id) { "ID:#{stack_name}" }
 
@@ -68,6 +76,31 @@ describe Stackup::Stack do
       it "returns false" do
         expect(stack.delete).to be false
       end
+    end
+
+    describe "#deploy" do
+
+      let(:template) { "stack template" }
+
+      context "successful" do
+
+        let(:describe_stacks_responses) do
+          super() + [
+            stack_description("CREATE_IN_PROGRESS"),
+            stack_description("CREATE_COMPLETE")
+          ]
+        end
+
+        let!(:return_value) do
+          stack.deploy(template)
+        end
+
+        it "calls :create_stack" do
+          expect(cf_client).to have_received(:create_stack)
+        end
+
+      end
+
     end
 
   end
