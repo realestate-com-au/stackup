@@ -24,7 +24,7 @@ module Stackup
 
     def on_event(event_handler = nil, &block)
       event_handler ||= block
-      raise ArgumentError, "no event_handler provided" if event_handler.nil?
+      fail ArgumentError, "no event_handler provided" if event_handler.nil?
       @event_handler = event_handler
     end
 
@@ -47,8 +47,7 @@ module Stackup
         return false
       end
       if status == "ROLLBACK_COMPLETE"
-        deleted = delete
-        return false if !deleted
+        return false unless delete
       end
       status = modify_stack do
         cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
@@ -108,9 +107,9 @@ module Stackup
     end
 
     def event_handler
-      @event_handler ||= ->(e) do
+      @event_handler ||= lambda do |e|
         fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
-        logger.info(fields.compact.join(' - '))
+        logger.info(fields.compact.join(" - "))
       end
     end
 
