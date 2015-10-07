@@ -35,9 +35,9 @@ module Stackup
     end
 
     def exists?
-      cf_stack.stack_status
+      status
       true
-    rescue Aws::CloudFormation::Errors::ValidationError
+    rescue NoSuchStack
       false
     end
 
@@ -56,11 +56,11 @@ module Stackup
     end
 
     def update(template, parameters)
-      if cf_stack.stack_status == "CREATE_FAILED"
+      if status == "CREATE_FAILED"
         puts "Stack is in CREATE_FAILED state so must be manually deleted before it can be updated"
         return false
       end
-      if cf_stack.stack_status == "ROLLBACK_COMPLETE"
+      if status == "ROLLBACK_COMPLETE"
         deleted = delete
         return false if !deleted
       end
