@@ -75,8 +75,8 @@ describe Stackup::Stack do
     end
 
     describe "#delete" do
-      it "returns false" do
-        expect(stack.delete).to be false
+      it "returns nil" do
+        expect(stack.delete).to be_nil
       end
     end
 
@@ -165,15 +165,14 @@ describe Stackup::Stack do
           ]
         end
 
-        let!(:return_value) { stack.delete }
-
         it "calls delete_stack" do
+          stack.delete
           expect(cf_client).to have_received(:delete_stack)
             .with(hash_including(:stack_name => stack_name))
         end
 
-        it "returns true" do
-          expect(return_value).to be true
+        it "returns :deleted" do
+          expect(stack.delete).to eq(:deleted)
         end
 
       end
@@ -232,8 +231,8 @@ describe Stackup::Stack do
             cf_client.stub_responses(:update_stack, no_update_required)
           end
 
-          it "returns :uptodate" do
-            expect(deploy).to eq(:uptodate)
+          it "returns nil" do
+            expect(deploy).to be_nil
           end
 
         end

@@ -55,17 +55,17 @@ module Stackup
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
       :updated
     rescue NoUpdateRequired
-      :uptodate
+      nil
     end
 
     def delete
-      return false unless exists?
+      return nil unless exists?
       status = modify_stack do
         cf_client.delete_stack(:stack_name => name)
       end
       fail StackUpdateError, "stack delete failed" unless status.nil?
     rescue NoSuchStack
-      true
+      :deleted
     end
 
     def deploy(template, parameters = [])

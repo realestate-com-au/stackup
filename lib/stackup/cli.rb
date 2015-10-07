@@ -35,6 +35,11 @@ module Stackup
         Stackup::Stack.new(stack_name, :logger => logger, :log_level => :debug)
       end
 
+      def report_change
+        change = yield
+        puts "Stack #{change}" unless change.nil?
+      end
+
       subcommand "status", "Print stack status." do
 
         def execute
@@ -49,11 +54,7 @@ module Stackup
 
         def execute
           template = File.read(template_file)
-          if stack.deploy(template)
-            puts "Stack updated"
-          else
-            puts "No updates required"
-          end
+          report_change { stack.deploy(template) }
         end
 
       end
@@ -61,11 +62,7 @@ module Stackup
       subcommand "delete", "Remove the stack." do
 
         def execute
-          if stack.delete
-            puts "Stack deleted"
-          else
-            puts "WARN: No such stack"
-          end
+          report_change { stack.delete }
         end
 
       end
