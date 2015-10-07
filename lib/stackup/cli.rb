@@ -47,8 +47,11 @@ module Stackup
 
         def execute
           template = File.read(template_file)
-          updated = stack.deploy(template)
-          puts "No updates required" if !updated
+          if stack.deploy(template)
+            puts "Stack updated"
+          else
+            puts "No updates required"
+          end
         end
 
       end
@@ -56,9 +59,11 @@ module Stackup
       subcommand "delete", "Remove the stack." do
 
         def execute
-          stack.delete
-        rescue Stackup::NoSuchStack
-          # that's okay
+          if stack.delete
+            puts "Stack deleted"
+          else
+            puts "WARN: No such stack"
+          end
         end
 
       end
