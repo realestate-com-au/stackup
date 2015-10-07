@@ -15,13 +15,26 @@ describe Stackup::Stack do
     }
   end
 
+  def stack_does_not_exist
+    service_error('ValidationError', "Stack with id #{stack_name} does not exist")
+  end
+
+  def stack_description(stack_status)
+    {
+      :stacks => [
+        {
+          :creation_time => Time.now - 100,
+          :stack_name => stack_name,
+          :stack_status => stack_status
+        }
+      ]
+    }
+  end
+
   context "before stack exists" do
 
     before do
-      cf_client.stub_responses(
-        :describe_stacks,
-        service_error('ValidationError', "Stack with id #{stack_name} does not exist")
-      )
+      cf_client.stub_responses(:describe_stacks, stack_does_not_exist)
     end
 
     describe "#exists?" do
@@ -48,16 +61,8 @@ describe Stackup::Stack do
 
     let(:stack_status) { "CREATE_COMPLETE" }
 
-    let(:stub_stack_data) do
-      {
-        :creation_time => Time.now - 100,
-        :stack_name => stack_name,
-        :stack_status => stack_status
-      }
-    end
-
     before do
-      cf_client.stub_responses(:describe_stacks, :stacks => [stub_stack_data])
+      cf_client.stub_responses(:describe_stacks, stack_description(stack_status))
     end
 
     describe "#exists?" do
@@ -68,7 +73,7 @@ describe Stackup::Stack do
 
     describe "#status" do
       it "returns the stack status" do
-        expect(stack.status).to eq("CREATE_COMPLETE")
+        expect(stack.status).to eq(stack_status)
       end
     end
 
