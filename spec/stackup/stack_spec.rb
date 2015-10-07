@@ -15,6 +15,10 @@ describe Stackup::Stack do
     allow(stack).to receive(:sleep)
   end
 
+  before do
+    cf_client.stub_responses(:describe_stacks, *describe_stacks_responses)
+  end
+
   def service_error(code, message)
     {
       :status_code => 400,
@@ -24,7 +28,7 @@ describe Stackup::Stack do
   end
 
   def stack_does_not_exist
-    service_error('ValidationError', "Stack with id #{stack_name} does not exist")
+    service_error("ValidationError", "Stack with id #{stack_name} does not exist")
   end
 
   def stack_description(stack_status)
@@ -42,8 +46,10 @@ describe Stackup::Stack do
 
   context "before stack exists" do
 
-    before do
-      cf_client.stub_responses(:describe_stacks, stack_does_not_exist)
+    let(:describe_stacks_responses) do
+      [
+        stack_does_not_exist
+      ]
     end
 
     describe "#exists?" do
@@ -70,8 +76,10 @@ describe Stackup::Stack do
 
     let(:stack_status) { "CREATE_COMPLETE" }
 
-    before do
-      cf_client.stub_responses(:describe_stacks, stack_description(stack_status))
+    let(:describe_stacks_responses) do
+      [
+        stack_description(stack_status)
+      ]
     end
 
     describe "#exists?" do
@@ -90,12 +98,11 @@ describe Stackup::Stack do
 
       context "if successful" do
 
-        before do
-          cf_client.stub_responses(
-            :describe_stacks,
+        let(:describe_stacks_responses) do
+          super() + [
             stack_description("DELETE_IN_PROGRESS"),
             stack_does_not_exist
-          )
+          ]
         end
 
         let!(:return_value) { stack.delete }
@@ -113,12 +120,11 @@ describe Stackup::Stack do
 
       context "if unsuccessful" do
 
-        before do
-          cf_client.stub_responses(
-            :describe_stacks,
+        let(:describe_stacks_responses) do
+          super() + [
             stack_description("DELETE_IN_PROGRESS"),
             stack_description("DELETE_FAILED")
-          )
+          ]
         end
 
         it "raises a StackUpdateError" do
