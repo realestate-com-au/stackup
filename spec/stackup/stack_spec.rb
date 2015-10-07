@@ -20,7 +20,7 @@ describe Stackup::Stack do
     # partial stubbing, to support spying
     allow(cf_client).to receive(:create_stack).and_call_original
     allow(cf_client).to receive(:delete_stack).and_call_original
-    allow(stack).to receive(:sleep)
+    allow(stack).to receive(:sleep).at_most(5).times
   end
 
   before do
