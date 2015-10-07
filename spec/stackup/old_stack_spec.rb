@@ -180,33 +180,4 @@ describe Stackup::Stack do
 
   end
 
-  describe "#delete" do
-
-    subject(:deleted) { stack.delete }
-
-    context "there is an existing stack" do
-
-      before do
-        allow(stack).to receive(:exists?).and_return true
-        allow(cf_client).to receive(:delete_stack)
-      end
-
-      context "deleting the stack succeeds" do
-        before do
-          allow(stack).to receive(:wait_until_stable) do
-            fail stack_does_not_exist
-          end
-        end
-        it { expect(deleted).to be true }
-      end
-
-      context "deleting the stack fails" do
-        before do
-          allow(stack).to receive(:wait_until_stable).and_return("DELETE_FAILED")
-        end
-        it { expect{ deleted }.to raise_error(Stackup::StackUpdateError) }
-      end
-    end
-  end
-
 end

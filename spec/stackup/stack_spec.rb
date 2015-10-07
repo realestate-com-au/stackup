@@ -4,6 +4,7 @@ describe Stackup::Stack do
 
   let(:cf_client) { Aws::CloudFormation::Client.new(:stub_responses => true) }
   let(:stack_name) { "stack_name" }
+  let(:unique_stack_id) { "ID:#{stack_name}" }
 
   subject(:stack) { described_class.new(stack_name, cf_client) }
 
@@ -24,6 +25,7 @@ describe Stackup::Stack do
       :stacks => [
         {
           :creation_time => Time.now - 100,
+          :stack_id => unique_stack_id,
           :stack_name => stack_name,
           :stack_status => stack_status
         }
@@ -75,6 +77,50 @@ describe Stackup::Stack do
       it "returns the stack status" do
         expect(stack.status).to eq(stack_status)
       end
+    end
+
+    describe "#delete" do
+
+      before do
+        cf_client.stub_responses(:delete_stack)
+      end
+
+      context "if successful" do
+
+        before do
+          cf_client.stub_responses(
+            :describe_stacks,
+            stack_description("DELETE_IN_PROGRESS"),
+            stack_does_not_exist
+          )
+        end
+
+        # it "calls delete_stack" do
+        #   expect(cf_client).to have_received(:delete_stack)
+        # end
+
+        it "returns true" do
+          expect(stack.delete).to be true
+        end
+
+      end
+
+      context "if unsuccessful" do
+
+        before do
+          cf_client.stub_responses(
+            :describe_stacks,
+            stack_description("DELETE_IN_PROGRESS"),
+            stack_description("DELETE_FAILED")
+          )
+        end
+
+        it "raises a StackUpdateError" do
+          expect { stack.delete }.to raise_error(Stackup::StackUpdateError)
+        end
+
+      end
+
     end
 
   end
