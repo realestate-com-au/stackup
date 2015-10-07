@@ -74,13 +74,13 @@ module Stackup
     end
 
     def delete
+      return false unless exists?
       status = modify_stack do
         cf_client.delete_stack(:stack_name => name)
       end
-      fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
-      true
+      fail StackUpdateError, "stack delete failed" unless status.nil?
     rescue NoSuchStack
-      false
+      true
     end
 
     def deploy(template, parameters = [])

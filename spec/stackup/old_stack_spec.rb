@@ -44,6 +44,10 @@ describe Stackup::Stack do
 
   end
 
+  def stack_does_not_exist
+    Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
+  end
+
   describe "#update" do
     subject(:updated) { stack.update(template, parameters) }
 
@@ -51,7 +55,7 @@ describe Stackup::Stack do
 
       before do
         allow(cf_client).to receive(:update_stack) do
-          fail Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
+          fail stack_does_not_exist
         end
       end
 
@@ -162,7 +166,7 @@ describe Stackup::Stack do
 
       before do
         allow(cf_client).to receive(:update_stack) do
-          fail Aws::CloudFormation::Errors::ValidationError.new("test", "stack does not exist")
+          fail stack_does_not_exist
         end
         allow(cf_client).to receive(:create_stack).and_return({ stack_id: "stack-name" })
       end
@@ -181,6 +185,7 @@ describe Stackup::Stack do
     subject(:deleted) { stack.delete }
 
     context "there is an existing stack" do
+
       before do
         allow(stack).to receive(:exists?).and_return true
         allow(cf_client).to receive(:delete_stack)
@@ -188,7 +193,9 @@ describe Stackup::Stack do
 
       context "deleting the stack succeeds" do
         before do
-          allow(stack).to receive(:wait_until_stable).and_return("DELETE_COMPLETE")
+          allow(stack).to receive(:wait_until_stable) do
+            fail stack_does_not_exist
+          end
         end
         it { expect(deleted).to be true }
       end
