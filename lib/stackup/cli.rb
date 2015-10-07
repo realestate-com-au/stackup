@@ -25,6 +25,8 @@ module Stackup
         super(*args)
       rescue Stackup::NoSuchStack => e
         signal_error "stack '#{stack_name}' does not exist"
+      rescue Stackup::StackUpdateError => e
+        signal_error e.message
       end
 
       private
