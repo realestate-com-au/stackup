@@ -27,40 +27,11 @@ describe Stackup::Stack do
   describe "#update" do
     subject(:updated) { stack.update(template, parameters) }
 
-    context "when there is no existing stack" do
-
-      before do
-        allow(cf_client).to receive(:update_stack) do
-          fail stack_does_not_exist
-        end
-      end
-
-      it { expect{ updated }.to raise_error Stackup::NoSuchStack }
-
-    end
-
     context "when there is an existing stack" do
 
       before do
         allow(cf_client).to receive(:update_stack).and_return(response)
         allow(stack).to receive(:wait_until_stable).and_return("UPDATE_COMPLETE")
-      end
-
-      context "in a successfully deployed state" do
-        before do
-          allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
-        end
-
-        context "when stack gets successfully updated" do
-          it { expect(updated).to be true }
-        end
-
-        context "when stack update fails" do
-          before do
-            allow(stack).to receive(:wait_until_stable).and_return("UPDATE_FAILED")
-          end
-          it { expect{ updated }.to raise_error Stackup::StackUpdateError }
-        end
       end
 
       context "in a ROLLBACK_COMPLETE state" do
@@ -81,7 +52,7 @@ describe Stackup::Stack do
               allow(response).to receive(:[]).with(:stack_id).and_return("1")
               allow(stack).to receive(:delete).and_return(true)
             end
-            it { expect(updated).to be true }
+            it { expect(updated).to be :updated }
           end
 
           context "when stack update fails" do
@@ -119,41 +90,6 @@ describe Stackup::Stack do
         end
       end
     end
-  end
-
-  describe "#deploy" do
-
-    subject(:deploy) { stack.deploy(template, parameters) }
-
-    context "when stack already exists" do
-
-      before do
-        allow(cf_stack).to receive(:stack_status).and_return("CREATE_COMPLETE")
-        allow(cf_client).to receive(:update_stack).and_return({ stack_id: "stack-name" })
-      end
-
-      it "updates the stack" do
-        expect(stack).to receive(:update)
-        deploy
-      end
-    end
-
-    context "when stack does not exist" do
-
-      before do
-        allow(cf_client).to receive(:update_stack) do
-          fail stack_does_not_exist
-        end
-        allow(cf_client).to receive(:create_stack).and_return({ stack_id: "stack-name" })
-      end
-
-      it "creates a new stack" do
-        expect(stack).to receive(:create)
-        deploy
-      end
-
-    end
-
   end
 
 end

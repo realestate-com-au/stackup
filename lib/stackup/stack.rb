@@ -41,7 +41,6 @@ module Stackup
       false
     end
 
-
     def update(template, parameters)
       if status == "CREATE_FAILED"
         puts "Stack is in CREATE_FAILED state so must be manually deleted before it can be updated"
@@ -55,9 +54,9 @@ module Stackup
         cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
       end
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
-      true
+      :updated
     rescue NoUpdateRequired
-      false
+      :uptodate
     end
 
     def delete
