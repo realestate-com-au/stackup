@@ -20,6 +20,8 @@ module Stackup
 
 end
 
+# rubocop:disable Style/MethodName
+
 def Stackup(*args)
   Stackup.service(*args)
 end

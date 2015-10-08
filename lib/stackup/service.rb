@@ -1,7 +1,7 @@
 require "aws-sdk-core"
 require "stackup/stack"
 
- module Stackup
+module Stackup
 
   # A handle to CloudFormation.
   #

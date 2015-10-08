@@ -227,8 +227,10 @@ describe Stackup::Stack do
         context "if no updates are required" do
 
           before do
-            cf_client.stub_responses :update_stack,
+            cf_client.stub_responses(
+              :update_stack,
               validation_error("No updates are to be performed.")
+            )
           end
 
           it "returns nil" do
@@ -279,8 +281,10 @@ describe Stackup::Stack do
           end
 
           before do
-            cf_client.stub_responses :update_stack,
+            cf_client.stub_responses(
+              :update_stack,
               validation_error("Stack [woollyams-test] does not exist")
+            )
           end
 
           it "calls :delete_stack, then :create_stack first" do
@@ -297,8 +301,10 @@ describe Stackup::Stack do
     context "when status is stable" do
 
       before do
-        cf_client.stub_responses :cancel_update_stack,
+        cf_client.stub_responses(
+          :cancel_update_stack,
           validation_error("that cannot be called from current stack status")
+        )
       end
 
       describe "#cancel_update" do

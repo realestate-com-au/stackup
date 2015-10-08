@@ -145,9 +145,7 @@ module Stackup
 
     def logger
       @logger ||= cf_client.config[:logger]
-      @logger ||= Logger.new($stdout).tap do |l|
-        l.level = Logger::INFO
-      end
+      @logger ||= Logger.new($stdout).tap { |l| l.level = Logger::INFO }
     end
 
     def cf

@@ -2,6 +2,10 @@ require "aws-sdk-core"
 
 module Stackup
 
+  # A stack event observer.
+  #
+  # Keeps track of previously processed events, and yields the new ones.
+  #
   class StackWatcher
 
     def initialize(stack)
