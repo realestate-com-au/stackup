@@ -18,6 +18,18 @@ require "stackup/stack"
       Stack.new(name, cf_client, options)
     end
 
+    # @return [Enumeration<String>] names of existing stacks
+    #
+    def stack_names
+      Enumerator.new do |y|
+        cf_client.describe_stacks.each do |response|
+          response.stacks.each do |stack|
+            y << stack.stack_name
+          end
+        end
+      end
+    end
+
     private
 
     attr_reader :cf_client

@@ -14,10 +14,15 @@ Clamp do
 
   option ["-f", "--format"], "FORMAT", "output format", :default => "yaml"
 
+  option ["-L", "--list"], :flag, "list stacks" do
+    list_stacks
+    exit 0
+  end
+
   parameter "NAME", "Name of stack", :attribute_name => :stack_name
 
-  def run(*args)
-    super(*args)
+  def run(arguments)
+    super(arguments)
   rescue Stackup::NoSuchStack => e
     signal_error "stack '#{stack_name}' does not exist"
   rescue Stackup::StackUpdateError => e
@@ -49,6 +54,12 @@ Clamp do
 
   def stack
     stackup.stack(stack_name)
+  end
+
+  def list_stacks
+    stackup.stack_names.each do |name|
+      puts name
+    end
   end
 
   def report_change
