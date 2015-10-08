@@ -88,7 +88,6 @@ module Stackup
         cf_client.create_stack(
           :stack_name => name,
           :template_body => template,
-          :disable_rollback => true,
           :capabilities => ["CAPABILITY_IAM"],
           :parameters => parameters
         )
