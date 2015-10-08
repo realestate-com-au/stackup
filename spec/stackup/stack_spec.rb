@@ -257,6 +257,43 @@ describe Stackup::Stack do
 
     end
 
+    %w(CREATE_FAILED ROLLBACK_COMPLETE).each do |initial_status|
+      context "when status is #{initial_status}" do
+
+        let(:stack_status) { initial_status }
+
+        describe "#deploy" do
+
+          let(:template) { "stack template" }
+
+          def deploy
+            stack.deploy(template)
+          end
+
+          let(:describe_stacks_responses) do
+            super() + [
+              stack_description("DELETE_IN_PROGRESS"),
+              stack_does_not_exist,
+              stack_description("CREATE_IN_PROGRESS"),
+              stack_description("CREATE_COMPLETE")
+            ]
+          end
+
+          before do
+            cf_client.stub_responses(:update_stack, stack_does_not_exist)
+          end
+
+          it "calls :delete_stack, then :create_stack first" do
+            deploy
+            expect(cf_client).to have_received(:delete_stack)
+            expect(cf_client).to have_received(:create_stack)
+          end
+
+        end
+
+      end
+    end
+
   end
 
 end

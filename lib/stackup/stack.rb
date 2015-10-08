@@ -13,14 +13,13 @@ module Stackup
       client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
       @name = name
       @cf_client = client
-      @cf_stack = Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
-      @watcher = Stackup::StackWatcher.new(@cf_stack)
+      @watcher = Stackup::StackWatcher.new(cf_stack)
       options.each do |key, value|
         public_send("#{key}=", value)
       end
     end
 
-    attr_reader :name, :cf_client, :cf_stack, :watcher
+    attr_reader :name, :cf_client, :watcher
 
     def on_event(event_handler = nil, &block)
       event_handler ||= block
@@ -41,14 +40,9 @@ module Stackup
       false
     end
 
+    ALMOST_DEAD_STATUSES = %w(CREATE_FAILED ROLLBACK_COMPLETE)
+
     def update(template, parameters)
-      if status == "CREATE_FAILED"
-        puts "Stack is in CREATE_FAILED state so must be manually deleted before it can be updated"
-        return false
-      end
-      if status == "ROLLBACK_COMPLETE"
-        return false unless delete
-      end
       status = modify_stack do
         cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
       end
@@ -69,6 +63,7 @@ module Stackup
     end
 
     def deploy(template, parameters = [])
+      delete if ALMOST_DEAD_STATUSES.include?(status)
       update(template, parameters)
     rescue NoSuchStack
       create(template, parameters)
@@ -104,6 +99,10 @@ module Stackup
 
     def logger
       @logger ||= (cf_client.config[:logger] || Logger.new($stdout))
+    end
+
+    def cf_stack
+      Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
     end
 
     def event_handler
