@@ -31,16 +31,12 @@ describe Stackup::Stack do
     {
       :status_code => 400,
       :headers => {},
-      :body => "<ErrorResponse><Error><Code>ValidationError</Code><Message>#{message}</Message></Error></ErrorResponse>"
+      :body => [
+        "<ErrorResponse><Error><Code>ValidationError</Code><Message>",
+        message,
+        "</Message></Error></ErrorResponse>"
+      ].join
     }
-  end
-
-  def stack_does_not_exist
-    validation_error("Stack with id #{stack_name} does not exist")
-  end
-
-  def no_update_required
-    validation_error("No updates are to be performed.")
   end
 
   def stack_description(stack_status)
@@ -60,7 +56,7 @@ describe Stackup::Stack do
 
     let(:describe_stacks_responses) do
       [
-        stack_does_not_exist
+        validation_error("Stack with id #{stack_name} does not exist")
       ]
     end
 
@@ -231,7 +227,8 @@ describe Stackup::Stack do
         context "if no updates are required" do
 
           before do
-            cf_client.stub_responses(:update_stack, no_update_required)
+            cf_client.stub_responses :update_stack,
+              validation_error("No updates are to be performed.")
           end
 
           it "returns nil" do
@@ -275,14 +272,15 @@ describe Stackup::Stack do
           let(:describe_stacks_responses) do
             super() + [
               stack_description("DELETE_IN_PROGRESS"),
-              stack_does_not_exist,
+              validation_error("Stack with id #{stack_name} does not exist"),
               stack_description("CREATE_IN_PROGRESS"),
               stack_description("CREATE_COMPLETE")
             ]
           end
 
           before do
-            cf_client.stub_responses(:update_stack, stack_does_not_exist)
+            cf_client.stub_responses :update_stack,
+              validation_error("Stack [woollyams-test] does not exist")
           end
 
           it "calls :delete_stack, then :create_stack first" do
