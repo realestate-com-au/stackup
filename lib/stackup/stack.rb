@@ -62,6 +62,8 @@ module Stackup
       create(template, parameters)
     end
 
+    alias_method :up, :create_or_update
+
     ALMOST_DEAD_STATUSES = %w(CREATE_FAILED ROLLBACK_COMPLETE)
 
     # Delete the stack.
@@ -80,6 +82,8 @@ module Stackup
     rescue NoSuchStack
       :deleted
     end
+
+    alias_method :down, :delete
 
     # Get stack outputs.
     #
