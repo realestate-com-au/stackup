@@ -84,6 +84,10 @@ describe Stackup::Stack do
 
       let(:template) { "stack template" }
 
+      def deploy
+        stack.deploy(template)
+      end
+
       context "successful" do
 
         let(:describe_stacks_responses) do
@@ -93,21 +97,18 @@ describe Stackup::Stack do
           ]
         end
 
-        let!(:return_value) do
-          stack.deploy(template)
-        end
-
         it "calls :create_stack" do
           expected_args = {
             :stack_name => stack_name,
             :template_body => template
           }
+          deploy
           expect(cf_client).to have_received(:create_stack)
             .with(hash_including(expected_args))
         end
 
         it "returns :created" do
-          expect(return_value).to eq(:created)
+          expect(deploy).to eq(:created)
         end
 
       end
@@ -122,7 +123,7 @@ describe Stackup::Stack do
         end
 
         it "raises a StackUpdateError" do
-          expect { stack.deploy(template) }
+          expect { deploy }
             .to raise_error(Stackup::StackUpdateError)
         end
 
@@ -198,6 +199,10 @@ describe Stackup::Stack do
 
       let(:template) { "stack template" }
 
+      def deploy
+        stack.deploy(template)
+      end
+
       context "successful" do
 
         let(:describe_stacks_responses) do
@@ -205,10 +210,6 @@ describe Stackup::Stack do
             stack_description("UPDATE_IN_PROGRESS"),
             stack_description("UPDATE_COMPLETE")
           ]
-        end
-
-        def deploy
-          stack.deploy(template)
         end
 
         it "calls :update_stack" do
@@ -249,8 +250,7 @@ describe Stackup::Stack do
         end
 
         it "raises a StackUpdateError" do
-          expect { stack.deploy(template) }
-            .to raise_error(Stackup::StackUpdateError)
+          expect { deploy }.to raise_error(Stackup::StackUpdateError)
         end
 
       end
