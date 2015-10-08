@@ -75,7 +75,7 @@ module Stackup
     def delete
       return nil unless exists?
       status = modify_stack do
-        cf_client.delete_stack(:stack_name => name)
+        cf_stack.delete
       end
       fail StackUpdateError, "stack delete failed" unless status.nil?
     rescue NoSuchStack
@@ -91,7 +91,7 @@ module Stackup
     #
     def cancel_update
       status = modify_stack do
-        cf_client.cancel_update_stack(:stack_name => name)
+        cf_stack.cancel_update
       end
       fail StackUpdateError, "update cancel failed" unless status =~ /_COMPLETE$/
       :update_cancelled
@@ -119,7 +119,7 @@ module Stackup
 
     def create(template, parameters)
       status = modify_stack do
-        cf_client.create_stack(
+        cf.create_stack(
           :stack_name => name,
           :template_body => template,
           :capabilities => ["CAPABILITY_IAM"],
@@ -132,7 +132,7 @@ module Stackup
 
     def update(template, parameters)
       status = modify_stack do
-        cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
+        cf_stack.update(:template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
       end
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
       :updated
@@ -144,8 +144,12 @@ module Stackup
       @logger ||= (cf_client.config[:logger] || Logger.new($stdout))
     end
 
+    def cf
+      Aws::CloudFormation::Resource.new(:client => cf_client)
+    end
+
     def cf_stack
-      Aws::CloudFormation::Stack.new(:name => name, :client => cf_client)
+      cf.stack(name)
     end
 
     def event_handler
