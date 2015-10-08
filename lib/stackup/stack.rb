@@ -40,17 +40,14 @@ module Stackup
       false
     end
 
-    ALMOST_DEAD_STATUSES = %w(CREATE_FAILED ROLLBACK_COMPLETE)
-
-    def update(template, parameters)
-      status = modify_stack do
-        cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
-      end
-      fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
-      :updated
-    rescue NoUpdateRequired
-      nil
+    def create_or_update(template, parameters = [])
+      delete if ALMOST_DEAD_STATUSES.include?(status)
+      update(template, parameters)
+    rescue NoSuchStack
+      create(template, parameters)
     end
+
+    ALMOST_DEAD_STATUSES = %w(CREATE_FAILED ROLLBACK_COMPLETE)
 
     def delete
       return nil unless exists?
@@ -60,13 +57,6 @@ module Stackup
       fail StackUpdateError, "stack delete failed" unless status.nil?
     rescue NoSuchStack
       :deleted
-    end
-
-    def deploy(template, parameters = [])
-      delete if ALMOST_DEAD_STATUSES.include?(status)
-      update(template, parameters)
-    rescue NoSuchStack
-      create(template, parameters)
     end
 
     # Returns a Hash of stack outputs.
@@ -94,6 +84,16 @@ module Stackup
       end
       fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
       :created
+    end
+
+    def update(template, parameters)
+      status = modify_stack do
+        cf_client.update_stack(:stack_name => name, :template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
+      end
+      fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
+      :updated
+    rescue NoUpdateRequired
+      nil
     end
 
     def logger

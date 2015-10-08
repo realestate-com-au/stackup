@@ -54,7 +54,7 @@ module Stackup
 
         def execute
           template = File.read(template_file)
-          report_change { stack.deploy(template) }
+          report_change { stack.create_or_update(template) }
         end
 
       end

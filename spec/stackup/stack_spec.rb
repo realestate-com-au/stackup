@@ -80,12 +80,12 @@ describe Stackup::Stack do
       end
     end
 
-    describe "#deploy" do
+    describe "#create_or_update" do
 
       let(:template) { "stack template" }
 
-      def deploy
-        stack.deploy(template)
+      def create_or_update
+        stack.create_or_update(template)
       end
 
       context "successful" do
@@ -102,13 +102,13 @@ describe Stackup::Stack do
             :stack_name => stack_name,
             :template_body => template
           }
-          deploy
+          create_or_update
           expect(cf_client).to have_received(:create_stack)
             .with(hash_including(expected_args))
         end
 
         it "returns :created" do
-          expect(deploy).to eq(:created)
+          expect(create_or_update).to eq(:created)
         end
 
       end
@@ -123,7 +123,7 @@ describe Stackup::Stack do
         end
 
         it "raises a StackUpdateError" do
-          expect { deploy }
+          expect { create_or_update }
             .to raise_error(Stackup::StackUpdateError)
         end
 
@@ -195,12 +195,12 @@ describe Stackup::Stack do
 
     end
 
-    describe "#deploy" do
+    describe "#create_or_update" do
 
       let(:template) { "stack template" }
 
-      def deploy
-        stack.deploy(template)
+      def create_or_update
+        stack.create_or_update(template)
       end
 
       context "successful" do
@@ -217,13 +217,13 @@ describe Stackup::Stack do
             :stack_name => stack_name,
             :template_body => template
           }
-          deploy
+          create_or_update
           expect(cf_client).to have_received(:update_stack)
             .with(hash_including(expected_args))
         end
 
         it "returns :updated" do
-          expect(deploy).to eq(:updated)
+          expect(create_or_update).to eq(:updated)
         end
 
         context "if no updates are required" do
@@ -233,7 +233,7 @@ describe Stackup::Stack do
           end
 
           it "returns nil" do
-            expect(deploy).to be_nil
+            expect(create_or_update).to be_nil
           end
 
         end
@@ -250,7 +250,7 @@ describe Stackup::Stack do
         end
 
         it "raises a StackUpdateError" do
-          expect { deploy }.to raise_error(Stackup::StackUpdateError)
+          expect { create_or_update }.to raise_error(Stackup::StackUpdateError)
         end
 
       end
@@ -262,12 +262,12 @@ describe Stackup::Stack do
 
         let(:stack_status) { initial_status }
 
-        describe "#deploy" do
+        describe "#create_or_update" do
 
           let(:template) { "stack template" }
 
-          def deploy
-            stack.deploy(template)
+          def create_or_update
+            stack.create_or_update(template)
           end
 
           let(:describe_stacks_responses) do
@@ -284,7 +284,7 @@ describe Stackup::Stack do
           end
 
           it "calls :delete_stack, then :create_stack first" do
-            deploy
+            create_or_update
             expect(cf_client).to have_received(:delete_stack)
             expect(cf_client).to have_received(:create_stack)
           end
