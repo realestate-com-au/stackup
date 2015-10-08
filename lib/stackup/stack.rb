@@ -79,9 +79,10 @@ module Stackup
       status = modify_stack do
         cf_stack.delete
       end
-      @stack_id = nil
       fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
       :deleted
+    ensure
+      @stack_id = nil
     end
 
     alias_method :down, :delete
