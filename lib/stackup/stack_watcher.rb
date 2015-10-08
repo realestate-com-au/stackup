@@ -17,22 +17,24 @@ module Stackup
 
     # Yield all events since the last call
     #
-    def new_events
-      [].tap do |events|
-        stack.events.each do |event|
-          break if @processed_event_ids.include?(event.event_id)
-          events.unshift(event)
-          @processed_event_ids.add(event.event_id)
-        end
+    def each_new_event
+      buffer = []
+      stack.events.each do |event|
+        break if @processed_event_ids.include?(event.event_id)
+        buffer.unshift(event)
       end
-    rescue ::Aws::CloudFormation::Errors::ValidationError
-      []
+      buffer.each do |event|
+        yield event if block_given?
+        @processed_event_ids.add(event.event_id)
+      end
+    rescue Aws::CloudFormation::Errors::ValidationError
+      # okay
     end
 
     # Consume all new events
     #
     def zero
-      new_events
+      each_new_event
       nil
     end
 

@@ -171,9 +171,7 @@ module Stackup
       watcher.zero
       yield
       loop do
-        watcher.new_events.each do |e|
-          event_handler.call(e)
-        end
+        watcher.each_new_event(&event_handler)
         status = self.status
         logger.debug("stack_status=#{status}")
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/

@@ -19,12 +19,20 @@ describe Stackup::StackWatcher do
     @event_id += 1
   end
 
+  def new_event_reasons
+    [].tap do |result|
+      subject.each_new_event do |event|
+        result << event.resource_status_reason
+      end
+    end
+  end
+
   context "with a empty set of events" do
 
-    describe "#new_events" do
+    describe "#each_new_event" do
 
-      it "is empty" do
-        expect(subject.new_events).to be_empty
+      it "yields nothing" do
+        expect(new_event_reasons).to be_empty
       end
 
     end
@@ -39,18 +47,14 @@ describe Stackup::StackWatcher do
       end
     end
 
-    describe "#new_events" do
+    describe "#each_new_event" do
 
-      it "is empty" do
-        expect(subject.new_events).to be_empty
+      it "yields nothing" do
+        expect(new_event_reasons).to be_empty
       end
 
     end
 
-  end
-
-  def new_event_reasons
-    subject.new_events.map(&:resource_status_reason)
   end
 
   context "when the stack has existing events" do
@@ -60,9 +64,9 @@ describe Stackup::StackWatcher do
       add_event("later")
     end
 
-    describe "#new_events" do
+    describe "#each_new_event" do
 
-      it "returns the events in the order they occurred" do
+      it "yields the events in the order they occurred" do
         expect(new_event_reasons).to eq(["earlier", "later"])
       end
 
@@ -71,14 +75,14 @@ describe Stackup::StackWatcher do
     context "and more events occur" do
 
       before do
-        subject.new_events
+        new_event_reasons
         add_event("even")
         add_event("more")
       end
 
-      describe "#new_events" do
+      describe "#each_new_event" do
 
-        it "returns only the new events" do
+        it "yields only the new events" do
           expect(new_event_reasons).to eq(["even", "more"])
         end
 
