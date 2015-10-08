@@ -77,7 +77,7 @@ describe Stackup::Stack do
       let(:template) { "stack template" }
 
       def create_or_update
-        stack.create_or_update(template)
+        stack.create_or_update(:template_body => template)
       end
 
       context "successful" do
@@ -192,7 +192,7 @@ describe Stackup::Stack do
       let(:template) { "stack template" }
 
       def create_or_update
-        stack.create_or_update(template)
+        stack.create_or_update(:template_body => template)
       end
 
       context "successful" do
@@ -262,7 +262,7 @@ describe Stackup::Stack do
           let(:template) { "stack template" }
 
           def create_or_update
-            stack.create_or_update(template)
+            stack.create_or_update(:template_body => template)
           end
 
           let(:describe_stacks_responses) do

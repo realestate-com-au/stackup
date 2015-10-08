@@ -47,16 +47,20 @@ module Stackup
 
     # Create or update the stack.
     #
-    # @param [String] template template JSON
-    # @param [Array<Hash>] parameters template parameters
+    # @param [Hash] options create/update options
+    #   accepts a superset of the options supported by
+    #   +Aws::CloudFormation::Stack#update+
+    #   (see http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Stack.html#update-instance_method)
     # @return [Symbol] `:created` or `:updated` if successful
     # @raise [Stackup::StackUpdateError] if operation fails
     #
-    def create_or_update(template, parameters = [])
+    def create_or_update(options)
+      options = options.dup
+      options[:capabilities] ||= ["CAPABILITY_IAM"]
       delete if ALMOST_DEAD_STATUSES.include?(status)
-      update(template, parameters)
+      update(options)
     rescue NoSuchStack
-      create(template, parameters)
+      create(options)
     end
 
     alias_method :up, :create_or_update
@@ -118,22 +122,18 @@ module Stackup
 
     private
 
-    def create(template, parameters)
+    def create(options)
+      options[:stack_name] = name
       status = modify_stack do
-        ErrorMappingProxy.new(cf).create_stack(
-          :stack_name => name,
-          :template_body => template,
-          :capabilities => ["CAPABILITY_IAM"],
-          :parameters => parameters
-        )
+        ErrorMappingProxy.new(cf).create_stack(options)
       end
       fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
       :created
     end
 
-    def update(template, parameters)
+    def update(options)
       status = modify_stack do
-        cf_stack.update(:template_body => template, :parameters => parameters, :capabilities => ["CAPABILITY_IAM"])
+        cf_stack.update(options)
       end
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
       :updated

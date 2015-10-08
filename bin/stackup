@@ -83,7 +83,9 @@ Clamp do
 
     def execute
       template = File.read(template_file)
-      report_change { stack.create_or_update(template) }
+      report_change do
+        stack.create_or_update(:template_body => template)
+      end
     end
 
   end
@@ -91,7 +93,9 @@ Clamp do
   subcommand ["down", "delete"], "Remove the stack." do
 
     def execute
-      report_change { stack.delete }
+      report_change do
+        stack.delete
+      end
     end
 
   end
@@ -99,7 +103,9 @@ Clamp do
   subcommand "cancel-update", "Cancel the update in-progress" do
 
     def execute
-      report_change { stack.cancel_update }
+      report_change do
+        stack.cancel_update
+      end
     end
 
   end
