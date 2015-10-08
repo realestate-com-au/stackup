@@ -13,7 +13,6 @@ module Stackup
       client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
       @name = name
       @cf_client = client
-      @watcher = Stackup::StackWatcher.new(cf_stack)
       options.each do |key, value|
         public_send("#{key}=", value)
       end
@@ -161,30 +160,19 @@ module Stackup
     # @return the final stack status
     #
     def modify_stack
+      watcher = Stackup::StackWatcher.new(cf_stack)
       watcher.zero
       yield
-      wait_until_stable
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      handle_validation_error(e)
-    end
-
-    # Wait (displaying stack events) until the stack reaches a stable state.
-    #
-    # @return the final stack status
-    #
-    def wait_until_stable
       loop do
-        report_new_events
+        watcher.new_events.each do |e|
+          event_handler.call(e)
+        end
         cf_stack.reload
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)
       end
-    end
-
-    def report_new_events
-      watcher.new_events.each do |e|
-        event_handler.call(e)
-      end
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      handle_validation_error(e)
     end
 
     def handle_validation_error(e)
