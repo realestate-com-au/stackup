@@ -16,4 +16,21 @@ module Stackup
   class InvalidStateError < ServiceError
   end
 
+  # Raised when a stack is already up-to-date
+  class NoUpdateRequired < StandardError
+  end
+
+  def self.handle_validation_error(e)
+    case e.message
+    when "No updates are to be performed."
+      fail NoUpdateRequired, "no updates are required"
+    when / does not exist$/
+      fail NoSuchStack, "no such stack: #{name}"
+    when / cannot be called from current stack status$/
+      fail InvalidStateError, e.message
+    else
+      raise e
+    end
+  end
+
 end

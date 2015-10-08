@@ -34,8 +34,6 @@ module Stackup
     #
     def status
       cf_stack.stack_status
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      handle_validation_error(e)
     end
 
     # @return [boolean] true iff the stack exists
@@ -111,8 +109,6 @@ module Stackup
           h[output.output_key] = output.output_value
         end
       end
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      handle_validation_error(e)
     end
 
     private
@@ -128,6 +124,8 @@ module Stackup
       end
       fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
       :created
+    rescue Aws::CloudFormation::Errors::ValidationError => e
+      Stackup.handle_validation_error(e)
     end
 
     def update(template, parameters)
@@ -149,7 +147,7 @@ module Stackup
     end
 
     def cf_stack
-      cf.stack(name)
+      StackProxy.new(cf.stack(name))
     end
 
     def event_handler
@@ -175,25 +173,27 @@ module Stackup
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)
       end
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      handle_validation_error(e)
     end
 
-    def handle_validation_error(e)
-      case e.message
-      when "No updates are to be performed."
-        fail NoUpdateRequired, "no updates are required"
-      when / does not exist$/
-        fail NoSuchStack, "no such stack: #{name}"
-      when / cannot be called from current stack status$/
-        fail InvalidStateError, e.message
-      else
-        raise e
+    # Proxy for Aws::CloudFormation::Stack which converts certains
+    # types of Aws::CloudFormation::Errors::ValidationError.
+    #
+    class StackProxy
+
+      def initialize(cf_stack)
+        @cf_stack = cf_stack
       end
-    end
 
-    # Raised when a stack is already up-to-date
-    class NoUpdateRequired < StandardError
+      def method_missing(*args)
+        @cf_stack.public_send(*args)
+      rescue Aws::CloudFormation::Errors::ValidationError => e
+        Stackup.handle_validation_error(e)
+      end
+
+      def respond_to?(method)
+        @cf_stack.respond_to?(method)
+      end
+
     end
 
   end
