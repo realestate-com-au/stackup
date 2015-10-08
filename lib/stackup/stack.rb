@@ -21,18 +21,26 @@ module Stackup
 
     attr_reader :name, :cf_client, :watcher
 
+    # Register a handler for reporting of stack events
+    # @param [Proc] event_handler
+    #
     def on_event(event_handler = nil, &block)
       event_handler ||= block
       fail ArgumentError, "no event_handler provided" if event_handler.nil?
       @event_handler = event_handler
     end
 
+    # @return [String] the current stack status
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
     def status
       cf_stack.stack_status
     rescue Aws::CloudFormation::Errors::ValidationError => e
       handle_validation_error(e)
     end
 
+    # @return [boolean] true iff the stack exists
+    #
     def exists?
       status
       true
@@ -40,6 +48,13 @@ module Stackup
       false
     end
 
+    # Create or update the stack.
+    #
+    # @param [String] template template JSON
+    # @param [Array<Hash>] parameters template parameters
+    # @return [Symbol] `:created` or `:updated` if successful
+    # @raise [Stackup::StackUpdateError] if operation fails
+    #
     def create_or_update(template, parameters = [])
       delete if ALMOST_DEAD_STATUSES.include?(status)
       update(template, parameters)
@@ -49,6 +64,13 @@ module Stackup
 
     ALMOST_DEAD_STATUSES = %w(CREATE_FAILED ROLLBACK_COMPLETE)
 
+    # Delete the stack.
+    #
+    # @param [String] template template JSON
+    # @param [Array<Hash>] parameters template parameters
+    # @return [Symbol] `:deleted` if successful
+    # @raise [Stackup::StackUpdateError] if operation fails
+    #
     def delete
       return nil unless exists?
       status = modify_stack do
@@ -59,7 +81,11 @@ module Stackup
       :deleted
     end
 
-    # Returns a Hash of stack outputs.
+    # Get stack outputs.
+    #
+    # @return [Hash<String, String>]
+    #   mapping of logical resource-name to physical resource-name
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def outputs
       {}.tap do |h|
@@ -112,7 +138,9 @@ module Stackup
     end
 
     # Execute a block, reporting stack events, until the stack is stable.
+    #
     # @return the final stack status
+    #
     def modify_stack
       watcher.zero
       yield
@@ -122,7 +150,9 @@ module Stackup
     end
 
     # Wait (displaying stack events) until the stack reaches a stable state.
+    #
     # @return the final stack status
+    #
     def wait_until_stable
       loop do
         report_new_events
