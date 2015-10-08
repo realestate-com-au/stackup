@@ -174,9 +174,8 @@ module Stackup
         watcher.new_events.each do |e|
           event_handler.call(e)
         end
-        cf_stack.reload
-        logger.debug("stack_status=#{status}")
         status = self.status
+        logger.debug("stack_status=#{status}")
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)
       end
