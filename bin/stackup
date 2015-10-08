@@ -27,6 +27,8 @@ Clamp do
     signal_error "stack '#{stack_name}' does not exist"
   rescue Stackup::StackUpdateError => e
     signal_error e.message
+  rescue Aws::Errors::MissingCredentialsError => e
+    signal_error "no credentials provided"
   end
 
   private
