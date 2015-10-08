@@ -1,6 +1,6 @@
 require "aws-sdk-resources"
 require "logger"
-require "stackup/errors"
+require "stackup/error_mapping_proxy"
 require "stackup/stack_watcher"
 
 module Stackup
@@ -120,7 +120,7 @@ module Stackup
 
     def create(template, parameters)
       status = modify_stack do
-        cf.create_stack(
+        ErrorMappingProxy.new(cf).create_stack(
           :stack_name => name,
           :template_body => template,
           :capabilities => ["CAPABILITY_IAM"],
@@ -129,8 +129,6 @@ module Stackup
       end
       fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
       :created
-    rescue Aws::CloudFormation::Errors::ValidationError => e
-      Stackup.handle_validation_error(e)
     end
 
     def update(template, parameters)
@@ -154,7 +152,7 @@ module Stackup
 
     def cf_stack
       id_or_name = @stack_id || name
-      StackProxy.new(cf.stack(id_or_name))
+      ErrorMappingProxy.new(cf.stack(id_or_name))
     end
 
     def event_handler
@@ -182,27 +180,6 @@ module Stackup
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)
       end
-    end
-
-    # Proxy for Aws::CloudFormation::Stack which converts certains
-    # types of Aws::CloudFormation::Errors::ValidationError.
-    #
-    class StackProxy
-
-      def initialize(cf_stack)
-        @cf_stack = cf_stack
-      end
-
-      def method_missing(*args)
-        @cf_stack.send(*args)
-      rescue Aws::CloudFormation::Errors::ValidationError => e
-        Stackup.handle_validation_error(e)
-      end
-
-      def respond_to?(method)
-        @cf_stack.respond_to?(method)
-      end
-
     end
 
   end
