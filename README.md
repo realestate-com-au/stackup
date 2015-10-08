@@ -16,26 +16,35 @@ the change is complete.
 
 The entry-point is the "stackup" command.
 
-The "stacks" subcommand lists stacks:
+Most commands operate in the context of a named stack:
 
-    $ stackup stacks
+    $ stackup STACK-NAME ...
 
-Most other commands operate in the context of a named stack:
+Called without stack-name, it will list stacks:
 
-    $ stackup stack STACK-NAME ...
+    $ stackup
+    foo-bar-test
+    zzz-production
 
-To create or update a stack, based on a template, use "up":
+### Stack create/update
 
-    $ stackup stack myapp-test up template.json
+Use sub-command "up" to create or update a stack, as appropriate:
+
+    $ stackup myapp-test up template.json
 
 This will:
 
   * update (or create) the named CloudFormation stack, using the specified template
   * monitor events until the stack update is complete
-  * print any stack "outputs"
 
-Other stack subcommands include:
+### Stack deletion
 
-    $ stackup stack myapp-test outputs
-    $ stackup stack myapp-test resources
-    $ stackup stack myapp-test delete
+Sub-command "delete" deletes the stack.
+
+### Stack inspection
+
+Inspect details of a stack with:
+
+    $ stackup myapp-test status
+    $ stackup myapp-test resources
+    $ stackup myapp-test outputs

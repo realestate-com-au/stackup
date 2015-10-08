@@ -14,7 +14,17 @@ Clamp do
 
   option ["-f", "--format"], "FORMAT", "output format", :default => "yaml"
 
-  protected
+  parameter "NAME", "Name of stack", :attribute_name => :stack_name
+
+  def run(*args)
+    super(*args)
+  rescue Stackup::NoSuchStack => e
+    signal_error "stack '#{stack_name}' does not exist"
+  rescue Stackup::StackUpdateError => e
+    signal_error e.message
+  end
+
+  private
 
   def logger
     @logger ||= ConsoleLogger.new($stdout, debug?)
@@ -33,62 +43,46 @@ Clamp do
     puts format_data(data)
   end
 
-  subcommand "stack", "Manage a stack." do
+  def stack
+    Stackup::Stack.new(stack_name, :logger => logger, :log_level => :debug)
+  end
 
-    parameter "NAME", "Name of stack", :attribute_name => :stack_name
+  def report_change
+    change = yield
+    puts "Stack #{change}" unless change.nil?
+  end
 
-    def run(*args)
-      super(*args)
-    rescue Stackup::NoSuchStack => e
-      signal_error "stack '#{stack_name}' does not exist"
-    rescue Stackup::StackUpdateError => e
-      signal_error e.message
+  subcommand "status", "Print stack status." do
+
+    def execute
+      puts stack.status
     end
 
-    private
+  end
 
-    def stack
-      Stackup::Stack.new(stack_name, :logger => logger, :log_level => :debug)
+  subcommand "up", "Create/update the stack" do
+
+    parameter "TEMPLATE", "CloudFormation template (.json)", :attribute_name => :template_file
+
+    def execute
+      template = File.read(template_file)
+      report_change { stack.create_or_update(template) }
     end
 
-    def report_change
-      change = yield
-      puts "Stack #{change}" unless change.nil?
+  end
+
+  subcommand ["down", "delete"], "Remove the stack." do
+
+    def execute
+      report_change { stack.delete }
     end
 
-    subcommand "status", "Print stack status." do
+  end
 
-      def execute
-        puts stack.status
-      end
+  subcommand "outputs", "Stack outputs." do
 
-    end
-
-    subcommand "up", "Create/update the stack" do
-
-      parameter "TEMPLATE", "CloudFormation template (.json)", :attribute_name => :template_file
-
-      def execute
-        template = File.read(template_file)
-        report_change { stack.create_or_update(template) }
-      end
-
-    end
-
-    subcommand ["down", "delete"], "Remove the stack." do
-
-      def execute
-        report_change { stack.delete }
-      end
-
-    end
-
-    subcommand "outputs", "Stack outputs." do
-
-      def execute
-        display_data(stack.outputs)
-      end
-
+    def execute
+      display_data(stack.outputs)
     end
 
   end
