@@ -12,7 +12,7 @@ the change is complete.
 
     $ gem install stackup
 
-## Usage
+## Command-line usage
 
 The entry-point is the "stackup" command.
 
@@ -48,3 +48,16 @@ Inspect details of a stack with:
     $ stackup myapp-test status
     $ stackup myapp-test resources
     $ stackup myapp-test outputs
+
+## Programmatic usage
+
+Get a handle to a `Stack` object as follows:
+
+    stack = Stackup.stack("my-stack")
+
+You can pass an `Aws::CloudFormation::Client`, or client config,
+to `Stackup`, e.g.
+
+    stack = Stackup(credentials).stack("my-stack")
+
+See {Stackup::Stack} for more details.
