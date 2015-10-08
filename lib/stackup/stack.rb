@@ -86,7 +86,7 @@ module Stackup
 
     alias_method :down, :delete
 
-    # Cancel update it progress.
+    # Cancel update in-progress.
     #
     # @return [Symbol] `:update_cancelled` if successful
     # @raise [Stackup::StackUpdateError] if operation fails
