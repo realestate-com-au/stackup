@@ -29,6 +29,8 @@ Clamp do
     signal_error e.message
   rescue Aws::Errors::MissingCredentialsError
     signal_error "no credentials provided"
+  rescue Aws::CloudFormation::Errors::ExpiredToken => e
+    signal_error e.message
   end
 
   private
