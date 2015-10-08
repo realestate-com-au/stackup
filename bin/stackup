@@ -4,7 +4,7 @@ $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 
 require "clamp"
 require "console_logger"
-require "stackup/stack"
+require "stackup"
 require "multi_json"
 require "yaml"
 
@@ -43,8 +43,12 @@ Clamp do
     puts format_data(data)
   end
 
+  def stackup
+    Stackup(:logger => logger, :log_level => :debug)
+  end
+
   def stack
-    Stackup::Stack.new(stack_name, :logger => logger, :log_level => :debug)
+    stackup.stack(stack_name)
   end
 
   def report_change
