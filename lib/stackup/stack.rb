@@ -144,7 +144,10 @@ module Stackup
     end
 
     def logger
-      @logger ||= (cf_client.config[:logger] || Logger.new($stdout))
+      @logger ||= cf_client.config[:logger]
+      @logger ||= Logger.new($stdout).tap do |l|
+        l.level = Logger::INFO
+      end
     end
 
     def cf
@@ -176,6 +179,7 @@ module Stackup
           event_handler.call(e)
         end
         cf_stack.reload
+        logger.debug("stack_status=#{status}")
         status = self.status
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)

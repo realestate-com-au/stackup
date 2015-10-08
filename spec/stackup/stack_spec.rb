@@ -1,3 +1,4 @@
+require "console_logger"
 require "spec_helper"
 
 describe Stackup::Stack do
@@ -5,7 +6,7 @@ describe Stackup::Stack do
   let(:cf_client) do
     client_options = { :stub_responses => true }
     if ENV.key?("AWS_DEBUG")
-      client_options[:logger] = Logger.new(STDOUT)
+      client_options[:logger] = ConsoleLogger.new(STDOUT, true)
       client_options[:log_level] = :debug
     end
     Aws::CloudFormation::Client.new(client_options)
