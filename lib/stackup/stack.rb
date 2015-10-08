@@ -85,6 +85,21 @@ module Stackup
 
     alias_method :down, :delete
 
+    # Cancel update it progress.
+    #
+    # @return [Symbol] `:update_cancelled` if successful
+    # @raise [Stackup::StackUpdateError] if operation fails
+    #
+    def cancel_update
+      status = modify_stack do
+        cf_client.cancel_update_stack(:stack_name => name)
+      end
+      fail StackUpdateError, "update cancel failed" unless status =~ /_COMPLETE$/
+      :update_cancelled
+    rescue InvalidStateError
+      nil
+    end
+
     # Get stack outputs.
     #
     # @return [Hash<String, String>]
@@ -178,6 +193,8 @@ module Stackup
         fail NoUpdateRequired, "no updates are required"
       when / does not exist$/
         fail NoSuchStack, "no such stack: #{name}"
+      when / cannot be called from current stack status$/
+        fail InvalidStateError, e.message
       else
         raise e
       end

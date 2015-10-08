@@ -96,6 +96,14 @@ Clamp do
 
   end
 
+  subcommand "cancel-update", "Cancel the update in-progress" do
+
+    def execute
+      report_change { stack.cancel_update }
+    end
+
+  end
+
   subcommand "outputs", "Stack outputs." do
 
     def execute

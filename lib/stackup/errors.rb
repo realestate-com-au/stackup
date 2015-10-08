@@ -12,4 +12,8 @@ module Stackup
   class StackUpdateError < ServiceError
   end
 
+  # Raised if we can't perform that operation now
+  class InvalidStateError < ServiceError
+  end
+
 end

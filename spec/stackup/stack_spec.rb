@@ -23,22 +23,23 @@ describe Stackup::Stack do
     allow(cf_client).to receive(:create_stack).and_call_original
     allow(cf_client).to receive(:delete_stack).and_call_original
     allow(cf_client).to receive(:update_stack).and_call_original
+    allow(cf_client).to receive(:cancel_update_stack).and_call_original
   end
 
-  def service_error(code, message)
+  def validation_error(message)
     {
       :status_code => 400,
       :headers => {},
-      :body => "<ErrorResponse><Error><Code>#{code}</Code><Message>#{message}</Message></Error></ErrorResponse>"
+      :body => "<ErrorResponse><Error><Code>ValidationError</Code><Message>#{message}</Message></Error></ErrorResponse>"
     }
   end
 
   def stack_does_not_exist
-    service_error("ValidationError", "Stack with id #{stack_name} does not exist")
+    validation_error("Stack with id #{stack_name} does not exist")
   end
 
   def no_update_required
-    service_error("ValidationError", "No updates are to be performed.")
+    validation_error("No updates are to be performed.")
   end
 
   def stack_description(stack_status)
@@ -292,6 +293,53 @@ describe Stackup::Stack do
         end
 
       end
+    end
+
+    context "when status is stable" do
+
+      before do
+        cf_client.stub_responses :cancel_update_stack,
+          validation_error("that cannot be called from current stack status")
+      end
+
+      describe "#cancel_update" do
+
+        it "returns nil" do
+          expect(stack.cancel_update).to be_nil
+        end
+
+      end
+
+    end
+
+    context "when status is UPDATE_IN_PROGRESS" do
+
+      let(:stack_status) { "UPDATE_IN_PROGRESS" }
+
+      describe "#cancel_update" do
+
+        let(:describe_stacks_responses) do
+          super() + [
+            stack_description("UPDATE_ROLLBACK_IN_PROGRESS"),
+            stack_description("UPDATE_ROLLBACK_COMPLETE")
+          ]
+        end
+
+        it "calls :cancel_update_stack" do
+          expected_args = {
+            :stack_name => stack_name
+          }
+          stack.cancel_update
+          expect(cf_client).to have_received(:cancel_update_stack)
+            .with(hash_including(expected_args))
+        end
+
+        it "returns :update_cancelled" do
+          expect(stack.cancel_update).to eq(:update_cancelled)
+        end
+
+      end
+
     end
 
   end
