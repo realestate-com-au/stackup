@@ -48,7 +48,7 @@ module Stackup
 
       end
 
-      subcommand "deploy", "Create/update the stack" do
+      subcommand "up", "Create/update the stack" do
 
         parameter "TEMPLATE", "CloudFormation template (.json)", :attribute_name => :template_file
 
@@ -59,7 +59,7 @@ module Stackup
 
       end
 
-      subcommand "delete", "Remove the stack." do
+      subcommand ["down", "delete"], "Remove the stack." do
 
         def execute
           report_change { stack.delete }
