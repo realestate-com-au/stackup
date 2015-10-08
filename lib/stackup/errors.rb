@@ -24,8 +24,8 @@ module Stackup
     case e.message
     when "No updates are to be performed."
       fail NoUpdateRequired, "no updates are required"
-    when / does not exist$/
-      fail NoSuchStack, "no such stack: #{name}"
+    when /Stack with id (.+) does not exist$/
+      fail NoSuchStack, "no such stack: #{$1}"
     when / cannot be called from current stack status$/
       fail InvalidStateError, e.message
     else

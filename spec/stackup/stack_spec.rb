@@ -163,14 +163,14 @@ describe Stackup::Stack do
         let(:describe_stacks_responses) do
           super() + [
             stack_description("DELETE_IN_PROGRESS"),
-            stack_does_not_exist
+            stack_description("DELETE_COMPLETE")
           ]
         end
 
         it "calls delete_stack" do
           stack.delete
           expect(cf_client).to have_received(:delete_stack)
-            .with(hash_including(:stack_name => stack_name))
+            .with(hash_including(:stack_name => unique_stack_id))
         end
 
         it "returns :deleted" do

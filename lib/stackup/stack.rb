@@ -71,12 +71,16 @@ module Stackup
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def delete
-      return nil unless exists?
+      begin
+        @stack_id = cf_stack.stack_id
+      rescue NoSuchStack
+        return nil
+      end
       status = modify_stack do
         cf_stack.delete
       end
-      fail StackUpdateError, "stack delete failed" unless status.nil?
-    rescue NoSuchStack
+      @stack_id = nil
+      fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
       :deleted
     end
 
@@ -147,7 +151,8 @@ module Stackup
     end
 
     def cf_stack
-      StackProxy.new(cf.stack(name))
+      id_or_name = @stack_id || name
+      StackProxy.new(cf.stack(id_or_name))
     end
 
     def event_handler
@@ -170,6 +175,7 @@ module Stackup
           event_handler.call(e)
         end
         cf_stack.reload
+        status = self.status
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)
       end
@@ -185,7 +191,7 @@ module Stackup
       end
 
       def method_missing(*args)
-        @cf_stack.public_send(*args)
+        @cf_stack.send(*args)
       rescue Aws::CloudFormation::Errors::ValidationError => e
         Stackup.handle_validation_error(e)
       end
