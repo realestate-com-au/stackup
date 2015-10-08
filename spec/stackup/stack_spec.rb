@@ -1,16 +1,10 @@
-require "console_logger"
 require "spec_helper"
+
+require "stackup/stack"
 
 describe Stackup::Stack do
 
-  let(:cf_client) do
-    client_options = { :stub_responses => true }
-    if ENV.key?("AWS_DEBUG")
-      client_options[:logger] = ConsoleLogger.new(STDOUT, true)
-      client_options[:log_level] = :debug
-    end
-    Aws::CloudFormation::Client.new(client_options)
-  end
+  let(:cf_client) { stub_cf_client }
 
   let(:stack_name) { "stack_name" }
   let(:unique_stack_id) { "ID:#{stack_name}" }

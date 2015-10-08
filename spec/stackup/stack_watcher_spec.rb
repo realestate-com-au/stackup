@@ -1,5 +1,6 @@
 require "spec_helper"
 
+require "aws-sdk-resources"
 require "stackup/stack_watcher"
 
 describe Stackup::StackWatcher do
