@@ -23,9 +23,7 @@ Clamp do
 
   def run(arguments)
     super(arguments)
-  rescue Stackup::NoSuchStack
-    signal_error "stack '#{stack_name}' does not exist"
-  rescue Stackup::StackUpdateError => e
+  rescue Stackup::ServiceError => e
     signal_error e.message
   rescue Aws::Errors::MissingCredentialsError
     signal_error "no credentials provided"

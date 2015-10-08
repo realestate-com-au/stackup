@@ -21,7 +21,7 @@ module Stackup
         raise NoUpdateRequired, "no updates are required"
       when /Stack .* does not exist$/
         raise NoSuchStack, "no such stack"
-      when / cannot be called from current stack status$/
+      when / can ?not be /
         raise InvalidStateError, e.message
       else
         raise e
