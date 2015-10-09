@@ -89,7 +89,7 @@ Clamp do
     def execute
       options = {}
       options[:template_body] = MultiJson.dump(template)
-      options[:parameters_file] = MultiJson.dump(parameters) if parameters
+      options[:parameters] = parameters if parameters
       options[:disable_rollback] = disable_rollback?
       report_change do
         stack.create_or_update(options)
