@@ -1,5 +1,6 @@
 require "aws-sdk-resources"
 require "logger"
+require "multi_json"
 require "stackup/error_handling"
 require "stackup/stack_watcher"
 
@@ -112,9 +113,36 @@ module Stackup
       nil
     end
 
+    # Get the current template.
+    #
+    # @return [Hash] current stack template, as Ruby data
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
+    def template
+      handling_validation_error do
+        template_json = cf_client.get_template(:stack_name => name).template_body
+        MultiJson.load(template_json)
+      end
+    end
+
+    # Get the current parameters.
+    #
+    # @return [Hash] current stack parameters
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
+    def parameters
+      handling_validation_error do
+        {}.tap do |h|
+          cf_stack.parameters.each do |p|
+            h[p.parameter_key] = p.parameter_value
+          end
+        end
+      end
+    end
+
     # Get stack outputs.
     #
-    # @return [Hash<String, String>] outputs
+    # @return [Hash<String, String>] stack outputs
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def outputs

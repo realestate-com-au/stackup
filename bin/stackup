@@ -127,6 +127,22 @@ Clamp do
 
   end
 
+  subcommand "template", "Display stack template." do
+
+    def execute
+      display_data(stack.template)
+    end
+
+  end
+
+  subcommand "parameters", "Display stack parameters." do
+
+    def execute
+      display_data(stack.parameters)
+    end
+
+  end
+
   subcommand "outputs", "Display stack outputs." do
 
     def execute
