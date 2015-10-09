@@ -51,7 +51,7 @@ module Stackup
     #   accepts a superset of the options supported by
     #   +Aws::CloudFormation::Stack#update+
     #   (see http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Stack.html#update-instance_method)
-    # @return [Symbol] `:created` or `:updated` if successful
+    # @return [Symbol] +:created+ or +:updated+ if successful
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def create_or_update(options)
@@ -71,7 +71,7 @@ module Stackup
     #
     # @param [String] template template JSON
     # @param [Array<Hash>] parameters template parameters
-    # @return [Symbol] `:deleted` if successful
+    # @return [Symbol] +:deleted+ if successful
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def delete
@@ -93,7 +93,7 @@ module Stackup
 
     # Cancel update in-progress.
     #
-    # @return [Symbol] `:update_cancelled` if successful
+    # @return [Symbol] +:update_cancelled+ if successful
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def cancel_update

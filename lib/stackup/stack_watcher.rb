@@ -18,6 +18,7 @@ module Stackup
     # Yield all events since the last call
     #
     def each_new_event
+      # rubocop:disable Lint/HandleExceptions
       buffer = []
       stack.events.each do |event|
         break if @processed_event_ids.include?(event.event_id)
@@ -28,7 +29,6 @@ module Stackup
         @processed_event_ids.add(event.event_id)
       end
     rescue Aws::CloudFormation::Errors::ValidationError
-      # okay
     end
 
     # Consume all new events
