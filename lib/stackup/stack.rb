@@ -208,6 +208,8 @@ module Stackup
 
     def create(options)
       options[:stack_name] = name
+      options.delete(:stack_policy_during_update_body)
+      options.delete(:stack_policy_during_update_url)
       status = modify_stack do
         cf.create_stack(options)
       end
@@ -217,6 +219,8 @@ module Stackup
 
     def update(options)
       options.delete(:disable_rollback)
+      options.delete(:on_failure)
+      options.delete(:timeout_in_minutes)
       status = modify_stack do
         cf_stack.update(options)
       end
