@@ -76,8 +76,12 @@ describe Stackup::Stack do
 
       let(:template) { "stack template" }
 
+      let(:options) do
+        { :template_body => template }
+      end
+
       def create_or_update
-        stack.create_or_update(:template_body => template)
+        stack.create_or_update(options)
       end
 
       let(:describe_stacks_responses) do
@@ -114,6 +118,20 @@ describe Stackup::Stack do
         it "raises a StackUpdateError" do
           expect { create_or_update }
             .to raise_error(Stackup::StackUpdateError)
+        end
+
+      end
+
+      context "with :template as data" do
+
+        let(:options) do
+          { :template => { "foo" => "bar" } }
+        end
+
+        it "converts the template to JSON" do
+          create_or_update
+          expect(cf_client).to have_received(:create_stack)
+            .with(hash_including(:template_body))
         end
 
       end

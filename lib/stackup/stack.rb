@@ -56,11 +56,15 @@ module Stackup
     #   accepts a superset of the options supported by
     #   +Aws::CloudFormation::Stack#update+
     #   (see http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Stack.html#update-instance_method)
+    # @option options [Hash] :template template as Ruby data
     # @return [Symbol] +:created+ or +:updated+ if successful
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def create_or_update(options)
       options = options.dup
+      if (template_data = options.delete(:template))
+        options[:template_body] = MultiJson.dump(template_data)
+      end
       options[:capabilities] ||= ["CAPABILITY_IAM"]
       delete if ALMOST_DEAD_STATUSES.include?(status)
       update(options)
