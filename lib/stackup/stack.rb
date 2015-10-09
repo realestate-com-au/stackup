@@ -1,6 +1,6 @@
 require "aws-sdk-resources"
 require "logger"
-require "stackup/error_mapping_proxy"
+require "stackup/error_handling"
 require "stackup/stack_watcher"
 
 module Stackup
@@ -20,7 +20,7 @@ module Stackup
 
     attr_reader :name, :cf_client, :watcher
 
-    # Register a handler for reporting of stack events
+    # Register a handler for reporting of stack events.
     # @param [Proc] event_handler
     #
     def on_event(event_handler = nil, &block)
@@ -29,11 +29,15 @@ module Stackup
       @event_handler = event_handler
     end
 
+    include ErrorHandling
+
     # @return [String] the current stack status
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def status
-      cf_stack.stack_status
+      handling_validation_error do
+        cf_stack.stack_status
+      end
     end
 
     # @return [boolean] true iff the stack exists
@@ -76,7 +80,9 @@ module Stackup
     #
     def delete
       begin
-        @stack_id = cf_stack.stack_id
+        @stack_id = handling_validation_error do
+          cf_stack.stack_id
+        end
       rescue NoSuchStack
         return nil
       end
@@ -112,9 +118,11 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def outputs
-      {}.tap do |h|
-        cf_stack.outputs.each do |o|
-          h[o.output_key] = o.output_value
+      handling_validation_error do
+        {}.tap do |h|
+          cf_stack.outputs.each do |o|
+            h[o.output_key] = o.output_value
+          end
         end
       end
     end
@@ -126,9 +134,11 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def resources
-      {}.tap do |h|
-        cf_stack.resource_summaries.each do |r|
-          h[r.logical_resource_id] = r.physical_resource_id
+      handling_validation_error do
+        {}.tap do |h|
+          cf_stack.resource_summaries.each do |r|
+            h[r.logical_resource_id] = r.physical_resource_id
+          end
         end
       end
     end
@@ -138,7 +148,7 @@ module Stackup
     def create(options)
       options[:stack_name] = name
       status = modify_stack do
-        ErrorMappingProxy.new(cf).create_stack(options)
+        cf.create_stack(options)
       end
       fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
       :created
@@ -166,7 +176,7 @@ module Stackup
 
     def cf_stack
       id_or_name = @stack_id || name
-      ErrorMappingProxy.new(cf.stack(id_or_name))
+      cf.stack(id_or_name)
     end
 
     def event_handler
@@ -183,7 +193,9 @@ module Stackup
     def modify_stack
       watcher = Stackup::StackWatcher.new(cf_stack)
       watcher.zero
-      yield
+      handling_validation_error do
+        yield
+      end
       loop do
         watcher.each_new_event(&event_handler)
         status = self.status

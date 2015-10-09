@@ -2,19 +2,18 @@ require "stackup/errors"
 
 module Stackup
 
-  # An error-mapping proxy for Aws::CloudFormation models.
+  # Handle +Aws::CloudFormation::Errors::ValidationError+.
   #
-  # It exists to convert certain types of `ValidationError`, where useful
-  # information is hidden inside the "message", to Stackup exceptions.
-  #
-  class ErrorMappingProxy
+  module ErrorHandling
 
-    def initialize(delegate)
-      @delegate = delegate
-    end
-
-    def method_missing(*args)
-      @delegate.send(*args)
+    # Invoke an Aws::CloudFormation operation
+    #
+    # If a +ValidationError+ is raised, check the message; there's often
+    # useful information is hidden inside.  If that's the case, convert it to
+    # an appropriate Stackup exception.
+    #
+    def handling_validation_error
+      yield
     rescue Aws::CloudFormation::Errors::ValidationError => e
       case e.message
       when "No updates are to be performed."
@@ -26,10 +25,6 @@ module Stackup
       else
         raise e
       end
-    end
-
-    def respond_to?(method)
-      @delegate.respond_to?(method)
     end
 
   end
