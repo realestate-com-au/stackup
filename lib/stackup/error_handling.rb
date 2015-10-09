@@ -16,10 +16,10 @@ module Stackup
       yield
     rescue Aws::CloudFormation::Errors::ValidationError => e
       case e.message
+      when /Stack .* does not exist/
+        raise NoSuchStack, "no such stack"
       when "No updates are to be performed."
         raise NoUpdateRequired, "no updates are required"
-      when /Stack .* does not exist$/
-        raise NoSuchStack, "no such stack"
       when / can ?not be /
         raise InvalidStateError, e.message
       else
