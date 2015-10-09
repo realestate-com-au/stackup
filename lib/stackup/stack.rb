@@ -62,7 +62,7 @@ module Stackup
     #   if true, disable rollback if stack creation fails
     # @option options [String] :notification_arns
     #   ARNs for the Amazon SNS topics associated with this stack
-    # @option options [String] :on_failure (DO_NOTHING)
+    # @option options [String] :on_failure (ROLLBACK)
     #   if stack creation fails: DO_NOTHING, ROLLBACK, or DELETE
     # @option options [Hash, Array<Hash>] :parameters
     #   stack parameters, either as a Hash, or as an Array of

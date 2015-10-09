@@ -78,7 +78,9 @@ Clamp do
 
   subcommand "up", "Create/update the stack" do
 
-    option "--disable-rollback", :flag, "disable stack rollback"
+    option "--on-failure", "ACTION",
+           "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
+           :default => "ROLLBACK"
 
     parameter "TEMPLATE", "CloudFormation template file",
               :attribute_name => :template_file
@@ -89,8 +91,8 @@ Clamp do
     def execute
       options = {}
       options[:template] = template
+      options[:on_failure] = on_failure
       options[:parameters] = parameters if parameters
-      options[:disable_rollback] = disable_rollback?
       report_change do
         stack.create_or_update(options)
       end
