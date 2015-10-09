@@ -191,28 +191,36 @@ describe Stackup::Stack do
 
       let(:template) { "stack template" }
 
+      let(:options) do
+        { :template_body => template }
+      end
+
       def create_or_update
-        stack.create_or_update(:template_body => template)
+        stack.create_or_update(options)
+      end
+
+      let(:describe_stacks_responses) do
+        super() + [
+          stack_description("UPDATE_IN_PROGRESS"),
+          final_describe_stacks_response
+        ]
+      end
+
+      let(:final_describe_stacks_response) do
+        stack_description("UPDATE_COMPLETE")
+      end
+
+      it "calls :update_stack" do
+        expected_args = {
+          :stack_name => stack_name,
+          :template_body => template
+        }
+        create_or_update
+        expect(cf_client).to have_received(:update_stack)
+          .with(hash_including(expected_args))
       end
 
       context "successful" do
-
-        let(:describe_stacks_responses) do
-          super() + [
-            stack_description("UPDATE_IN_PROGRESS"),
-            stack_description("UPDATE_COMPLETE")
-          ]
-        end
-
-        it "calls :update_stack" do
-          expected_args = {
-            :stack_name => stack_name,
-            :template_body => template
-          }
-          create_or_update
-          expect(cf_client).to have_received(:update_stack)
-            .with(hash_including(expected_args))
-        end
 
         it "returns :updated" do
           expect(create_or_update).to eq(:updated)
@@ -237,15 +245,26 @@ describe Stackup::Stack do
 
       context "unsuccessful" do
 
-        let(:describe_stacks_responses) do
-          super() + [
-            stack_description("UPDATE_IN_PROGRESS"),
-            stack_description("UPDATE_ROLLBACK_COMPLETE")
-          ]
+        let(:final_describe_stacks_response) do
+          stack_description("UPDATE_ROLLBACK_COMPLETE")
         end
 
         it "raises a StackUpdateError" do
           expect { create_or_update }.to raise_error(Stackup::StackUpdateError)
+        end
+
+      end
+
+      context "with :disable_rollback" do
+
+        before do
+          options[:disable_rollback] = true
+        end
+
+        it "calls :update_stack" do
+          create_or_update
+          expect(cf_client).to have_received(:update_stack)
+            .with(hash_not_including(:disable_rollback))
         end
 
       end

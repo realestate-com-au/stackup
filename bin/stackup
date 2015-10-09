@@ -79,12 +79,17 @@ Clamp do
 
   subcommand "up", "Create/update the stack" do
 
-    parameter "TEMPLATE", "CloudFormation template (.json)", :attribute_name => :template_file
+    option "--disable-rollback", :flag, "disable stack rollback"
+
+    parameter "TEMPLATE", "CloudFormation template (.json)",
+              :attribute_name => :template_file
 
     def execute
-      template = File.read(template_file)
+      options = {}
+      options[:template_body] = File.read(template_file)
+      options[:disable_rollback] = disable_rollback?
       report_change do
-        stack.create_or_update(:template_body => template)
+        stack.create_or_update(options)
       end
     end
 

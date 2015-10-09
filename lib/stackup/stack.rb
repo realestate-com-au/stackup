@@ -132,6 +132,7 @@ module Stackup
     end
 
     def update(options)
+      options.delete(:disable_rollback)
       status = modify_stack do
         cf_stack.update(options)
       end
