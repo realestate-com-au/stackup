@@ -2,11 +2,21 @@
 
 [![Build Status](https://travis-ci.org/realestate-com-au/stackup.svg?branch=master)](https://travis-ci.org/realestate-com-au/stackup)
 
-Stackup attempts to simplify AWS Cloudformation stack creation process in
-ruby projects by providing executable to perform common operations such
-as apply(create/update), delete, recreate on stack along with validations on
-templates. Operations which enforce a stack change will wait until
-the change is complete.
+Stackup provides a CLI and a simplified Ruby API for dealing with
+AWS CloudFormation stacks.
+
+## Why?
+
+Stackup provides some advantages over using `awscli` or `aws-sdk` directly:
+
+  - It treats stack changes as synchronous, streaming stack events until the
+    stack reaches a stable state.
+
+  - A `Stack#up` facade for `create`/`update` frees you from having to know
+    whether your stack already exists or not.
+
+  - "No-op" operations - deleting a stack that doesn't exist, or updating
+    without a template change - are handled gracefully (i.e. without error).
 
 ## Installation
 
@@ -20,9 +30,9 @@ Most commands operate in the context of a named stack:
 
     $ stackup STACK-NAME ...
 
-Called without stack-name, it will list stacks:
+Called with `--list`, it will list stacks:
 
-    $ stackup
+    $ stackup --list
     foo-bar-test
     zzz-production
 
