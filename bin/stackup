@@ -81,16 +81,28 @@ Clamp do
 
     option "--disable-rollback", :flag, "disable stack rollback"
 
-    parameter "TEMPLATE", "CloudFormation template (.json)",
+    parameter "TEMPLATE", "CloudFormation template file",
               :attribute_name => :template_file
+
+    parameter "[PARAMETERS]", "CloudFormation parameters file",
+              :attribute_name => :parameters_file
 
     def execute
       options = {}
-      options[:template_body] = File.read(template_file)
+      options[:template_body] = load_file(template_file)
+      options[:parameters_file] = load_file(parameters_file) if parameters_file
       options[:disable_rollback] = disable_rollback?
       report_change do
         stack.create_or_update(options)
       end
+    end
+
+    private
+
+    def load_file(file)
+      File.read(file)
+    rescue Errno::ENOENT
+      signal_error "no such file: #{file.inspect}"
     end
 
   end
