@@ -127,10 +127,18 @@ Clamp do
 
   end
 
-  subcommand "outputs", "Stack outputs." do
+  subcommand "outputs", "Display stack outputs." do
 
     def execute
       display_data(stack.outputs)
+    end
+
+  end
+
+  subcommand "resources", "Display stack resources." do
+
+    def execute
+      display_data(stack.resources)
     end
 
   end

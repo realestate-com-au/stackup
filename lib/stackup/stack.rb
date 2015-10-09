@@ -108,14 +108,27 @@ module Stackup
 
     # Get stack outputs.
     #
-    # @return [Hash<String, String>]
-    #   mapping of logical resource-name to physical resource-name
+    # @return [Hash<String, String>] outputs
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def outputs
       {}.tap do |h|
-        cf_stack.outputs.each do |output|
-          h[output.output_key] = output.output_value
+        cf_stack.outputs.each do |o|
+          h[o.output_key] = o.output_value
+        end
+      end
+    end
+
+    # Get stack outputs.
+    #
+    # @return [Hash<String, String>]
+    #   mapping of logical resource-name to physical resource-name
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
+    def resources
+      {}.tap do |h|
+        cf_stack.resource_summaries.each do |r|
+          h[r.logical_resource_id] = r.physical_resource_id
         end
       end
     end
