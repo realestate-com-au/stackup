@@ -56,7 +56,36 @@ module Stackup
     #   accepts a superset of the options supported by
     #   +Aws::CloudFormation::Stack#update+
     #   (see http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Stack.html#update-instance_method)
-    # @option options [Hash] :template template as Ruby data
+    # @option options [Array<String>] :capabilities (CAPABILITY_IAM)
+    #   list of capabilities required for stack template
+    # @option options [boolean] :disable_rollback (false)
+    #   if true, disable rollback if stack creation fails
+    # @option options [String] :notification_arns
+    #   ARNs for the Amazon SNS topics associated with this stack
+    # @option options [String] :on_failure (DO_NOTHING)
+    #   if stack creation fails: DO_NOTHING, ROLLBACK, or DELETE
+    # @option options [Array<Hash>] :parameters
+    #   stack parameters
+    # @option options [Array<String>] :resource_types
+    #   resource types that you have permissions to work with
+    # @option options [Hash] :template
+    #   stack template, as Ruby data
+    # @option options [String] :stack_policy_body
+    #   stack policy, as JSON
+    # @option options [String] :stack_policy_url
+    #   location of stack policy
+    # @option options [String] :stack_policy_during_update_body
+    #   temporary stack policy, as JSON
+    # @option options [String] :stack_policy_during_update_url
+    #   location of temporary stack policy
+    # @option options [String] :template_body
+    #   stack template, as JSON
+    # @option options [String] :template_url
+    #   location of stack template
+    # @option options [Integer] :timeout_in_minutes
+    #   stack creation timeout
+    # @option options [boolean] :use_previous_template
+    #   if true, reuse the existing template
     # @return [Symbol] +:created+ or +:updated+ if successful
     # @raise [Stackup::StackUpdateError] if operation fails
     #
