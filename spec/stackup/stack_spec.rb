@@ -80,14 +80,16 @@ describe Stackup::Stack do
         stack.create_or_update(:template_body => template)
       end
 
-      context "successful" do
+      let(:describe_stacks_responses) do
+        super() + [
+          stack_description("CREATE_IN_PROGRESS"),
+          stack_description(final_status)
+        ]
+      end
 
-        let(:describe_stacks_responses) do
-          super() + [
-            stack_description("CREATE_IN_PROGRESS"),
-            stack_description("CREATE_COMPLETE")
-          ]
-        end
+      let(:final_status) { "CREATE_COMPLETE" }
+
+      context "successful" do
 
         it "calls :create_stack" do
           expected_args = {
@@ -107,12 +109,7 @@ describe Stackup::Stack do
 
       context "unsuccessful" do
 
-        let(:describe_stacks_responses) do
-          super() + [
-            stack_description("CREATE_IN_PROGRESS"),
-            stack_description("CREATE_FAILED")
-          ]
-        end
+        let(:final_status) { "CREATE_FAILED" }
 
         it "raises a StackUpdateError" do
           expect { create_or_update }
@@ -202,13 +199,11 @@ describe Stackup::Stack do
       let(:describe_stacks_responses) do
         super() + [
           stack_description("UPDATE_IN_PROGRESS"),
-          final_describe_stacks_response
+          stack_description(final_status)
         ]
       end
 
-      let(:final_describe_stacks_response) do
-        stack_description("UPDATE_COMPLETE")
-      end
+      let(:final_status) { "UPDATE_COMPLETE" }
 
       it "calls :update_stack" do
         expected_args = {
@@ -245,9 +240,7 @@ describe Stackup::Stack do
 
       context "unsuccessful" do
 
-        let(:final_describe_stacks_response) do
-          stack_description("UPDATE_ROLLBACK_COMPLETE")
-        end
+        let(:final_status) { "UPDATE_ROLLBACK_COMPLETE" }
 
         it "raises a StackUpdateError" do
           expect { create_or_update }.to raise_error(Stackup::StackUpdateError)
@@ -300,7 +293,7 @@ describe Stackup::Stack do
             )
           end
 
-          it "calls :delete_stack, then :create_stack first" do
+          it "calls :delete_stack, then :create_stack" do
             create_or_update
             expect(cf_client).to have_received(:delete_stack)
             expect(cf_client).to have_received(:create_stack)
