@@ -88,8 +88,8 @@ Clamp do
 
     def execute
       options = {}
-      options[:template_body] = load_file(template_file)
-      options[:parameters_file] = load_file(parameters_file) if parameters_file
+      options[:template_body] = MultiJson.dump(template)
+      options[:parameters_file] = MultiJson.dump(parameters) if parameters
       options[:disable_rollback] = disable_rollback?
       report_change do
         stack.create_or_update(options)
@@ -98,10 +98,18 @@ Clamp do
 
     private
 
-    def load_file(file)
-      File.read(file)
+    def load_data(file)
+      YAML.load_file(file)
     rescue Errno::ENOENT
       signal_error "no such file: #{file.inspect}"
+    end
+
+    def template
+      @template ||= load_data(template_file)
+    end
+
+    def parameters
+      @parameters ||= load_data(parameters_file) if parameters_file
     end
 
   end
