@@ -23,7 +23,7 @@ module Stackup
       when / can ?not be /
         raise InvalidStateError, e.message
       else
-        raise e
+        raise ValidationError, e.message
       end
     end
 

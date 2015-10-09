@@ -12,6 +12,9 @@ module Stackup
   # Raised if we can't perform that operation now
   class InvalidStateError < ServiceError; end
 
+  # Raised when something else dodgy happened
+  class ValidationError < ServiceError; end
+
   # Raised when a stack is already up-to-date
   class NoUpdateRequired < StandardError; end
 
