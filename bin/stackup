@@ -10,14 +10,14 @@ require "yaml"
 
 Clamp do
 
-  option "--debug", :flag, "enable debugging"
-
-  option ["-f", "--format"], "FORMAT", "output format", :default => "yaml"
-
   option ["-L", "--list"], :flag, "list stacks" do
     list_stacks
     exit 0
   end
+
+  option ["-Y", "--yaml"], :flag, "output data in YAML format"
+
+  option "--debug", :flag, "enable debugging"
 
   parameter "NAME", "Name of stack", :attribute_name => :stack_name
 
@@ -38,11 +38,10 @@ Clamp do
   end
 
   def format_data(data)
-    case format.downcase
-    when "json"
-      MultiJson.dump(data, :pretty => true)
-    when "yaml"
+    if yaml?
       YAML.dump(data)
+    else
+      MultiJson.dump(data, :pretty => true)
     end
   end
 
