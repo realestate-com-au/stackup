@@ -64,8 +64,9 @@ module Stackup
     #   ARNs for the Amazon SNS topics associated with this stack
     # @option options [String] :on_failure (DO_NOTHING)
     #   if stack creation fails: DO_NOTHING, ROLLBACK, or DELETE
-    # @option options [Array<Hash>] :parameters
-    #   stack parameters
+    # @option options [Hash, Array<Hash>] :parameters
+    #   stack parameters, either as a Hash, or as an Array of
+    #   +Aws::CloudFormation::Types::Parameter+ structures
     # @option options [Array<String>] :resource_types
     #   resource types that you have permissions to work with
     # @option options [Hash] :template
@@ -93,6 +94,9 @@ module Stackup
       options = options.dup
       if (template_data = options.delete(:template))
         options[:template_body] = MultiJson.dump(template_data)
+      end
+      if (parameters = options[:parameters])
+        options[:parameters] = normalise_parameters(parameters)
       end
       options[:capabilities] ||= ["CAPABILITY_IAM"]
       delete if ALMOST_DEAD_STATUSES.include?(status)
@@ -267,6 +271,16 @@ module Stackup
         logger.debug("stack_status=#{status}")
         return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
         sleep(5)
+      end
+    end
+
+    def normalise_parameters(arg)
+      return arg unless arg.is_a?(Hash)
+      arg.map do |key, value|
+        {
+          :parameter_key => key,
+          :parameter_value => value
+        }
       end
     end
 
