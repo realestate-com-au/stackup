@@ -135,6 +135,14 @@ Clamp do
 
   end
 
+  subcommand "wait", "Wait until stack is stable" do
+
+    def execute
+      puts stack.wait
+    end
+
+  end
+
   subcommand "template", "Display stack template." do
 
     def execute

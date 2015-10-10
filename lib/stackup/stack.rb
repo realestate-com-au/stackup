@@ -150,6 +150,16 @@ module Stackup
       nil
     end
 
+    # Wait until stack reaches a stable state
+    #
+    # @return [String] status, once stable
+    #
+    def wait
+      modify_stack do
+        # nothing
+      end
+    end
+
     # Get the current template.
     #
     # @return [Hash] current stack template, as Ruby data
