@@ -78,21 +78,28 @@ Clamp do
 
   subcommand "up", "Create/update the stack" do
 
-    option "--on-failure", "ACTION",
-           "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
-           :default => "ROLLBACK"
-
     option ["-t", "--template"], "FILE", "template file",
            :attribute_name => :template_file
+
+    option ["-T", "--use-previous-template"], :flag,
+           "reuse the existing template"
 
     option ["-p", "--parameters"], "FILE", "parameters file",
            :attribute_name => :parameters_file
 
+    option "--on-failure", "ACTION",
+           "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
+           :default => "ROLLBACK"
+
     def execute
+      unless template_file || use_previous_template?
+        signal_usage_error "Specify either --template or --use-previous-template"
+      end
       options = {}
-      options[:template] = template
+      options[:template] = load_data(template_file) if template_file
       options[:on_failure] = on_failure
-      options[:parameters] = parameters if parameters
+      options[:parameters] = load_data(parameters_file) if parameters_file
+      options[:use_previous_template] = use_previous_template?
       report_change do
         stack.create_or_update(options)
       end
@@ -104,14 +111,6 @@ Clamp do
       YAML.load_file(file)
     rescue Errno::ENOENT
       signal_error "no such file: #{file.inspect}"
-    end
-
-    def template
-      @template ||= load_data(template_file)
-    end
-
-    def parameters
-      @parameters ||= load_data(parameters_file) if parameters_file
     end
 
   end
