@@ -82,11 +82,11 @@ Clamp do
            "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
            :default => "ROLLBACK"
 
-    parameter "TEMPLATE", "CloudFormation template file",
-              :attribute_name => :template_file
+    option ["-t", "--template"], "FILE", "template file",
+           :attribute_name => :template_file
 
-    parameter "[PARAMETERS]", "CloudFormation parameters file",
-              :attribute_name => :parameters_file
+    option ["-p", "--parameters"], "FILE", "parameters file",
+           :attribute_name => :parameters_file
 
     def execute
       options = {}
