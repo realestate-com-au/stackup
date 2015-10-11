@@ -19,7 +19,7 @@ module Stackup
       end
     end
 
-    attr_reader :name, :cf_client, :watcher
+    attr_reader :name
 
     # Register a handler for reporting of stack events.
     # @param [Proc] event_handler
@@ -220,6 +220,17 @@ module Stackup
 
     private
 
+    attr_reader :cf_client
+
+    def cf
+      Aws::CloudFormation::Resource.new(:client => cf_client)
+    end
+
+    def cf_stack
+      id_or_name = @stack_id || name
+      cf.stack(id_or_name)
+    end
+
     def create(options)
       options[:stack_name] = name
       options.delete(:stack_policy_during_update_body)
@@ -247,15 +258,6 @@ module Stackup
     def logger
       @logger ||= cf_client.config[:logger]
       @logger ||= Logger.new($stdout).tap { |l| l.level = Logger::INFO }
-    end
-
-    def cf
-      Aws::CloudFormation::Resource.new(:client => cf_client)
-    end
-
-    def cf_stack
-      id_or_name = @stack_id || name
-      cf.stack(id_or_name)
     end
 
     def event_handler
