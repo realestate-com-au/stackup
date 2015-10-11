@@ -87,6 +87,9 @@ Clamp do
     option ["-p", "--parameters"], "FILE", "parameters file",
            :attribute_name => :parameters_file
 
+    option "--policy", "FILE", "stack policy file",
+           :attribute_name => :policy_file
+
     option "--on-failure", "ACTION",
            "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
            :default => "ROLLBACK"
@@ -99,6 +102,7 @@ Clamp do
       options[:template] = load_data(template_file) if template_file
       options[:on_failure] = on_failure
       options[:parameters] = load_data(parameters_file) if parameters_file
+      options[:stack_policy] = load_data(policy_file) if policy_file
       options[:use_previous_template] = use_previous_template?
       report_change do
         stack.create_or_update(options)

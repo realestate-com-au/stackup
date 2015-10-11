@@ -69,12 +69,14 @@ module Stackup
     #   +Aws::CloudFormation::Types::Parameter+ structures
     # @option options [Array<String>] :resource_types
     #   resource types that you have permissions to work with
-    # @option options [Hash] :template
-    #   stack template, as Ruby data
+    # @option options [Hash] :stack_policy
+    #   stack policy, as Ruby data
     # @option options [String] :stack_policy_body
     #   stack policy, as JSON
     # @option options [String] :stack_policy_url
     #   location of stack policy
+    # @option options [Hash] :stack_policy_during_update
+    #   temporary stack policy, as Ruby data
     # @option options [String] :stack_policy_during_update_body
     #   temporary stack policy, as JSON
     # @option options [String] :stack_policy_during_update_url
@@ -99,6 +101,12 @@ module Stackup
       end
       if (parameters = options[:parameters])
         options[:parameters] = normalise_parameters(parameters)
+      end
+      if (policy_data = options.delete(:stack_policy))
+        options[:stack_policy_body] = MultiJson.dump(policy_data)
+      end
+      if (policy_data = options.delete(:stack_policy_during_update))
+        options[:stack_policy_during_update_body] = MultiJson.dump(policy_data)
       end
       options[:capabilities] ||= ["CAPABILITY_IAM"]
       delete if ALMOST_DEAD_STATUSES.include?(status)
