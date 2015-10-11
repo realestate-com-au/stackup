@@ -79,6 +79,8 @@ module Stackup
     #   temporary stack policy, as JSON
     # @option options [String] :stack_policy_during_update_url
     #   location of temporary stack policy
+    # @option options [Hash] :template
+    #   stack template, as Ruby data
     # @option options [String] :template_body
     #   stack template, as JSON
     # @option options [String] :template_url
