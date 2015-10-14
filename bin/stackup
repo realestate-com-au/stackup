@@ -4,8 +4,9 @@ $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 
 require "clamp"
 require "console_logger"
-require "stackup"
 require "multi_json"
+require "stackup"
+require "stackup/version"
 require "yaml"
 
 Clamp do
@@ -18,6 +19,11 @@ Clamp do
   option ["-Y", "--yaml"], :flag, "output data in YAML format"
 
   option "--debug", :flag, "enable debugging"
+
+  option ["--version"], :flag, "display version" do
+    puts "stackup v#{Stackup::VERSION}"
+    exit 0
+  end
 
   parameter "NAME", "Name of stack", :attribute_name => :stack_name
 

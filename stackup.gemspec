@@ -1,10 +1,12 @@
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require "stackup/version"
+
 Gem::Specification.new do |spec|
 
   spec.name          = "stackup"
-  spec.version       = "0.4.0"
+  spec.version       = Stackup::VERSION
   spec.authors       = ["Mike Williams", "Arvind Kunday"]
   spec.email         = ["mike.williams@rea-group.com", "arvind.kunday@rea-group.com"]
   spec.summary       = "Manage CloudFormation stacks"
