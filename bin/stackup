@@ -147,6 +147,34 @@ Clamp do
 
   end
 
+  subcommand "events", "List stack events" do
+
+    def execute
+      stack.watch(false) do |watcher|
+        watcher.each_new_event do |event|
+          display_data event_data(event)
+        end
+      end
+    end
+
+    private
+
+    def event_data(event)
+      {
+        "timestamp" => event.timestamp.localtime,
+        "logical_resource_id" => event.logical_resource_id,
+        "physical_resource_id" => event.physical_resource_id,
+        "resource_status" => event.resource_status,
+        "resource_status_reason" => event.resource_status_reason
+      }.reject { |_k, v| blank?(v) }
+    end
+
+    def blank?(v)
+      v.nil? || v.respond_to?(:empty?) && v.empty?
+    end
+
+  end
+
   subcommand "template", "Display stack template." do
 
     def execute

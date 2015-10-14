@@ -228,6 +228,12 @@ module Stackup
       end
     end
 
+    def watch(zero = true)
+      watcher = Stackup::StackWatcher.new(cf_stack)
+      watcher.zero if zero
+      yield watcher
+    end
+
     private
 
     attr_reader :cf_client
@@ -282,17 +288,17 @@ module Stackup
     # @return the final stack status
     #
     def modify_stack
-      watcher = Stackup::StackWatcher.new(cf_stack)
-      watcher.zero
-      handling_validation_error do
-        yield
-      end
-      loop do
-        watcher.each_new_event(&event_handler)
-        status = self.status
-        logger.debug("stack_status=#{status}")
-        return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
-        sleep(5)
+      watch do |watcher|
+        handling_validation_error do
+          yield
+        end
+        loop do
+          watcher.each_new_event(&event_handler)
+          status = self.status
+          logger.debug("stack_status=#{status}")
+          return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
+          sleep(5)
+        end
       end
     end
 
