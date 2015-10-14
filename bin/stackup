@@ -149,28 +149,50 @@ Clamp do
 
   subcommand "events", "List stack events" do
 
+    option ["-f", "--follow"], :flag, "follow new events"
+    option ["--data"], :flag, "display events as data"
+
     def execute
       stack.watch(false) do |watcher|
-        watcher.each_new_event do |event|
-          display_data event_data(event)
+        loop do
+          watcher.each_new_event do |event|
+            display_event(event)
+          end
+          break unless follow?
+          sleep 5
         end
       end
     end
 
     private
 
-    def event_data(event)
+    def display_event(e)
+      if data?
+        display_data(event_data(e))
+      else
+        puts event_summary(e)
+      end
+    end
+
+    def event_data(e)
       {
-        "timestamp" => event.timestamp.localtime,
-        "logical_resource_id" => event.logical_resource_id,
-        "physical_resource_id" => event.physical_resource_id,
-        "resource_status" => event.resource_status,
-        "resource_status_reason" => event.resource_status_reason
+        "timestamp" => e.timestamp.localtime,
+        "logical_resource_id" => e.logical_resource_id,
+        "physical_resource_id" => e.physical_resource_id,
+        "resource_status" => e.resource_status,
+        "resource_status_reason" => e.resource_status_reason
       }.reject { |_k, v| blank?(v) }
     end
 
     def blank?(v)
       v.nil? || v.respond_to?(:empty?) && v.empty?
+    end
+
+    def event_summary(e)
+      summary = "[#{e.timestamp.localtime.iso8601}] #{e.logical_resource_id}"
+      summary += " - #{e.resource_status}"
+      summary += " - #{e.resource_status_reason}" if e.resource_status_reason
+      summary
     end
 
   end
