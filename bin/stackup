@@ -4,6 +4,7 @@ $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 
 require "clamp"
 require "console_logger"
+require "diffy"
 require "multi_json"
 require "stackup"
 require "stackup/version"
@@ -74,6 +75,12 @@ Clamp do
     puts "Stack #{change}" unless change.nil?
   end
 
+  def load_data(file)
+    YAML.load_file(file)
+  rescue Errno::ENOENT
+    signal_error "no such file: #{file.inspect}"
+  end
+
   subcommand "status", "Print stack status." do
 
     def execute
@@ -115,12 +122,20 @@ Clamp do
       end
     end
 
-    private
+  end
 
-    def load_data(file)
-      YAML.load_file(file)
-    rescue Errno::ENOENT
-      signal_error "no such file: #{file.inspect}"
+  subcommand "diff", "Compare current stack to template" do
+
+    option ["-t", "--template"], "FILE", "template file",
+           :attribute_name => :template_file,
+           :required => true
+
+    option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
+
+    def execute
+      pending_template = format_data(load_data(template_file) ) + "\n"
+      existing_template = format_data(stack.template) + "\n"
+      puts Diffy::Diff.new(existing_template, pending_template).to_s(diff_format.to_sym)
     end
 
   end
