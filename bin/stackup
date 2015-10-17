@@ -124,16 +124,26 @@ Clamp do
 
   end
 
-  subcommand "diff", "Compare current stack to template" do
+  subcommand "diff", "Compare template/params to current stack." do
 
     option ["-t", "--template"], "FILE", "template file",
-           :attribute_name => :template_file,
-           :required => true
+           :attribute_name => :template_file
+
+    option ["-p", "--parameters"], "FILE", "parameters file",
+           :attribute_name => :parameters_file
 
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
-      puts diff_data(load_data(template_file), stack.template)
+      # rubocop:disable Style/GuardClause
+      if template_file
+        template = load_data(template_file)
+        diff_data(stack.template, template)
+      end
+      if parameters_file
+        parameters = hashify_parameters(load_data(parameters_file))
+        diff_data(stack.parameters, parameters)
+      end
     end
 
     private
@@ -141,7 +151,18 @@ Clamp do
     def diff_data(existing_data, pending_data)
       existing = format_data(existing_data) + "\n"
       pending = format_data(pending_data) + "\n"
-      Diffy::Diff.new(existing, pending).to_s(diff_format.to_sym)
+      diff = Diffy::Diff.new(existing, pending).to_s(diff_format.to_sym)
+      return if diff =~ /\A\s*\Z/
+      puts diff
+    end
+
+    def hashify_parameters(parameters)
+      return parameters unless parameters.is_a?(Array)
+      {}.tap do |result|
+        parameters.each do |p|
+          result[p["parameter_key"]] = p["parameter_value"]
+        end
+      end
     end
 
   end
