@@ -133,9 +133,15 @@ Clamp do
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
-      pending_template = format_data(load_data(template_file) ) + "\n"
-      existing_template = format_data(stack.template) + "\n"
-      puts Diffy::Diff.new(existing_template, pending_template).to_s(diff_format.to_sym)
+      puts diff_data(load_data(template_file), stack.template)
+    end
+
+    private
+
+    def diff_data(existing_data, pending_data)
+      existing = format_data(existing_data) + "\n"
+      pending = format_data(pending_data) + "\n"
+      Diffy::Diff.new(existing, pending).to_s(diff_format.to_sym)
     end
 
   end
