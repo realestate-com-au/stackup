@@ -13,9 +13,13 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/realestate-com-au/stackup"
   spec.license       = "MIT"
 
-  spec.files         = Dir["**/*"].reject { |f| File.directory?(f) }
-  spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }
+  spec.files         = `git ls-files`.split("\n")
+  spec.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+
   spec.require_paths = ["lib"]
+
+  spec.bindir = "bin"
+  spec.executables << "stackup"
 
   spec.add_dependency "aws-sdk", "~> 2.0"
   spec.add_dependency "clamp", "~> 1.0"
