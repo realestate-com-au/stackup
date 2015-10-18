@@ -15,8 +15,9 @@ Stackup provides some advantages over using `awscli` or `aws-sdk` directly:
   - A `Stack#up` facade for `create`/`update` frees you from having to know
     whether your stack already exists or not.
 
-  - "No-op" operations - deleting a stack that doesn't exist, or updating
-    without a template change - are handled gracefully (i.e. without error).
+  - Changes are (mostly) idempotent: "no-op" operations - e.g. deleting a
+    stack that doesn't exist, or updating without a template change - are
+    handled gracefully (i.e. without error).
 
 ## Installation
 
