@@ -138,7 +138,7 @@ module Stackup
         cf_stack.delete
       end
       fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
-      :deleted
+      status
     ensure
       @stack_id = nil
     end
@@ -155,7 +155,7 @@ module Stackup
         cf_stack.cancel_update
       end
       fail StackUpdateError, "update cancel failed" unless status =~ /_COMPLETE$/
-      :update_cancelled
+      status
     rescue InvalidStateError
       nil
     end
@@ -255,7 +255,7 @@ module Stackup
         cf.create_stack(options)
       end
       fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
-      :created
+      status
     end
 
     def update(options)
@@ -266,7 +266,7 @@ module Stackup
         cf_stack.update(options)
       end
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
-      :updated
+      status
     rescue NoUpdateRequired
       nil
     end

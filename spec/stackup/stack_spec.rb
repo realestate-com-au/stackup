@@ -105,8 +105,8 @@ describe Stackup::Stack do
             .with(hash_including(expected_args))
         end
 
-        it "returns :created" do
-          expect(create_or_update).to eq(:created)
+        it "returns status" do
+          expect(create_or_update).to eq("CREATE_COMPLETE")
         end
 
       end
@@ -200,8 +200,8 @@ describe Stackup::Stack do
             .with(hash_including(:stack_name => unique_stack_id))
         end
 
-        it "returns :deleted" do
-          expect(stack.delete).to eq(:deleted)
+        it "returns status" do
+          expect(stack.delete).to eq("DELETE_COMPLETE")
         end
 
       end
@@ -256,8 +256,8 @@ describe Stackup::Stack do
 
       context "successful" do
 
-        it "returns :updated" do
-          expect(create_or_update).to eq(:updated)
+        it "returns status" do
+          expect(create_or_update).to eq(final_status)
         end
 
         context "if no updates are required" do
@@ -384,8 +384,8 @@ describe Stackup::Stack do
             .with(hash_including(expected_args))
         end
 
-        it "returns :update_cancelled" do
-          expect(stack.cancel_update).to eq(:update_cancelled)
+        it "returns status" do
+          expect(stack.cancel_update).to eq("UPDATE_ROLLBACK_COMPLETE")
         end
 
       end

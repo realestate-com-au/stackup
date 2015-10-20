@@ -71,8 +71,8 @@ Clamp do
   end
 
   def report_change
-    change = yield
-    puts "Stack #{change}" unless change.nil?
+    final_status = yield
+    puts final_status unless final_status.nil?
   end
 
   def load_data(file)
