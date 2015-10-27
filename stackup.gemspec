@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.executables << "stackup"
 
-  spec.add_dependency "aws-sdk", "~> 2.0"
+  spec.add_dependency "aws-sdk-resources", "~> 2.0"
   spec.add_dependency "clamp", "~> 1.0"
   spec.add_dependency "console_logger"
   spec.add_dependency "diffy", "~> 3.0.5"
