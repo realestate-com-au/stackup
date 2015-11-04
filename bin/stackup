@@ -141,8 +141,10 @@ Clamp do
         diff_data(stack.template, template)
       end
       if parameters_file
-        parameters = hashify_parameters(load_data(parameters_file))
-        diff_data(stack.parameters, parameters)
+        new_parameters = hashify_parameters(load_data(parameters_file))
+        existing_parameters = stack.parameters
+        new_parameters = existing_parameters.merge(new_parameters)
+        diff_data(existing_parameters.sort.to_h, new_parameters.sort.to_h)
       end
     end
 
