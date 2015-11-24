@@ -1,6 +1,6 @@
 [
   {
-    "parameter_key": "IndexDoc",
-    "parameter_value": "default.htm"
+    "ParameterKey": "IndexDoc",
+    "ParameterValue": "default.htm"
   }
 ]

@@ -162,7 +162,9 @@ Clamp do
       return parameters unless parameters.is_a?(Array)
       {}.tap do |result|
         parameters.each do |p|
-          result[p["parameter_key"]] = p["parameter_value"]
+          key = p.fetch("ParameterKey") { p.fetch("parameter_key") }
+          value = p.fetch("ParameterValue") { p.fetch("parameter_value") }
+          result[key] = value
         end
       end
     end

@@ -303,13 +303,30 @@ module Stackup
     end
 
     def normalise_parameters(arg)
-      return arg unless arg.is_a?(Hash)
-      arg.map do |key, value|
-        {
-          :parameter_key => key,
-          :parameter_value => value
-        }
+      if arg.is_a?(Hash)
+        return arg.map do |key, value|
+          {
+            :parameter_key => key,
+            :parameter_value => value
+          }
+        end
       end
+      arg.map do |parameter|
+        normalise_parameter_keys(parameter)
+      end
+    end
+
+    def normalise_parameter_keys(input)
+      {}.tap do |output|
+        input.each do |key, value|
+          output[normalise_parameter_key(key)] = value
+        end
+      end
+    end
+
+    def normalise_parameter_key(s)
+      return s if s.is_a?(Symbol)
+      s.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
     end
 
   end

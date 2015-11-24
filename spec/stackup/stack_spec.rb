@@ -157,6 +157,30 @@ describe Stackup::Stack do
 
       end
 
+      context "with :parameters in awscli form" do
+
+        before do
+          options[:parameters] = [{
+            "ParameterKey" => "foo",
+            "ParameterValue" => "bar"
+          }]
+        end
+
+        it "converts them to an Array" do
+          expected_parameters = [
+            {
+              "parameter_key" => "foo",
+              "parameter_value" => "bar"
+            }
+          ]
+          create_or_update
+          expect(cf_client).to have_received(:create_stack) do |options|
+            expect(options[:parameters]).to eq(expected_parameters)
+          end
+        end
+
+      end
+
     end
 
   end
