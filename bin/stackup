@@ -265,6 +265,14 @@ Clamp do
 
   end
 
+  subcommand "resources", "Display stack resources." do
+
+    def execute
+      display_data(stack.resources)
+    end
+
+  end
+
   subcommand "outputs", "Display stack outputs." do
 
     def execute
@@ -273,10 +281,16 @@ Clamp do
 
   end
 
-  subcommand "resources", "Display stack resources." do
+  subcommand "inspect", "status + parameters + resources + outputs" do
 
     def execute
-      display_data(stack.resources)
+      data = {
+        "Status" => stack.status,
+        "Parameters" => stack.parameters,
+        "Resources" => stack.resources,
+        "Outputs" => stack.outputs,
+      }
+      display_data(data)
     end
 
   end
