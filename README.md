@@ -37,6 +37,8 @@ Called with `--list`, it will list stacks:
     foo-bar-test
     zzz-production
 
+The command-line support inputs (template and parameters) in either JSON or YAML format.
+
 ### Stack create/update
 
 Use sub-command "up" to create or update a stack, as appropriate:
