@@ -10,6 +10,9 @@ require "stackup"
 require "stackup/version"
 require "yaml"
 
+$stdout.sync = true
+$stderr.sync = true
+
 Clamp do
 
   option ["-L", "--list"], :flag, "list stacks" do
