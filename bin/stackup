@@ -288,7 +288,7 @@ Clamp do
         "Status" => stack.status,
         "Parameters" => stack.parameters,
         "Resources" => stack.resources,
-        "Outputs" => stack.outputs,
+        "Outputs" => stack.outputs
       }
       display_data(data)
     end
