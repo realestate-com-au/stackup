@@ -23,30 +23,44 @@ module Stackup
       define
     end
 
+    def stackup(*rest)
+      sh "stackup", stack, *rest
+    end
+
     def define
       namespace(name) do
 
-        template_and_params = "-t #{template}"
-        template_and_params += " -p #{parameters}" if parameters
+        up_args = ["-t", template]
+        up_deps = [template]
+
+        if parameters
+          up_args += ["-p", parameters]
+          up_deps += [parameters]
+        end
 
         desc "Update #{stack} stack"
-        task "up" => template do
-          sh "stackup #{stack} up #{template_and_params}"
+        task "up" => up_deps do
+          stackup "up", *up_args
+        end
+
+        desc "Cancel update of #{stack} stack"
+        task "cancel" do
+          stackup "cancel-update"
         end
 
         desc "Show pending changes to #{stack} stack"
-        task "diff" => template do
-          sh "stackup #{stack} diff #{template_and_params}"
+        task "diff" => up_deps do
+          stackup "diff", *up_args
         end
 
         desc "Show #{stack} stack outputs and resources"
         task "inspect" do
-          sh "stackup #{stack} inspect -Y"
+          stackup "inspect"
         end
 
         desc "Delete #{stack} stack"
         task "down" do
-          sh "stackup #{stack} down"
+          stackup "down"
         end
 
       end
