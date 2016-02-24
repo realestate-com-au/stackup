@@ -74,3 +74,21 @@ to `Stackup`, e.g.
     stack = Stackup(credentials).stack("my-stack")
 
 See {Stackup::Stack} for more details.
+
+## Rake integration
+
+Stackup integrates with Rake to generate handy tasks for managing a stack, e.g.
+
+    require "stackup/rake_tasks"
+
+    Stackup::RakeTasks("app") do |t|
+      t.stack = "my-app"
+      t.template = "app-template.json"
+    end
+
+providing tasks:
+
+    rake app:diff       # Show pending changes to my-app stack
+    rake app:down       # Delete my-app stack
+    rake app:inspect    # Show my-app stack outputs and resources
+    rake app:up         # Update my-app stack
