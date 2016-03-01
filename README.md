@@ -81,7 +81,7 @@ Stackup integrates with Rake to generate handy tasks for managing a stack, e.g.
 
     require "stackup/rake_tasks"
 
-    Stackup::RakeTasks("app") do |t|
+    Stackup::RakeTasks.new("app") do |t|
       t.stack = "my-app"
       t.template = "app-template.json"
     end
