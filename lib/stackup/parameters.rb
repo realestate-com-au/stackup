@@ -18,9 +18,8 @@ module Stackup
       def hashify(parameters)
         {}.tap do |result|
           parameters.each do |p|
-            key = p.fetch("ParameterKey") { p.fetch("parameter_key") { p.fetch(:parameter_key) } }
-            value = p.fetch("ParameterValue") { p.fetch("parameter_value") { p.fetch(:parameter_value) } }
-            result[key] = value
+            p_struct = ParameterStruct.new(p)
+            result[p_struct.key] = p_struct.value
           end
         end
       end
@@ -40,6 +39,26 @@ module Stackup
         { :parameter_key => key, :parameter_value => value }
       end
     end
+
+  end
+
+  class ParameterStruct
+
+    def initialize(attributes)
+      attributes.each do |name, value|
+        if name.respond_to?(:gsub)
+          name = name.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
+        end
+        public_send("#{name}=", value)
+      end
+    end
+
+    attr_accessor :parameter_key
+    attr_accessor :parameter_value
+    attr_accessor :use_previous_value
+
+    alias_method :key, :parameter_key
+    alias_method :value, :parameter_value
 
   end
 
