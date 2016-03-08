@@ -101,6 +101,31 @@ describe Stackup::Parameters do
 
     end
 
+    context "with String keys" do
+
+      let(:input_records) do
+        [
+          { "ParameterKey" => "Ami", "ParameterValue" => "ami-123" },
+          { "ParameterKey" => "VpcId", "ParameterValue" => "vpc-456" }
+        ]
+      end
+
+      subject(:parameters) { Stackup::Parameters.new(input_records) }
+
+      describe "#to_hash" do
+
+        it "returns an equivalent Hash" do
+          expected = {
+            "Ami" => "ami-123",
+            "VpcId" => "vpc-456"
+          }
+          expect(parameters.to_hash).to eql(expected)
+        end
+
+      end
+
+    end
+
   end
 
 end
