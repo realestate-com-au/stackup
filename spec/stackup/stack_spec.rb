@@ -166,11 +166,11 @@ describe Stackup::Stack do
           }]
         end
 
-        it "converts them to an Array" do
+        it "converts the keys to aws-sdk form" do
           expected_parameters = [
             {
-              "parameter_key" => "foo",
-              "parameter_value" => "bar"
+              :parameter_key => "foo",
+              :parameter_value => "bar"
             }
           ]
           create_or_update

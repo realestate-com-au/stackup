@@ -2,6 +2,7 @@ require "aws-sdk-resources"
 require "logger"
 require "multi_json"
 require "stackup/error_handling"
+require "stackup/parameters"
 require "stackup/stack_watcher"
 
 module Stackup
@@ -100,7 +101,7 @@ module Stackup
         options[:template_body] = MultiJson.dump(template_data)
       end
       if (parameters = options[:parameters])
-        options[:parameters] = normalise_parameters(parameters)
+        options[:parameters] = Parameters.new(parameters).to_a
       end
       if (policy_data = options.delete(:stack_policy))
         options[:stack_policy_body] = MultiJson.dump(policy_data)
@@ -301,33 +302,6 @@ module Stackup
           sleep(5)
         end
       end
-    end
-
-    def normalise_parameters(arg)
-      if arg.is_a?(Hash)
-        return arg.map do |key, value|
-          {
-            :parameter_key => key,
-            :parameter_value => value
-          }
-        end
-      end
-      arg.map do |parameter|
-        normalise_parameter_keys(parameter)
-      end
-    end
-
-    def normalise_parameter_keys(input)
-      {}.tap do |output|
-        input.each do |key, value|
-          output[normalise_parameter_key(key)] = value
-        end
-      end
-    end
-
-    def normalise_parameter_key(s)
-      return s if s.is_a?(Symbol)
-      s.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
     end
 
   end
