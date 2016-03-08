@@ -4,8 +4,6 @@ module Stackup
   #
   class Parameters
 
-    USE_PREVIOUS_VALUE = :use_previous_value
-
     class << self
 
       def new(arg)
@@ -36,7 +34,13 @@ module Stackup
 
     def to_a
       @parameter_hash.map do |key, value|
-        { :parameter_key => key, :parameter_value => value }
+        { :parameter_key => key }.tap do |record|
+          if value == :use_previous_value
+            record[:use_previous_value] = true
+          else
+            record[:parameter_value] = value
+          end
+        end
       end
     end
 

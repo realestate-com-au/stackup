@@ -35,6 +35,35 @@ describe Stackup::Parameters do
 
     end
 
+    context "with a :use_previous_value" do
+
+      let(:input_hash) do
+        {
+          "Ami" => :use_previous_value
+        }
+      end
+
+      describe "#to_hash" do
+
+        it "returns the original Hash" do
+          expect(parameters.to_hash).to eql(input_hash)
+        end
+
+      end
+
+      describe "#to_a" do
+
+        it "returns a record with :use_previous_value true" do
+          expected = [
+            { :parameter_key => "Ami", :use_previous_value => true }
+          ]
+          expect(parameters.to_a).to eql(expected)
+        end
+
+      end
+
+    end
+
   end
 
   context "constructed with an array of parameter records" do
