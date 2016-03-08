@@ -22,6 +22,14 @@ Clamp do
 
   option ["-Y", "--yaml"], :flag, "output data in YAML format"
 
+  option ["--region"], "REGION", "set region" do |arg|
+    unless arg =~ %r{^[a-z]{2}-[a-z]+-\d$}
+      raise ArgumentError, "#{arg.inspect} doesn't look like a region"
+    end
+    Aws.config.update(:region => arg)
+    arg
+  end
+
   option "--debug", :flag, "enable debugging"
 
   option ["--version"], :flag, "display version" do
