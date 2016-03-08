@@ -99,6 +99,24 @@ describe Stackup::Parameters do
 
       end
 
+      context "with :use_previous_value" do
+
+        let(:input_records) do
+          [
+            { :parameter_key => "Ami", :use_previous_value => true }
+          ]
+        end
+
+        describe "#to_hash" do
+
+          it "marks the corresponding parameter as :use_previous_value" do
+            expect(parameters.to_hash).to eql("Ami" => :use_previous_value)
+          end
+
+        end
+
+      end
+
     end
 
     context "with String keys" do

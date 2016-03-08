@@ -62,7 +62,14 @@ module Stackup
     attr_accessor :use_previous_value
 
     alias_method :key, :parameter_key
-    alias_method :value, :parameter_value
+
+    def value
+      if use_previous_value
+        :use_previous_value
+      else
+        parameter_value
+      end
+    end
 
   end
 
