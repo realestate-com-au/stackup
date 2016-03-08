@@ -279,7 +279,8 @@ module Stackup
     def event_handler
       @event_handler ||= lambda do |e|
         fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
-        logger.info(fields.compact.join(" - "))
+        time = e.timestamp.localtime.strftime("%H:%M:%S")
+        logger.info("[#{time}] #{fields.compact.join(' - ')}")
       end
     end
 
