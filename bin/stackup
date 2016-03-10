@@ -4,9 +4,9 @@ $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 
 require "clamp"
 require "console_logger"
-require "diffy"
 require "multi_json"
 require "stackup"
+require "stackup/differ"
 require "stackup/version"
 require "yaml"
 
@@ -149,25 +149,28 @@ Clamp do
       # rubocop:disable Style/GuardClause
       if template_file
         template = load_data(template_file)
-        diff_data(stack.template, template)
+        puts differ.diff(stack.template, template)
       end
       if parameters_file
-        existing_parameters = stack.parameters
-        new_parameters = load_data(parameters_file)
-        new_parameters = Stackup::Parameters.new(new_parameters).to_hash
-        new_parameters = existing_parameters.merge(new_parameters)
-        diff_data(existing_parameters.sort.to_h, new_parameters.sort.to_h)
+        puts differ.diff(existing_parameters, new_parameters)
       end
     end
 
     private
 
-    def diff_data(existing_data, pending_data)
-      existing = format_data(existing_data) + "\n"
-      pending = format_data(pending_data) + "\n"
-      diff = Diffy::Diff.new(existing, pending).to_s(diff_format.to_sym)
-      return if diff =~ /\A\s*\Z/
-      puts diff
+    def differ
+      Stackup::Differ.new(diff_format, &method(:format_data))
+    end
+
+    def existing_parameters
+      @existing_parameters ||= stack.parameters.sort.to_h
+    end
+
+    def new_parameters
+      result = load_data(parameters_file)
+      result = Stackup::Parameters.new(result).to_hash
+      result = existing_parameters.merge(result)
+      result
     end
 
   end
