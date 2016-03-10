@@ -111,6 +111,10 @@ Clamp do
     option ["-p", "--parameters"], "FILE", "parameters file",
            :attribute_name => :parameters_file
 
+    option ["-o", "--override"], "PARAM=VALUE", "parameters overrides",
+           :multivalued => true,
+           :attribute_name => :override_list
+
     option "--policy", "FILE", "stack policy file",
            :attribute_name => :policy_file
 
@@ -125,11 +129,31 @@ Clamp do
       options = {}
       options[:template] = load_data(template_file) if template_file
       options[:on_failure] = on_failure
-      options[:parameters] = load_data(parameters_file) if parameters_file
+      options[:parameters] = parameters
       options[:stack_policy] = load_data(policy_file) if policy_file
       options[:use_previous_template] = use_previous_template?
       report_change do
         stack.create_or_update(options)
+      end
+    end
+
+    private
+
+    def parameters
+      parameters_from_file.merge(parameter_overrides)
+    end
+
+    def parameters_from_file
+      return {} unless parameters_file
+      Stackup::Parameters.new(load_data(parameters_file)).to_hash
+    end
+
+    def parameter_overrides
+      {}.tap do |result|
+        override_list.each do |override|
+          key, value = override.split("=", 2)
+          result[key] = value
+        end
       end
     end
 
@@ -146,14 +170,8 @@ Clamp do
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
-      # rubocop:disable Style/GuardClause
-      if template_file
-        template = load_data(template_file)
-        puts differ.diff(stack.template, template)
-      end
-      if parameters_file
-        puts differ.diff(existing_parameters, new_parameters)
-      end
+      puts differ.diff(stack.template, load_data(template_file)) if template_file
+      puts differ.diff(existing_parameters, new_parameters) if parameters_file
     end
 
     private
