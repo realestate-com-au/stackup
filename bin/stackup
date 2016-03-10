@@ -152,8 +152,9 @@ Clamp do
         diff_data(stack.template, template)
       end
       if parameters_file
-        new_parameters = hashify_parameters(load_data(parameters_file))
         existing_parameters = stack.parameters
+        new_parameters = load_data(parameters_file)
+        new_parameters = Stackup::Parameters.new(new_parameters).to_hash
         new_parameters = existing_parameters.merge(new_parameters)
         diff_data(existing_parameters.sort.to_h, new_parameters.sort.to_h)
       end
@@ -167,17 +168,6 @@ Clamp do
       diff = Diffy::Diff.new(existing, pending).to_s(diff_format.to_sym)
       return if diff =~ /\A\s*\Z/
       puts diff
-    end
-
-    def hashify_parameters(parameters)
-      return parameters unless parameters.is_a?(Array)
-      {}.tap do |result|
-        parameters.each do |p|
-          key = p.fetch("ParameterKey") { p.fetch("parameter_key") }
-          value = p.fetch("ParameterValue") { p.fetch("parameter_value") }
-          result[key] = value
-        end
-      end
     end
 
   end
