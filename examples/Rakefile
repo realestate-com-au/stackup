@@ -4,5 +4,8 @@ Stackup::RakeTasks.new("demo") do |t|
   t.stack = ENV.fetch("STACKUP_DEMO_STACK", "stackup-demo")
   t.template = "template.json"
   t.parameters = "parameters-verbose.json"
-  t.tags = "tags.yml"
+  t.tags = {
+    "environment" => "dev",
+    "team" => "rea-oss"
+  }
 end

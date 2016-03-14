@@ -1,4 +1,6 @@
 require "rake/tasklib"
+require "tempfile"
+require "yaml"
 
 module Stackup
 
@@ -34,14 +36,14 @@ module Stackup
     def define
       namespace(name) do
 
-        up_args = {}
-        up_args["--template"] = template
-        up_args["--parameters"] = parameters if parameters
-        up_args["--tags"] = tags if tags
+        data_options = DataOptions.new
+        data_options["--template"] = template
+        data_options["--parameters"] = parameters if parameters
+        data_options["--tags"] = tags if tags
 
         desc "Update #{stack} stack"
-        task "up" => up_args.values do
-          stackup "up", *up_args.to_a.flatten
+        task "up" => data_options.files do
+          stackup "up", *data_options.to_a
         end
 
         desc "Cancel update of #{stack} stack"
@@ -50,8 +52,8 @@ module Stackup
         end
 
         desc "Show pending changes to #{stack} stack"
-        task "diff" => up_args.values do
-          stackup "diff", *up_args.to_a.flatten
+        task "diff" => data_options.files do
+          stackup "diff", *data_options.to_a
         end
 
         desc "Show #{stack} stack outputs and resources"
@@ -65,6 +67,41 @@ module Stackup
         end
 
       end
+    end
+
+    # Options to "stackup up".
+    #
+    class DataOptions
+
+      def initialize
+        @options = {}
+      end
+
+      def []=(option, file_or_value)
+        @options[option] = file_or_value
+      end
+
+      def files
+        @options.values.grep(String)
+      end
+
+      def to_a
+        [].tap do |result|
+          @options.each do |option, file_or_data|
+            result << option
+            result << maybe_tempfile(file_or_data, option[2..-1])
+          end
+        end
+      end
+
+      def maybe_tempfile(file_or_data, type)
+        return file_or_data if file_or_data.is_a?(String)
+        tempfile = Tempfile.new([type, ".yml"])
+        tempfile.write(YAML.dump(file_or_data))
+        tempfile.close
+        tempfile.path.to_s
+      end
+
     end
 
   end

@@ -92,3 +92,12 @@ providing tasks:
     rake app:down       # Delete my-app stack
     rake app:inspect    # Show my-app stack outputs and resources
     rake app:up         # Update my-app stack
+
+Parameters and tags may be specified via files, or as a Hash, e.g.
+
+    Stackup::RakeTasks.new("app") do |t|
+      t.stack = "my-app"
+      t.template = "app-template.json"
+      t.parameters = "production-params.json"
+      t.tags = { "environment" => "production" }
+    end
