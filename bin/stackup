@@ -115,6 +115,9 @@ Clamp do
            :multivalued => true,
            :attribute_name => :override_list
 
+    option "--tags", "FILE", "stack tags file",
+           :attribute_name => :tags_file
+
     option "--policy", "FILE", "stack policy file",
            :attribute_name => :policy_file
 
@@ -130,6 +133,7 @@ Clamp do
       options[:template] = load_data(template_file) if template_file
       options[:on_failure] = on_failure
       options[:parameters] = parameters
+      options[:tags] = load_data(tags_file) if tags_file
       options[:stack_policy] = load_data(policy_file) if policy_file
       options[:use_previous_template] = use_previous_template?
       report_change do
@@ -303,12 +307,13 @@ Clamp do
 
   end
 
-  subcommand "inspect", "status + parameters + resources + outputs" do
+  subcommand "inspect", "Display stack particulars" do
 
     def execute
       data = {
         "Status" => stack.status,
         "Parameters" => stack.parameters,
+        "Tags" => stack.tags,
         "Resources" => stack.resources,
         "Outputs" => stack.outputs
       }

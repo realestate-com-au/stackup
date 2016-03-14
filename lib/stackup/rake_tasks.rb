@@ -10,6 +10,7 @@ module Stackup
     attr_accessor :stack
     attr_accessor :template
     attr_accessor :parameters
+    attr_accessor :tags
 
     alias_method :namespace=, :name=
 
@@ -39,6 +40,11 @@ module Stackup
         if parameters
           up_args += ["-p", parameters]
           up_deps += [parameters]
+        end
+
+        if tags
+          up_args += ["--tags", tags]
+          up_deps += [tags]
         end
 
         desc "Update #{stack} stack"
