@@ -195,13 +195,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def parameters
-      handling_validation_error do
-        {}.tap do |h|
-          cf_stack.parameters.each do |p|
-            h[p.parameter_key] = p.parameter_value
-          end
-        end
-      end
+      extract_hash(:parameters, :parameter_key, :parameter_value)
     end
 
     # Get the current tags.
@@ -210,13 +204,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def tags
-      handling_validation_error do
-        {}.tap do |h|
-          cf_stack.tags.each do |p|
-            h[p.key] = p.value
-          end
-        end
-      end
+      extract_hash(:tags, :key, :value)
     end
 
     # Get stack outputs.
@@ -225,13 +213,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def outputs
-      handling_validation_error do
-        {}.tap do |h|
-          cf_stack.outputs.each do |o|
-            h[o.output_key] = o.output_value
-          end
-        end
-      end
+      extract_hash(:outputs, :output_key, :output_value)
     end
 
     # Get stack outputs.
@@ -241,13 +223,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def resources
-      handling_validation_error do
-        {}.tap do |h|
-          cf_stack.resource_summaries.each do |r|
-            h[r.logical_resource_id] = r.physical_resource_id
-          end
-        end
-      end
+      extract_hash(:resource_summaries, :logical_resource_id, :physical_resource_id)
     end
 
     def watch(zero = true)
@@ -332,6 +308,25 @@ module Stackup
         end
       else
         tags
+      end
+    end
+
+    # Extract data from a collection attribute of the stack.
+    #
+    # @param [Symbol] collection_name collection attribute name
+    # @param [Symbol] key_name name of item attribute that provides key
+    # @param [Symbol] value_name name of item attribute that provides value
+    # @return [Hash<String, String>] mapping of collection
+    #
+    def extract_hash(collection_name, key_name, value_name)
+      handling_validation_error do
+        {}.tap do |result|
+          cf_stack.public_send(collection_name).each do |item|
+            key = item.public_send(key_name)
+            value = item.public_send(value_name)
+            result[key] = value
+          end
+        end
       end
     end
 
