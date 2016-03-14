@@ -1,5 +1,5 @@
 module Stackup
 
-  VERSION = "0.7.0"
+  VERSION = File.read(File.join(File.dirname(__FILE__), "../../version.txt"))
 
 end

@@ -1,0 +1,14 @@
+version: "2"
+
+volumes:
+  gem-cache:
+
+services:
+  dev:
+    image: ruby:2.3
+    volumes:
+      - .:/app
+      - gem-cache:/usr/local/bundle/
+    environment:
+      - GEM_HOME=/usr/local/bundle/
+    working_dir: /app
