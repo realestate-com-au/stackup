@@ -23,8 +23,11 @@ module Stackup
       define
     end
 
+    # path to the "stackup" executable
+    STACKUP_CLI = File.expand_path("../../../bin/stackup", __FILE__)
+
     def stackup(*rest)
-      sh "stackup", stack, *rest
+      sh STACKUP_CLI, stack, *rest
     end
 
     def define
