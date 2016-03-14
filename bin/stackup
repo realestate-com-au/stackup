@@ -171,6 +171,9 @@ Clamp do
     option ["-p", "--parameters"], "FILE", "parameters file",
            :attribute_name => :parameters_file
 
+    option "--tags", "FILE", "stack tags file",
+           :attribute_name => :tags_file
+
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
@@ -183,6 +186,10 @@ Clamp do
       if parameters_file
         current["Parameters"] = existing_parameters.sort.to_h
         planned["Parameters"] = new_parameters.sort.to_h
+      end
+      if tags_file
+        current["Tags"] = stack.tags.sort.to_h
+        planned["Tags"] = load_data(tags_file).sort.to_h
       end
       signal_usage_error "specify '--template' or '--parameters'" if planned.empty?
       puts differ.diff(current, planned)
