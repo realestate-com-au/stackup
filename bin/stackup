@@ -174,8 +174,18 @@ Clamp do
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
-      puts differ.diff(stack.template, load_data(template_file)) if template_file
-      puts differ.diff(existing_parameters, new_parameters) if parameters_file
+      current = {}
+      planned = {}
+      if template_file
+        current["Template"] = stack.template
+        planned["Template"] = load_data(template_file)
+      end
+      if parameters_file
+        current["Parameters"] = existing_parameters.sort.to_h
+        planned["Parameters"] = new_parameters.sort.to_h
+      end
+      signal_usage_error "specify '--template' or '--parameters'" if planned.empty?
+      puts differ.diff(current, planned)
     end
 
     private
@@ -185,14 +195,14 @@ Clamp do
     end
 
     def existing_parameters
-      @existing_parameters ||= stack.parameters.sort.to_h
+      @existing_parameters ||= stack.parameters
     end
 
     def new_parameters
       result = load_data(parameters_file)
       result = Stackup::Parameters.new(result).to_hash
       result = existing_parameters.merge(result)
-      result
+      result.sort
     end
 
   end
