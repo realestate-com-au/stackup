@@ -266,6 +266,7 @@ module Stackup
       fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
       status
     rescue NoUpdateRequired
+      logger.info "No update required"
       nil
     end
 
