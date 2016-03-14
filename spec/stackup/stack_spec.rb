@@ -181,6 +181,44 @@ describe Stackup::Stack do
 
       end
 
+      context "with :tags as Hash" do
+
+        before do
+          options[:tags] = { "foo" => "bar" }
+        end
+
+        it "converts them to an Array" do
+          expected_tags = [
+            { :key => "foo", :value => "bar" }
+          ]
+          create_or_update
+          expect(cf_client).to have_received(:create_stack) do |options|
+            expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
+      context "with :tags in SDK form" do
+
+        before do
+          options[:tags] = [
+            { :key => "foo", :value => "bar" }
+          ]
+        end
+
+        it "passes them through" do
+          expected_tags = [
+            { :key => "foo", :value => "bar" }
+          ]
+          create_or_update
+          expect(cf_client).to have_received(:create_stack) do |options|
+            expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
     end
 
   end

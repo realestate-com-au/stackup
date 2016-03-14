@@ -66,8 +66,11 @@ module Stackup
     # @option options [String] :on_failure (ROLLBACK)
     #   if stack creation fails: DO_NOTHING, ROLLBACK, or DELETE
     # @option options [Hash, Array<Hash>] :parameters
-    #   stack parameters, either as a Hash, or as an Array of
+    #   stack parameters, either as a Hash, or an Array of
     #   +Aws::CloudFormation::Types::Parameter+ structures
+    # @option options [Hash, Array<Hash>] :tags
+    #   stack tags, either as a Hash, or an Array of
+    #   +Aws::CloudFormation::Types::Tag+ structures
     # @option options [Array<String>] :resource_types
     #   resource types that you have permissions to work with
     # @option options [Hash] :stack_policy
@@ -102,6 +105,9 @@ module Stackup
       end
       if (parameters = options[:parameters])
         options[:parameters] = Parameters.new(parameters).to_a
+      end
+      if (tags = options[:tags])
+        options[:tags] = normalize_tags(tags)
       end
       if (policy_data = options.delete(:stack_policy))
         options[:stack_policy_body] = MultiJson.dump(policy_data)
@@ -301,6 +307,16 @@ module Stackup
           return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
           sleep(5)
         end
+      end
+    end
+
+    def normalize_tags(tags)
+      if tags.is_a?(Hash)
+        tags.map do |key, value|
+          { :key => key, :value => value }
+        end
+      else
+        tags
       end
     end
 
