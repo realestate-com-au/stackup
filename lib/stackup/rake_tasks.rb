@@ -34,22 +34,14 @@ module Stackup
     def define
       namespace(name) do
 
-        up_args = ["-t", template]
-        up_deps = [template]
-
-        if parameters
-          up_args += ["-p", parameters]
-          up_deps += [parameters]
-        end
-
-        if tags
-          up_args += ["--tags", tags]
-          up_deps += [tags]
-        end
+        up_args = {}
+        up_args["--template"] = template
+        up_args["--parameters"] = parameters if parameters
+        up_args["--tags"] = tags if tags
 
         desc "Update #{stack} stack"
-        task "up" => up_deps do
-          stackup "up", *up_args
+        task "up" => up_args.values do
+          stackup "up", *up_args.to_a.flatten
         end
 
         desc "Cancel update of #{stack} stack"
@@ -58,8 +50,8 @@ module Stackup
         end
 
         desc "Show pending changes to #{stack} stack"
-        task "diff" => up_deps do
-          stackup "diff", *up_args
+        task "diff" => up_args.values do
+          stackup "diff", *up_args.to_a.flatten
         end
 
         desc "Show #{stack} stack outputs and resources"
