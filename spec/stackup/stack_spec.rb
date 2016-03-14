@@ -33,7 +33,7 @@ describe Stackup::Stack do
     }
   end
 
-  def stack_description(stack_status)
+  def stack_description(stack_status, details = {})
     {
       :stacks => [
         {
@@ -41,7 +41,7 @@ describe Stackup::Stack do
           :stack_id => unique_stack_id,
           :stack_name => stack_name,
           :stack_status => stack_status
-        }
+        }.merge(details)
       ]
     }
   end
@@ -243,6 +243,26 @@ describe Stackup::Stack do
       it "returns the stack status" do
         expect(stack.status).to eq(stack_status)
       end
+    end
+
+    describe "#tags" do
+
+      let(:tags) do
+        [
+          { :key => "foo", :value => "bar" }
+        ]
+      end
+
+      let(:describe_stacks_responses) do
+        [
+          stack_description(stack_status, :tags => tags)
+        ]
+      end
+
+      it "returns tags as a Hash" do
+        expect(stack.tags).to eq("foo" => "bar")
+      end
+
     end
 
     describe "#delete" do

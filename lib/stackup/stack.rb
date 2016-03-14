@@ -204,6 +204,21 @@ module Stackup
       end
     end
 
+    # Get the current tags.
+    #
+    # @return [Hash] current stack tags
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
+    def tags
+      handling_validation_error do
+        {}.tap do |h|
+          cf_stack.tags.each do |p|
+            h[p.key] = p.value
+          end
+        end
+      end
+    end
+
     # Get stack outputs.
     #
     # @return [Hash<String, String>] stack outputs
