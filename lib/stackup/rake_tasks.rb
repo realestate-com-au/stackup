@@ -28,7 +28,7 @@ module Stackup
     STACKUP_CLI = File.expand_path("../../../bin/stackup", __FILE__)
 
     def stackup(*rest)
-      sh STACKUP_CLI, stack, *rest
+      sh STACKUP_CLI, "-Y", stack, *rest
     end
 
     def define
