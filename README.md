@@ -43,7 +43,7 @@ The command-line support inputs (template and parameters) in either JSON or YAML
 
 Use sub-command "up" to create or update a stack, as appropriate:
 
-    $ stackup myapp-test up template.json
+    $ stackup myapp-test up -t template.json
 
 This will:
 
