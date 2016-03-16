@@ -61,6 +61,11 @@ module Stackup
           stackup "inspect"
         end
 
+        desc "Show #{stack} stack outputs only"
+        task "outputs" do
+          stackup "outputs"
+        end
+
         desc "Delete #{stack} stack"
         task "down" do
           stackup "down"
