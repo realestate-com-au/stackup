@@ -4,7 +4,7 @@
 
 cd $(dirname $0)/..
 
-REPOSITORY=realestate/rea-shipper
+REPOSITORY=realestate/stackup
 VERSION=$(ruby -r ./lib/stackup/version.rb -e 'puts Stackup::VERSION')
 
 echo "--- Check that we're releasing from master"
