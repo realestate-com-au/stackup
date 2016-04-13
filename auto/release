@@ -1,0 +1,24 @@
+#! /bin/bash -eu
+#
+# Release Stackup
+
+cd $(dirname $0)/..
+
+REPOSITORY=realestate/rea-shipper
+VERSION=$(ruby -r ./lib/stackup/version.rb -e 'puts Stackup::VERSION')
+
+echo "--- Check that we're releasing from master"
+git fetch origin
+git diff origin/master --exit-code
+
+echo "--- Build Docker image"
+docker build .
+
+echo "--- Releasing gem"
+bundle rake release
+
+echo "--- Releasing Docker image"
+docker build -t ${REPOSITORY}:latest .
+docker tag ${REPOSITORY}:latest ${REPOSITORY}:${VERSION}
+docker push ${REPOSITORY}:${VERSION}
+docker push ${REPOSITORY}:latest
