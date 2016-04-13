@@ -15,7 +15,7 @@ echo "--- Build Docker image"
 docker build .
 
 echo "--- Releasing gem"
-bundle rake release
+bundle exec rake release
 
 echo "--- Releasing Docker image"
 docker build -t ${REPOSITORY}:latest .
