@@ -30,6 +30,13 @@ Clamp do
     arg
   end
 
+  option ["--retry-limit"], "N", "maximum number of retries for API calls",
+    :environment_variable => "AWS_API_RETRY_LIMIT" do |arg|
+    Integer(arg).tap do |value|
+      Aws.config.update(:retry_limit => value)
+    end
+  end
+
   option "--debug", :flag, "enable debugging"
 
   option ["--version"], :flag, "display version" do

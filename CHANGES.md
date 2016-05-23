@@ -1,6 +1,7 @@
 ## PENDING
 
 * CLI catches and reports any `Aws::Errors::ServiceError`.
+* Add `--retry-limit` option.
 
 ## 0.8.1 (2016-04-13)
 
