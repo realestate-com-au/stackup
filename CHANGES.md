@@ -2,6 +2,7 @@
 
 * CLI catches and reports any `Aws::Errors::ServiceError`.
 * Add `--retry-limit` option.
+* Normalize templates (sort by key) before diff-ing them.
 
 ## 0.8.1 (2016-04-13)
 

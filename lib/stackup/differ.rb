@@ -1,4 +1,5 @@
 require "diffy"
+require "stackup/utils"
 require "yaml"
 
 module Stackup
@@ -14,9 +15,11 @@ module Stackup
 
     attr_reader :diff_style
 
+    include Utils
+
     def diff(existing_data, pending_data)
-      existing = format(existing_data) + "\n"
-      pending = format(pending_data) + "\n"
+      existing = format(normalize_data(existing_data)) + "\n"
+      pending = format(normalize_data(pending_data)) + "\n"
       diff = Diffy::Diff.new(existing, pending).to_s(diff_style)
       diff unless diff =~ /\A\s*\Z/
     end
