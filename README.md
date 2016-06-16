@@ -101,3 +101,18 @@ Parameters and tags may be specified via files, or as a Hash, e.g.
       t.parameters = "production-params.json"
       t.tags = { "environment" => "production" }
     end
+
+## Docker image
+
+Stackup is also published as a Docker image. Basic usage is:
+
+    docker run --rm \
+        -v `pwd`:/cwd \
+        -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
+        -e AWS_DEFAULT_REGION \
+        realestate/stackup:latest ...
+
+Replace "latest" with a specific version for added safety.
+
+The default working-directory within the container is `/cwd`;
+hence the volume mount to make files available from the host system.
