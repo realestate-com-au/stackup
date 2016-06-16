@@ -2,6 +2,8 @@ FROM ruby:2.3-alpine
 
 MAINTAINER https://github.com/realestate-com-au/stackup
 
+RUN apk --no-cache add diffutils
+
 WORKDIR /app
 
 COPY bin /app/bin
