@@ -184,12 +184,13 @@ describe Stackup::Stack do
       context "with :tags as Hash" do
 
         before do
-          options[:tags] = { "foo" => "bar" }
+          options[:tags] = { "foo" => "bar", "code" => 123 }
         end
 
         it "converts them to an Array" do
           expected_tags = [
-            { :key => "foo", :value => "bar" }
+            { :key => "foo", :value => "bar" },
+            { :key => "code", :value => "123" }
           ]
           create_or_update
           expect(cf_client).to have_received(:create_stack) do |options|

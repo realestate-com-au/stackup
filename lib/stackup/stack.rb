@@ -305,7 +305,7 @@ module Stackup
     def normalize_tags(tags)
       if tags.is_a?(Hash)
         tags.map do |key, value|
-          { :key => key, :value => value }
+          { :key => key, :value => value.to_s }
         end
       else
         tags

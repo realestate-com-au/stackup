@@ -1,3 +1,7 @@
+## PENDING
+
+* Ensure stack tag values are strings.
+
 ## 0.8.2 (2016-05-31)
 
 * CLI catches and reports any `Aws::Errors::ServiceError`.
