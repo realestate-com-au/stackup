@@ -1,5 +1,5 @@
 module Stackup
 
-  VERSION = "0.8.3"
+  VERSION = "0.8.4"
 
 end

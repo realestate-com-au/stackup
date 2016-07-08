@@ -1,6 +1,10 @@
-## PENDING
+## 0.8.4 (2016-07-08)
 
 * Ensure stack tag values are strings.
+
+## 0.8.3 (2016-06-16)
+
+* Release as a Docker image, too.
 
 ## 0.8.2 (2016-05-31)
 
