@@ -37,6 +37,9 @@ Clamp do
     end
   end
 
+  option ["--poll-interval"], "N", "stack status polling interval",
+    :default => 10, &method(:Integer)
+
   option "--debug", :flag, "enable debugging"
 
   option ["--version"], :flag, "display version" do
@@ -79,7 +82,7 @@ Clamp do
   end
 
   def stack
-    stackup.stack(stack_name)
+    stackup.stack(stack_name, :poll_interval => poll_interval)
   end
 
   def list_stacks
