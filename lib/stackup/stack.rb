@@ -11,16 +11,20 @@ module Stackup
   #
   class Stack
 
+    DEFAULT_POLL_INTERVAL = 10 # seconds
+
     def initialize(name, client = {}, options = {})
       client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
       @name = name
       @cf_client = client
+      @poll_interval = DEFAULT_POLL_INTERVAL
       options.each do |key, value|
         public_send("#{key}=", value)
       end
     end
 
     attr_reader :name
+    attr_accessor :poll_interval
 
     # Register a handler for reporting of stack events.
     # @param [Proc] event_handler
@@ -297,7 +301,7 @@ module Stackup
           status = self.status
           logger.debug("stack_status=#{status}")
           return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
-          sleep(5)
+          sleep(poll_interval)
         end
       end
     end

@@ -8,8 +8,9 @@ describe Stackup::Stack do
 
   let(:stack_name) { "stack_name" }
   let(:unique_stack_id) { "ID:#{stack_name}" }
+  let(:stack_options) { {} }
 
-  subject(:stack) { described_class.new(stack_name, cf_client) }
+  subject(:stack) { described_class.new(stack_name, cf_client, stack_options) }
 
   before do
     cf_client.stub_responses(:describe_stacks, *describe_stacks_responses)
@@ -93,27 +94,23 @@ describe Stackup::Stack do
 
       let(:final_status) { "CREATE_COMPLETE" }
 
-      context "successful" do
+      it "calls :create_stack" do
+        expected_args = {
+          :stack_name => stack_name,
+          :template_body => template
+        }
+        create_or_update
+        expect(cf_client).to have_received(:create_stack)
+          .with(hash_including(expected_args))
+      end
 
-        it "calls :create_stack" do
-          expected_args = {
-            :stack_name => stack_name,
-            :template_body => template
-          }
-          create_or_update
-          expect(cf_client).to have_received(:create_stack)
-            .with(hash_including(expected_args))
-        end
+      it "it sleeps" do
+        create_or_update
+        expect(stack).to have_received(:sleep).with(10)
+      end
 
-        it "it sleeps" do
-          create_or_update
-          expect(stack).to have_received(:sleep).with(5)
-        end
-
-        it "returns status" do
-          expect(create_or_update).to eq("CREATE_COMPLETE")
-        end
-
+      it "returns status" do
+        expect(create_or_update).to eq("CREATE_COMPLETE")
       end
 
       context "unsuccessful" do
@@ -123,6 +120,19 @@ describe Stackup::Stack do
         it "raises a StackUpdateError" do
           expect { create_or_update }
             .to raise_error(Stackup::StackUpdateError)
+        end
+
+      end
+
+      context "with a custom poll_interval" do
+
+        let(:stack_options) do
+          { :poll_interval => 12.3 }
+        end
+
+        it "it sleeps for the specified interval" do
+          create_or_update
+          expect(stack).to have_received(:sleep).with(12.3)
         end
 
       end

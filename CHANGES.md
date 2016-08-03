@@ -1,3 +1,8 @@
+## PENDING
+
+* Make poll_interval (during deployment) configurable.
+* Extend the default poll_interval to 10 seconds.
+
 ## 0.8.4 (2016-07-08)
 
 * Ensure stack tag values are strings.
