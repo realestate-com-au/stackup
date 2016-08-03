@@ -106,7 +106,7 @@ describe Stackup::Stack do
 
       it "it sleeps" do
         create_or_update
-        expect(stack).to have_received(:sleep).with(10)
+        expect(stack).to have_received(:sleep).with(5)
       end
 
       it "returns status" do

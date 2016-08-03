@@ -11,7 +11,7 @@ module Stackup
   #
   class Stack
 
-    DEFAULT_POLL_INTERVAL = 10 # seconds
+    DEFAULT_POLL_INTERVAL = 5 # seconds
 
     def initialize(name, client = {}, options = {})
       client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
