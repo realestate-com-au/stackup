@@ -105,6 +105,11 @@ describe Stackup::Stack do
             .with(hash_including(expected_args))
         end
 
+        it "it sleeps" do
+          create_or_update
+          expect(stack).to have_received(:sleep).with(5)
+        end
+
         it "returns status" do
           expect(create_or_update).to eq("CREATE_COMPLETE")
         end
