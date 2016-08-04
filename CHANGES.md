@@ -1,7 +1,7 @@
 ## PENDING
 
 * Make poll_interval (during deployment) configurable.
-* Add `--poll-interval` option.
+* Add `--wait-poll-interval` option.
 * Minimise calls to "DescribeStackEvents" (esp. for older stacks).
 * Add `--no-wait` option.
 

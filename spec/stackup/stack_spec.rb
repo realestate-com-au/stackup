@@ -149,10 +149,10 @@ describe Stackup::Stack do
 
       end
 
-      context "with a custom poll_interval" do
+      context "with a custom wait_poll_interval" do
 
         let(:stack_options) do
-          { :poll_interval => 12.3 }
+          { :wait_poll_interval => 12.3 }
         end
 
         it "it sleeps for the specified interval" do

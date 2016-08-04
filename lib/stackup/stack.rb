@@ -11,21 +11,21 @@ module Stackup
   #
   class Stack
 
-    DEFAULT_POLL_INTERVAL = 5 # seconds
+    DEFAULT_WAIT_POLL_INTERVAL = 5 # seconds
 
     def initialize(name, client = {}, options = {})
       client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
       @name = name
       @cf_client = client
       @wait = true
-      @poll_interval = DEFAULT_POLL_INTERVAL
       options.each do |key, value|
         public_send("#{key}=", value)
       end
+      @wait_poll_interval ||= DEFAULT_WAIT_POLL_INTERVAL
     end
 
     attr_reader :name
-    attr_accessor :poll_interval
+    attr_accessor :wait_poll_interval
 
     attr_writer :wait
 
@@ -314,7 +314,7 @@ module Stackup
           status = self.status
           logger.debug("stack_status=#{status}")
           return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
-          sleep(poll_interval)
+          sleep(wait_poll_interval)
         end
       end
     end
