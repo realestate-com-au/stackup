@@ -2,6 +2,7 @@
 
 * Make poll_interval (during deployment) configurable.
 * Add `--poll-interval` option.
+* Minimise calls to "DescribeStackEvents" (esp. for older stacks).
 
 ## 0.8.4 (2016-07-08)
 

@@ -12,9 +12,12 @@ describe Stackup::StackWatcher do
   subject(:monitor) { described_class.new(stack) }
 
   def add_event(description)
+    event_id = SecureRandom.uuid
     event = instance_double(
       Aws::CloudFormation::Event,
-      :event_id => SecureRandom.uuid, :resource_status_reason => description
+      :event_id => event_id,
+      :id => event_id,
+      :resource_status_reason => description
     )
     events.unshift(event)
   end

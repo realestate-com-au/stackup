@@ -10,7 +10,6 @@ module Stackup
 
     def initialize(stack)
       @stack = stack
-      @processed_event_ids = Set.new
     end
 
     attr_accessor :stack
@@ -19,14 +18,14 @@ module Stackup
     #
     def each_new_event
       # rubocop:disable Lint/HandleExceptions
-      buffer = []
+      new_events = []
       stack.events.each do |event|
-        break if @processed_event_ids.include?(event.event_id)
-        buffer.unshift(event)
+        break if event.id == @last_processed_event_id
+        new_events.unshift(event)
       end
-      buffer.each do |event|
-        yield event if block_given?
-        @processed_event_ids.add(event.event_id)
+      new_events.each do |event|
+        yield event
+        @last_processed_event_id = event.id
       end
     rescue Aws::CloudFormation::Errors::ValidationError
     end
@@ -34,7 +33,8 @@ module Stackup
     # Consume all new events
     #
     def zero
-      each_new_event
+      last_event = stack.events.first
+      @last_processed_event_id = last_event.id unless last_event.nil?
       nil
     end
 
