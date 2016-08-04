@@ -41,7 +41,7 @@ Clamp do
     :default => true
 
   option ["--wait-poll-interval"], "N", "polling interval while waiting for updates",
-    :default => 10, &method(:Integer)
+    :default => 5, &method(:Integer)
 
   option "--debug", :flag, "enable debugging"
 
