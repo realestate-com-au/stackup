@@ -1,6 +1,7 @@
 require "spec_helper"
 
 require "aws-sdk-resources"
+require "securerandom"
 require "stackup/stack_watcher"
 
 describe Stackup::StackWatcher do
@@ -11,13 +12,11 @@ describe Stackup::StackWatcher do
   subject(:monitor) { described_class.new(stack) }
 
   def add_event(description)
-    @event_id ||= 0
     event = instance_double(
       Aws::CloudFormation::Event,
-      :event_id => @event_id, :resource_status_reason => description
+      :event_id => SecureRandom.uuid, :resource_status_reason => description
     )
     events.unshift(event)
-    @event_id += 1
   end
 
   def new_event_reasons
