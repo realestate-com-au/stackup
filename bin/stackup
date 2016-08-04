@@ -37,6 +37,9 @@ Clamp do
     end
   end
 
+  option ["--[no-]wait"], :flag, "wait for stack updates to complete",
+    :default => true
+
   option ["--poll-interval"], "N", "stack status polling interval",
     :default => 10, &method(:Integer)
 
@@ -82,7 +85,7 @@ Clamp do
   end
 
   def stack
-    stackup.stack(stack_name, :poll_interval => poll_interval)
+    stackup.stack(stack_name, :wait => wait?, :poll_interval => poll_interval)
   end
 
   def list_stacks

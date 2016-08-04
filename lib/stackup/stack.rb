@@ -17,6 +17,7 @@ module Stackup
       client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
       @name = name
       @cf_client = client
+      @wait = true
       @poll_interval = DEFAULT_POLL_INTERVAL
       options.each do |key, value|
         public_send("#{key}=", value)
@@ -25,6 +26,12 @@ module Stackup
 
     attr_reader :name
     attr_accessor :poll_interval
+
+    attr_writer :wait
+
+    def wait?
+      @wait
+    end
 
     # Register a handler for reporting of stack events.
     # @param [Proc] event_handler
@@ -145,11 +152,9 @@ module Stackup
       rescue NoSuchStack
         return nil
       end
-      status = modify_stack do
+      modify_stack("DELETE_COMPLETE", "stack delete failed") do
         cf_stack.delete
       end
-      fail StackUpdateError, "stack delete failed" unless status == "DELETE_COMPLETE"
-      status
     ensure
       @stack_id = nil
     end
@@ -162,11 +167,9 @@ module Stackup
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def cancel_update
-      status = modify_stack do
+      modify_stack(/_COMPLETE$/, "update cancel failed") do
         cf_stack.cancel_update
       end
-      fail StackUpdateError, "update cancel failed" unless status =~ /_COMPLETE$/
-      status
     rescue InvalidStateError
       nil
     end
@@ -176,7 +179,7 @@ module Stackup
     # @return [String] status, once stable
     #
     def wait
-      modify_stack do
+      modify_stack(/./, "failed to stabilize") do
         # nothing
       end
     end
@@ -253,22 +256,18 @@ module Stackup
       options[:stack_name] = name
       options.delete(:stack_policy_during_update_body)
       options.delete(:stack_policy_during_update_url)
-      status = modify_stack do
+      modify_stack("CREATE_COMPLETE", "stack creation failed") do
         cf.create_stack(options)
       end
-      fail StackUpdateError, "stack creation failed" unless status == "CREATE_COMPLETE"
-      status
     end
 
     def update(options)
       options.delete(:disable_rollback)
       options.delete(:on_failure)
       options.delete(:timeout_in_minutes)
-      status = modify_stack do
+      modify_stack("UPDATE_COMPLETE", "stack update failed") do
         cf_stack.update(options)
       end
-      fail StackUpdateError, "stack update failed" unless status == "UPDATE_COMPLETE"
-      status
     rescue NoUpdateRequired
       logger.info "No update required"
       nil
@@ -287,11 +286,25 @@ module Stackup
       end
     end
 
+    # Execute a block, to modify the stack.
+    #
+    # @return the stack status
+    #
+    def modify_stack(target_status, failure_message, &block)
+      if wait?
+        status = modify_stack_synchronously(&block)
+        fail StackUpdateError, failure_message unless target_status === status
+        status
+      else
+        modify_stack_asynchronously(&block)
+      end
+    end
+
     # Execute a block, reporting stack events, until the stack is stable.
     #
     # @return the final stack status
     #
-    def modify_stack
+    def modify_stack_synchronously
       watch do |watcher|
         handling_validation_error do
           yield
@@ -304,6 +317,17 @@ module Stackup
           sleep(poll_interval)
         end
       end
+    end
+
+    # Execute a block to instigate stack modification, but don't wait.
+    #
+    # @return the stack status
+    #
+    def modify_stack_asynchronously
+      handling_validation_error do
+        yield
+      end
+      self.status
     end
 
     def normalize_tags(tags)

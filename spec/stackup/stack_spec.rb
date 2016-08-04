@@ -113,6 +113,31 @@ describe Stackup::Stack do
         expect(create_or_update).to eq("CREATE_COMPLETE")
       end
 
+      context "with :wait = false" do
+
+        let(:stack_options) { { :wait => false } }
+
+        it "calls :create_stack" do
+          expected_args = {
+            :stack_name => stack_name,
+            :template_body => template
+          }
+          create_or_update
+          expect(cf_client).to have_received(:create_stack)
+            .with(hash_including(expected_args))
+        end
+
+        it "it does not sleep" do
+          create_or_update
+          expect(stack).not_to have_received(:sleep)
+        end
+
+        it "returns initial status" do
+          expect(create_or_update).to eq("CREATE_IN_PROGRESS")
+        end
+
+      end
+
       context "unsuccessful" do
 
         let(:final_status) { "CREATE_FAILED" }
