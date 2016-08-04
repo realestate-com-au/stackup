@@ -1,8 +1,4 @@
-## 0.9.1 (2016-08-04)
-
-* Revert default poll interval to 5 seconds.
-
-## 0.9.0 (2016-08-04)
+## 0.9.2 (2016-08-04)
 
 * Make poll_interval (during deployment) configurable.
 * Add `--wait-poll-interval` option.
