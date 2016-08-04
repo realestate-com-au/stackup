@@ -1,4 +1,4 @@
-## PENDING
+## 0.9.0 (2016-08-04)
 
 * Make poll_interval (during deployment) configurable.
 * Add `--wait-poll-interval` option.
