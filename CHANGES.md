@@ -1,4 +1,4 @@
-## PENDING
+## 0.9.3 (2016-08-21)
 
 * Specify CAPABILITY_NAMED_IAM by default, allowing creation of named IAM roles.
 
