@@ -68,7 +68,7 @@ module Stackup
     #   accepts a superset of the options supported by
     #   +Aws::CloudFormation::Stack#update+
     #   (see http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Stack.html#update-instance_method)
-    # @option options [Array<String>] :capabilities (CAPABILITY_IAM)
+    # @option options [Array<String>] :capabilities (CAPABILITY_NAMED_IAM)
     #   list of capabilities required for stack template
     # @option options [boolean] :disable_rollback (false)
     #   if true, disable rollback if stack creation fails
@@ -126,7 +126,7 @@ module Stackup
       if (policy_data = options.delete(:stack_policy_during_update))
         options[:stack_policy_during_update_body] = MultiJson.dump(policy_data)
       end
-      options[:capabilities] ||= ["CAPABILITY_IAM"]
+      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
       delete if ALMOST_DEAD_STATUSES.include?(status)
       update(options)
     rescue NoSuchStack

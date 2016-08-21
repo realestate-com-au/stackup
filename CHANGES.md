@@ -1,3 +1,7 @@
+## PENDING
+
+* Specify CAPABILITY_NAMED_IAM by default, allowing creation of named IAM roles.
+
 ## 0.9.2 (2016-08-04)
 
 * Make poll_interval (during deployment) configurable.
