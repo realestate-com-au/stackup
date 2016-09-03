@@ -1,4 +1,4 @@
-## PENDING
+## 0.9.4 (2016-09-03)
 
 * Support multiple parameters files.
 
