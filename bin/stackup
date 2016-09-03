@@ -105,6 +105,10 @@ Clamp do
     signal_error "no such file: #{file.inspect}"
   end
 
+  def load_parameters(file)
+    Stackup::Parameters.new(load_data(file)).to_hash
+  end
+
   subcommand "status", "Print stack status." do
 
     def execute
@@ -121,10 +125,11 @@ Clamp do
     option ["-T", "--use-previous-template"], :flag,
            "reuse the existing template"
 
-    option ["-p", "--parameters"], "FILE", "parameters file",
-           :attribute_name => :parameters_file
+    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
+           :multivalued => true,
+           :attribute_name => :parameter_file_list
 
-    option ["-o", "--override"], "PARAM=VALUE", "parameters overrides",
+    option ["-o", "--override"], "PARAM=VALUE", "parameter overrides",
            :multivalued => true,
            :attribute_name => :override_list
 
@@ -157,12 +162,9 @@ Clamp do
     private
 
     def parameters
-      parameters_from_file.merge(parameter_overrides)
-    end
-
-    def parameters_from_file
-      return {} unless parameters_file
-      Stackup::Parameters.new(load_data(parameters_file)).to_hash
+      hashes = parameter_file_list.map(&method(:load_parameters))
+      hashes << parameter_overrides
+      hashes.inject(:merge)
     end
 
     def parameter_overrides
@@ -181,8 +183,9 @@ Clamp do
     option ["-t", "--template"], "FILE", "template file",
            :attribute_name => :template_file
 
-    option ["-p", "--parameters"], "FILE", "parameters file",
-           :attribute_name => :parameters_file
+    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
+           :multivalued => true,
+           :attribute_name => :parameter_file_list
 
     option "--tags", "FILE", "stack tags file",
            :attribute_name => :tags_file
@@ -196,7 +199,7 @@ Clamp do
         current["Template"] = stack.template
         planned["Template"] = load_data(template_file)
       end
-      if parameters_file
+      unless parameter_file_list.empty?
         current["Parameters"] = existing_parameters.sort.to_h
         planned["Parameters"] = new_parameters.sort.to_h
       end
@@ -218,11 +221,12 @@ Clamp do
       @existing_parameters ||= stack.parameters
     end
 
+    def parameters_from_files
+      parameter_file_list.map(&method(:load_parameters)).inject(:merge)
+    end
+
     def new_parameters
-      result = load_data(parameters_file)
-      result = Stackup::Parameters.new(result).to_hash
-      result = existing_parameters.merge(result)
-      result.sort
+      existing_parameters.merge(parameters_from_files)
     end
 
   end
