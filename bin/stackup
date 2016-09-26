@@ -5,6 +5,7 @@ $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 require "clamp"
 require "console_logger"
 require "multi_json"
+require "securerandom"
 require "stackup"
 require "stackup/differ"
 require "stackup/version"
@@ -28,6 +29,9 @@ Clamp do
     end
     arg
   end
+
+  option ["--with-role"], "ROLE_ARN", "assume this role",
+    :attribute_name => :role_arn
 
   option ["--retry-limit"], "N", "maximum number of retries for API calls",
     :environment_variable => "AWS_API_RETRY_LIMIT" do |arg|
@@ -77,17 +81,34 @@ Clamp do
     puts format_data(data)
   end
 
+  def role_arn=(arg)
+    unless arg =~ %r{^arn:aws:iam::\d+:role/}
+      fail ArgumentError, "#{arg.inspect} doesn't look like a role ARN"
+    end
+    @role_arn = arg
+  end
+
   def stackup
     Stackup(aws_config)
   end
 
-  def aws_config
+  def base_aws_config
     {
       :log_level => :debug,
       :logger => logger,
       :region => region,
       :retry_limit => retry_limit
     }.reject { |_k, v| v.nil? }
+  end
+
+  def aws_config
+    return base_aws_config unless role_arn
+    assumed_credentials = Aws::AssumeRoleCredentials.new(
+      :client => Aws::STS::Client.new(base_aws_config),
+      :role_arn => role_arn,
+      :role_session_name => "stackup-#{SecureRandom.hex(8)}"
+    )
+    base_aws_config.merge(:credentials => assumed_credentials)
   end
 
   def stack

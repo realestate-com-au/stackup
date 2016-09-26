@@ -1,3 +1,7 @@
+## 0.9.4 (2016-09-26)
+
+* Add `--with-role` option, to assume a role for stack operations.
+
 ## 0.9.4 (2016-09-03)
 
 * Support multiple parameters files.

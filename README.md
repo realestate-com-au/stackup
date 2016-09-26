@@ -116,3 +116,12 @@ Replace "latest" with a specific version for added safety.
 
 The default working-directory within the container is `/cwd`;
 hence the volume mount to make files available from the host system.
+
+## AWS credentials
+
+The stackup command-line looks for AWS credentials in the [standard environment variables](https://blogs.aws.amazon.com/security/post/Tx3D6U6WSFGOK2H/A-New-and-Standardized-Way-to-Manage-Credentials-in-the-AWS-SDKs).
+
+You can also use the `--with-role` option to temporarily assume a different IAM role, for stack operations:
+
+    $ stackup myapp-test up -t template.json \
+      --with-role arn:aws:iam::862905684840:role/deployment
