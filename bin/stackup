@@ -26,15 +26,12 @@ Clamp do
     unless arg =~ /^[a-z]{2}-[a-z]+-\d$/
       fail ArgumentError, "#{arg.inspect} doesn't look like a region"
     end
-    Aws.config.update(:region => arg)
     arg
   end
 
   option ["--retry-limit"], "N", "maximum number of retries for API calls",
     :environment_variable => "AWS_API_RETRY_LIMIT" do |arg|
-    Integer(arg).tap do |value|
-      Aws.config.update(:retry_limit => value)
-    end
+    Integer(arg)
   end
 
   option ["--[no-]wait"], :flag, "wait for stack updates to complete",
@@ -81,7 +78,16 @@ Clamp do
   end
 
   def stackup
-    Stackup(:logger => logger, :log_level => :debug)
+    Stackup(aws_config)
+  end
+
+  def aws_config
+    {
+      :log_level => :debug,
+      :logger => logger,
+      :region => region,
+      :retry_limit => retry_limit
+    }.reject { |_k, v| v.nil? }
   end
 
   def stack
