@@ -1,4 +1,4 @@
-## 0.9.4 (2016-09-26)
+## 0.9.5 (2016-09-26)
 
 * Add `--with-role` option, to assume a role for stack operations.
 
