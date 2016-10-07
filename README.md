@@ -37,8 +37,6 @@ Called with `--list`, it will list stacks:
     foo-bar-test
     zzz-production
 
-The command-line support inputs (template and parameters) in either JSON or YAML format.
-
 ### Stack create/update
 
 Use sub-command "up" to create or update a stack, as appropriate:
@@ -101,6 +99,12 @@ Parameters and tags may be specified via files, or as a Hash, e.g.
       t.parameters = "production-params.json"
       t.tags = { "environment" => "production" }
     end
+
+## YAML support
+
+Stackup supports input files (template, parameters, tags) in either JSON or YAML format.
+
+It also supports the [abbreviated YAML syntax for Cloudformation functions](https://aws.amazon.com/blogs/aws/aws-cloudformation-update-yaml-cross-stack-references-simplified-substitution/), though unlike the [AWS CLI](https://aws.amazon.com/cli/), Stackup normalises YAML input to JSON before invoking CloudFormation APIs.
 
 ## Docker image
 
