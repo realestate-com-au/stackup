@@ -1,4 +1,4 @@
-## PENDING
+## 1.0.0 (2016-10-07)
 
 * Add support for CloudFormation YAML extensions (e.g. `!Ref`).
 
