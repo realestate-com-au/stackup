@@ -1,0 +1,33 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Sample Template
+Parameters:
+  IndexDoc:
+    Description: Website index doc
+    Type: String
+    Default: index.html
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument:
+          Ref: IndexDoc
+        ErrorDocument: error.html
+Outputs:
+  WebsiteURL:
+    Value:
+      Fn::GetAtt:
+      - S3Bucket
+      - WebsiteURL
+    Description: URL for website hosted on S3
+  S3BucketSecureURL:
+    Value:
+      Fn::Join:
+      - ''
+      - - https://
+        - !GetAtt
+          - S3Bucket
+          - DomainName
+    Description: Name of S3 bucket to hold website content

@@ -9,7 +9,7 @@ require "securerandom"
 require "stackup"
 require "stackup/differ"
 require "stackup/version"
-require "yaml"
+require "stackup/yaml"
 
 $stdout.sync = true
 $stderr.sync = true
@@ -127,7 +127,7 @@ Clamp do
   end
 
   def load_data(file)
-    YAML.load_file(file)
+    Stackup::YAML.load_file(file)
   rescue Errno::ENOENT
     signal_error "no such file: #{file.inspect}"
   end
