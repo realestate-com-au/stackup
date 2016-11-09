@@ -100,7 +100,7 @@ module Stackup
     # @option options [Hash] :template
     #   stack template, as Ruby data
     # @option options [String] :template_body
-    #   stack template, as JSON
+    #   stack template, as JSON or YAML
     # @option options [String] :template_url
     #   location of stack template
     # @option options [Integer] :timeout_in_minutes
@@ -185,16 +185,25 @@ module Stackup
       end
     end
 
+    # Get the current template body.
+    #
+    # @return [String] current stack template, as JSON or YAML
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
+    def template_body
+      handling_validation_error do
+        template_json = cf_client.get_template(:stack_name => name).template_body
+        Stackup::YAML.load(template_json)
+      end
+    end
+
     # Get the current template.
     #
     # @return [Hash] current stack template, as Ruby data
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def template
-      handling_validation_error do
-        template_json = cf_client.get_template(:stack_name => name).template_body
-        Stackup::YAML.load(template_json)
-      end
+      Stackup::YAML.load(template_body)
     end
 
     # Get the current parameters.
