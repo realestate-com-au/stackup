@@ -4,6 +4,7 @@ require "multi_json"
 require "stackup/error_handling"
 require "stackup/parameters"
 require "stackup/stack_watcher"
+require "stackup/yaml"
 
 module Stackup
 
@@ -192,7 +193,7 @@ module Stackup
     def template
       handling_validation_error do
         template_json = cf_client.get_template(:stack_name => name).template_body
-        MultiJson.load(template_json)
+        Stackup::YAML.load(template_json)
       end
     end
 
