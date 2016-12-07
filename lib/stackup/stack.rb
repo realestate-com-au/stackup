@@ -190,8 +190,7 @@ module Stackup
     #
     def template_body
       handling_validation_error do
-        template_json = cf_client.get_template(:stack_name => name).template_body
-        Stackup::YAML.load(template_json)
+        cf_client.get_template(:stack_name => name).template_body
       end
     end
 
