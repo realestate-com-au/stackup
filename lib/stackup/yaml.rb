@@ -47,6 +47,8 @@ module Stackup
         case target.tag
         when "!Ref"
           { "Ref" => super }
+        when "!GetAtt"
+          { "Fn::GetAtt" => super.split(".") }
         when /^!(\w+)$/
           { "Fn::#{$1}" => super }
         else

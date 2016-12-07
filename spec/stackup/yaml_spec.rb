@@ -10,7 +10,7 @@ describe Stackup::YAML do
       described_class.load(input)
     end
 
-    context "with plain YAML" do
+    describe "plain YAML" do
 
       let(:input) do
         <<-YAML
@@ -29,7 +29,7 @@ describe Stackup::YAML do
 
     end
 
-    context "with a !Ref" do
+    describe "!Ref" do
 
       let(:input) do
         <<-YAML
@@ -50,16 +50,16 @@ describe Stackup::YAML do
 
     end
 
-    context "with a !Ref" do
+    describe "!GetAtt" do
 
       let(:input) do
         <<-YAML
         Outputs:
-          Foo: !GetAtt ["Bar", "Baz"]
+          Foo: !GetAtt Bar.Baz
         YAML
       end
 
-      it "expands to Ref" do
+      it "expands to Fn::GetAtt" do
         expect(data).to eql(
           "Outputs" => {
             "Foo" => {
