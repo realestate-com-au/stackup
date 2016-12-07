@@ -140,8 +140,6 @@ module Stackup
 
     # Delete the stack.
     #
-    # @param [String] template template JSON
-    # @param [Array<Hash>] parameters template parameters
     # @return [Symbol] +:deleted+ if successful
     # @raise [Stackup::StackUpdateError] if operation fails
     #
