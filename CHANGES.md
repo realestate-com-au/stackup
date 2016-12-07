@@ -1,3 +1,9 @@
+## 1.0.1 (2016-12-07)
+
+* Fix handling of "!GetAtt" in CloudFormation YAML.
+* Special-case "!GetAZs" without an argument.
+* Add Stack#template_body.
+
 ## 1.0.0 (2016-10-07)
 
 * Add support for CloudFormation YAML extensions (e.g. `!Ref`).
