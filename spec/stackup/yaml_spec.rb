@@ -74,6 +74,48 @@ describe Stackup::YAML do
 
     end
 
+    describe "!GetAtt" do
+
+      context "with an argument" do
+
+        let(:input) do
+          <<-YAML
+            Foo:
+              !GetAZs xy-foobar-6
+          YAML
+        end
+
+        it "expands to Fn::GetAtt" do
+          expect(data).to eql(
+            "Foo" => {
+              "Fn::GetAZs" => "xy-foobar-6"
+            }
+          )
+        end
+
+      end
+
+      context "without an argument" do
+
+        let(:input) do
+          <<-YAML
+            Foo:
+              !GetAZs
+          YAML
+        end
+
+        it "infers a blank argument" do
+          expect(data).to eql(
+            "Foo" => {
+              "Fn::GetAZs" => ""
+            }
+          )
+        end
+
+      end
+
+    end
+
     describe "!Whatever" do
 
       let(:input) do

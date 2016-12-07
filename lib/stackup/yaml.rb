@@ -49,6 +49,8 @@ module Stackup
           { "Ref" => super }
         when "!GetAtt"
           { "Fn::GetAtt" => super.split(".") }
+        when "!GetAZs"
+          { "Fn::GetAZs" => (super || "") }
         when /^!(\w+)$/
           { "Fn::#{$1}" => super }
         else
