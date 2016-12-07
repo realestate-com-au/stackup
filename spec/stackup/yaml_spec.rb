@@ -74,6 +74,35 @@ describe Stackup::YAML do
 
     end
 
+    describe "!Whatever" do
+
+      let(:input) do
+        <<-YAML
+          Stuff:
+          - !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+          - !If [CreateProdResources, c1.xlarge, m1.small]
+          - !Join [ ":", [ "a", "b", "c" ] ]
+        YAML
+      end
+
+      it "expands to Fn::Whatever" do
+        expect(data).to eql(
+          "Stuff" => [
+            {
+              "Fn::FindInMap" => ["RegionMap", {"Ref"=>"AWS::Region"}, "AMI"]
+            },
+            {
+              "Fn::If" => ["CreateProdResources", "c1.xlarge", "m1.small"]
+            },
+            {
+              "Fn::Join" => [":", ["a", "b", "c"]]
+            }
+          ]
+        )
+      end
+
+    end
+
   end
 
 end
