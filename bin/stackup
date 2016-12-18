@@ -344,7 +344,7 @@ Clamp do
 
   end
 
-  subcommand "parameters", "Display stack parameters." do
+  subcommand ["parameters", "params"], "Display stack parameters." do
 
     def execute
       display_data(stack.parameters)
