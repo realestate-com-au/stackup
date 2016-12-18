@@ -352,6 +352,14 @@ Clamp do
 
   end
 
+  subcommand "tags", "Display stack tags." do
+
+    def execute
+      display_data(stack.tags)
+    end
+
+  end
+
   subcommand "resources", "Display stack resources." do
 
     def execute
