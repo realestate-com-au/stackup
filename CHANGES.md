@@ -1,3 +1,7 @@
+## 1.0.3 (2016-12-19)
+
+* Support "!GetAtt" with an array (rather than dotted string).
+
 ## 1.0.2 (2016-12-19)
 
 * Add `tags` subcommand.

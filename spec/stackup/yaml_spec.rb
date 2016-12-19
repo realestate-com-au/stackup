@@ -52,24 +52,52 @@ describe Stackup::YAML do
 
     describe "!GetAtt" do
 
-      let(:input) do
-        <<-YAML
-        Outputs:
-          Foo: !GetAtt Bar.Baz
-        YAML
+      context "with an array" do
+
+        let(:input) do
+          <<-YAML
+          Outputs:
+            Foo: !GetAtt [Bar, Baz]
+          YAML
+        end
+
+        it "expands to Fn::GetAtt" do
+          expect(data).to eql(
+            "Outputs" => {
+              "Foo" => {
+                "Fn::GetAtt" => [
+                  "Bar",
+                  "Baz"
+                ]
+              }
+            }
+          )
+        end
+
       end
 
-      it "expands to Fn::GetAtt" do
-        expect(data).to eql(
-          "Outputs" => {
-            "Foo" => {
-              "Fn::GetAtt" => [
-                "Bar",
-                "Baz"
-              ]
+      context "with a string" do
+
+        let(:input) do
+          <<-YAML
+          Outputs:
+            Foo: !GetAtt Bar.Baz
+          YAML
+        end
+
+        it "split on dot" do
+          expect(data).to eql(
+            "Outputs" => {
+              "Foo" => {
+                "Fn::GetAtt" => [
+                  "Bar",
+                  "Baz"
+                ]
+              }
             }
-          }
-        )
+          )
+        end
+
       end
 
     end

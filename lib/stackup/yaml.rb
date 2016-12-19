@@ -48,13 +48,21 @@ module Stackup
         when "!Ref"
           { "Ref" => super }
         when "!GetAtt"
-          { "Fn::GetAtt" => super.split(".") }
+          { "Fn::GetAtt" => array_or_dotted_string(super) }
         when "!GetAZs"
           { "Fn::GetAZs" => (super || "") }
         when /^!(\w+)$/
           { "Fn::#{$1}" => super }
         else
           super
+        end
+      end
+
+      def array_or_dotted_string(arg)
+        if arg.respond_to?(:split)
+          arg.split(".")
+        else
+          arg
         end
       end
 
