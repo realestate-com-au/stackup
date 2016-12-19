@@ -74,7 +74,7 @@ describe Stackup::YAML do
 
     end
 
-    describe "!GetAtt" do
+    describe "!GetAZs" do
 
       context "with an argument" do
 
