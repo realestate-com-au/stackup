@@ -43,6 +43,10 @@ module Stackup
     #
     class CloudFormationToRuby < Psych::Visitors::ToRuby
 
+      class << self
+        alias_method :create, :new unless method_defined?(:create)
+      end
+
       def accept(target)
         case target.tag
         when "!Ref"

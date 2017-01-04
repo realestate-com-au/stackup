@@ -1,3 +1,7 @@
+## PENDING
+
+* Fix #34: make YAML parsing work in ruby-2.0.
+
 ## 1.0.3 (2016-12-19)
 
 * Support "!GetAtt" with an array (rather than dotted string).
