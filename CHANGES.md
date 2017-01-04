@@ -1,4 +1,4 @@
-## PENDING
+## 1.0.4 (2017-01-04)
 
 * Fix #34: make YAML parsing work in ruby-2.0.
 
