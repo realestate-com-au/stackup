@@ -127,7 +127,14 @@ Clamp do
   end
 
   def load_data(file)
-    Stackup::YAML.load_file(file)
+    case File.extname(file)
+    when ".json"
+      MultiJson.load(File.open(file))
+    when ".yaml", ".yml"
+      Stackup::YAML.load_file(file)
+    else
+      signal_error "unknown file type: #{file.inspect}"
+    end
   rescue Errno::ENOENT
     signal_error "no such file: #{file.inspect}"
   end
