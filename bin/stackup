@@ -151,7 +151,7 @@ Clamp do
 
   end
 
-  subcommand "up", "Create/update the stack" do
+  subcommand "up", "Create/update the stack." do
 
     option ["-t", "--template"], "FILE", "template file",
            :attribute_name => :template_file
@@ -275,7 +275,7 @@ Clamp do
 
   end
 
-  subcommand "cancel-update", "Cancel the update in-progress" do
+  subcommand "cancel-update", "Cancel the update in-progress." do
 
     def execute
       report_change do
@@ -285,7 +285,7 @@ Clamp do
 
   end
 
-  subcommand "wait", "Wait until stack is stable" do
+  subcommand "wait", "Wait until stack is stable." do
 
     def execute
       puts stack.wait
@@ -293,7 +293,7 @@ Clamp do
 
   end
 
-  subcommand "events", "List stack events" do
+  subcommand "events", "List stack events." do
 
     option ["-f", "--follow"], :flag, "follow new events"
     option ["--data"], :flag, "display events as data"
@@ -383,7 +383,7 @@ Clamp do
 
   end
 
-  subcommand "inspect", "Display stack particulars" do
+  subcommand "inspect", "Display stack particulars." do
 
     def execute
       data = {
