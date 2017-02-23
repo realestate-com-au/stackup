@@ -1,8 +1,4 @@
-## PENDING
-
-* Fix recognition of URLs referencing S3.
-
-## 1.1.0 (2017-02-23)
+## 1.1.1 (2017-02-23)
 
 * The `stackup` CLI now allows stack template and policy documents to be specified as URLs.
   * Template URL must point to a template stored in an Amazon S3 bucket, e.g. `https://s3-ap-southeast-2.amazonaws.com/bucket/template.json`.
