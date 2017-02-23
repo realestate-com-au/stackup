@@ -15,6 +15,8 @@ module Stackup
 
     def body
       @body ||= IO.read(location)
+    rescue Errno::ENOENT
+      raise ReadError, "no such file: #{location.inspect}"
     end
 
     def data
@@ -31,6 +33,9 @@ module Stackup
       else
         Stackup::YAML.load(body)
       end
+    end
+
+    class ReadError < StandardError
     end
 
   end

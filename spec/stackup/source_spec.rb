@@ -56,4 +56,20 @@ describe Stackup::Source do
 
   end
 
+  context "with a non-existant file" do
+
+    let(:bogus_file) { "notreallythere.json" }
+
+    subject(:source) { described_class.new(bogus_file) }
+
+    describe "#body" do
+
+      it "raises a ReadError" do
+        expect { subject.body }.to raise_error(Stackup::Source::ReadError, %q(no such file: "notreallythere.json"))
+      end
+
+    end
+
+  end
+
 end
