@@ -1,5 +1,6 @@
 # stackup
 
+[![Gem Version](https://badge.fury.io/rb/stackup.png)](http://badge.fury.io/rb/stackup)
 [![Build Status](https://travis-ci.org/realestate-com-au/stackup.svg?branch=master)](https://travis-ci.org/realestate-com-au/stackup)
 
 Stackup provides a CLI and a simplified Ruby API for dealing with
