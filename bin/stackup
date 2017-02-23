@@ -132,7 +132,7 @@ Clamp do
   def parameters_from_files
     parameter_sources.map { |src|
       Stackup::Parameters.new(src.data).to_hash
-    }.inject(:merge)
+    }.inject({}, :merge)
   end
 
   subcommand "status", "Print stack status." do
