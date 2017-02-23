@@ -130,8 +130,8 @@ Clamp do
   end
 
   def parameters_from_files
-    parameter_sources.map { |source|
-      Stackup::Parameters.new(source.data).to_hash
+    parameter_sources.map { |src|
+      Stackup::Parameters.new(src.data).to_hash
     }.inject(:merge)
   end
 
@@ -179,7 +179,7 @@ Clamp do
       end
       options = {}
       if template_source
-        if template_source.location =~ %r{^https://}
+        if is_s3_url?(template_source.location)
           options[:template_url] = template_source.location
         else
           options[:template] = template_source.data
@@ -188,7 +188,13 @@ Clamp do
       options[:on_failure] = on_failure
       options[:parameters] = parameters
       options[:tags] = tag_source.data if tag_source
-      options[:stack_policy] = policy_source.data if policy_source
+      if policy_source
+        if is_s3_url?(policy_source.location)
+          options[:stack_policy_url] = policy_source.location
+        else
+          options[:stack_policy] = policy_source.data
+        end
+      end
       options[:use_previous_template] = use_previous_template?
       report_change do
         stack.create_or_update(options)
@@ -208,6 +214,10 @@ Clamp do
           result[key] = value
         end
       end
+    end
+
+    def is_s3_url?(location)
+      location =~ %r{^https://s3\w*.amazonaws.com}
     end
 
   end
