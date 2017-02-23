@@ -128,7 +128,7 @@ Clamp do
 
   def read(file)
     File.read(file, mode: 'r:bom|utf-8')
-  rescue Errno::ENOENT
+  rescue Errno::ENOENT => e
     signal_error "no such file: #{file.inspect}"
   end
 
@@ -158,7 +158,7 @@ Clamp do
   subcommand "up", "Create/update the stack." do
 
     option ["-t", "--template"], "FILE", "template file",
-           :attribute_name => :template_file
+           :attribute_name => :template_location
 
     option ["-T", "--use-previous-template"], :flag,
            "reuse the existing template"
@@ -182,11 +182,17 @@ Clamp do
            :default => "ROLLBACK"
 
     def execute
-      unless template_file || use_previous_template?
+      unless template_location || use_previous_template?
         signal_usage_error "Specify either --template or --use-previous-template"
       end
       options = {}
-      options[:template] = load_data(template_file) if template_file
+      if template_location
+        if template_location =~ %r{^https://}
+          options[:template_url] = template_location
+        else
+          options[:template] = load_data(template_location)
+        end
+      end
       options[:on_failure] = on_failure
       options[:parameters] = parameters
       options[:tags] = load_data(tags_file) if tags_file
@@ -219,7 +225,7 @@ Clamp do
   subcommand "diff", "Compare template/params to current stack." do
 
     option ["-t", "--template"], "FILE", "template file",
-           :attribute_name => :template_file
+           :attribute_name => :template_location
 
     option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
            :multivalued => true,
@@ -233,9 +239,9 @@ Clamp do
     def execute
       current = {}
       planned = {}
-      if template_file
+      if template_location
         current["Template"] = stack.template
-        planned["Template"] = load_data(template_file)
+        planned["Template"] = load_data(template_location)
       end
       unless parameter_file_list.empty?
         current["Parameters"] = existing_parameters.sort.to_h
