@@ -43,8 +43,12 @@ module Stackup
       end
     rescue Errno::ENOENT
       raise ReadError, "no such file: #{location.inspect}"
+    rescue Errno::ECONNREFUSED => e
+      raise ReadError, "cannot read #{location.inspect} - #{e.message}"
     rescue OpenURI::HTTPError => e
-      raise ReadError, "#{e}: #{location.inspect}"
+      raise ReadError, "cannot read #{location.inspect} - #{e.message}"
+    rescue SocketError => e
+      raise ReadError, "cannot read #{location.inspect} - #{e.message}"
     end
 
     def parse_body
