@@ -1,4 +1,5 @@
 require "aws-sdk-core"
+require "open-uri"
 require "stackup/stack"
 
 module Stackup
@@ -14,9 +15,7 @@ module Stackup
     attr_reader :location
 
     def body
-      @body ||= IO.read(location)
-    rescue Errno::ENOENT
-      raise ReadError, "no such file: #{location.inspect}"
+      @body ||= read
     end
 
     def data
@@ -26,6 +25,22 @@ module Stackup
     private
 
     LOOKS_LIKE_JSON = /^\s*[\{\[]/
+
+    def uri
+      URI(location)
+    end
+
+    def read
+      if uri.scheme
+        uri.read
+      else
+        IO.read(location)
+      end
+    rescue Errno::ENOENT
+      raise ReadError, "no such file: #{location.inspect}"
+    rescue OpenURI::HTTPError => e
+      raise ReadError, "#{e}: #{location.inspect}"
+    end
 
     def parse_body
       if body =~ LOOKS_LIKE_JSON
