@@ -15,6 +15,7 @@ AWS CloudFormation stacks.
 	- [Specifying parameters](#specifying-parameters)
 	- [YAML support](#yaml-support)
 	- [AWS credentials](#aws-credentials)
+	- [Using URLs as inputs](#using-urls-as-inputs)
 	- [Stack deletion](#stack-deletion)
 	- [Stack inspection](#stack-inspection)
 - [Programmatic usage](#programmatic-usage)
@@ -122,6 +123,20 @@ You can also use the `--with-role` option to temporarily assume a different IAM 
 
     $ stackup myapp-test up -t template.json \
       --with-role arn:aws:iam::862905684840:role/deployment
+
+### Using URLs as inputs
+
+You can use either local files, or HTTP URLs, to specify inputs; stack template, parameters, etc.
+
+    $ stackup mystack up \
+      -t https://s3.amazonaws.com/mybucket/stack-template.json
+
+Where a template URL references an object in S3, `stackup` leverages [CloudFormation's native support](http://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateStack.html) for such URLs, enabling use of much larger templates.
+
+Non-S3 URLs are also supported, though in that case `stackup` must fetch the content itself:
+
+    $ stackup mystack up \
+      -t https://raw.githubusercontent.com/realestate-com-au/stackup/master/examples/template.yml
 
 ### Stack deletion
 
