@@ -12,7 +12,7 @@ describe Stackup::Source do
 
     let(:json_file) { File.join(example_dir, "template.json") }
 
-    subject(:source) { described_class.new(json_file) }
+    subject(:src) { described_class.new(json_file) }
 
     describe "#body" do
 
@@ -30,13 +30,17 @@ describe Stackup::Source do
 
     end
 
+    it "is not S3" do
+      expect(subject).not_to be_s3
+    end
+
   end
 
   context "from a YAML file" do
 
     let(:yaml_file) { File.join(example_dir, "template.yml") }
 
-    subject(:source) { described_class.new(yaml_file) }
+    subject(:src) { described_class.new(yaml_file) }
 
     describe "#body" do
 
@@ -60,12 +64,62 @@ describe Stackup::Source do
 
     let(:bogus_file) { "notreallythere.json" }
 
-    subject(:source) { described_class.new(bogus_file) }
+    subject(:src) { described_class.new(bogus_file) }
 
     describe "#body" do
 
       it "raises a ReadError" do
         expect { subject.body }.to raise_error(Stackup::Source::ReadError, %q(no such file: "notreallythere.json"))
+      end
+
+    end
+
+  end
+
+  context "with an HTTP URL" do
+
+    let(:url) { "https://example.com/template.json" }
+
+    subject(:src) { described_class.new(url) }
+
+    it "is not S3" do
+      expect(subject).not_to be_s3
+    end
+
+  end
+
+  context "with an S3 URL" do
+
+    let(:s3_url) { "https://s3.amazonaws.com/bucket/template.json" }
+
+    subject(:src) { described_class.new(s3_url) }
+
+    context "with bucket in path" do
+
+      let(:s3_url) { "https://s3.amazonaws.com/bucket/template.json" }
+
+      it "is S3" do
+        expect(subject).to be_s3
+      end
+
+    end
+
+    context "with bucket in host" do
+
+      let(:s3_url) { "https://bucket.s3.amazonaws.com/template.json" }
+
+      it "is S3" do
+        expect(subject).to be_s3
+      end
+
+    end
+
+    context "with bucket region" do
+
+      let(:s3_url) { "https://bucket.s3-ap-northeast-3.amazonaws.com/template.json" }
+
+      it "is S3" do
+        expect(subject).to be_s3
       end
 
     end

@@ -14,6 +14,11 @@ module Stackup
 
     attr_reader :location
 
+    def s3?
+      uri.scheme == "https" &&
+      uri.host =~ %r{(^|\.)s3(-\w+-\w+-\d)?\.amazonaws\.com$}
+    end
+
     def body
       @body ||= read
     end

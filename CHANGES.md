@@ -1,3 +1,7 @@
+## PENDING
+
+* Fix recognition of URLs referencing S3.
+
 ## 1.1.0 (2017-02-23)
 
 * The `stackup` CLI now allows stack template and policy documents to be specified as URLs.

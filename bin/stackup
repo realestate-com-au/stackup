@@ -179,7 +179,7 @@ Clamp do
       end
       options = {}
       if template_source
-        if is_s3_url?(template_source.location)
+        if template_source.s3?
           options[:template_url] = template_source.location
         else
           options[:template] = template_source.data
@@ -189,7 +189,7 @@ Clamp do
       options[:parameters] = parameters
       options[:tags] = tag_source.data if tag_source
       if policy_source
-        if is_s3_url?(policy_source.location)
+        if policy_source.s3?
           options[:stack_policy_url] = policy_source.location
         else
           options[:stack_policy] = policy_source.data
@@ -214,10 +214,6 @@ Clamp do
           result[key] = value
         end
       end
-    end
-
-    def is_s3_url?(location)
-      location =~ %r{^https://s3\w*.amazonaws.com}
     end
 
   end
