@@ -8,6 +8,7 @@ require "multi_json"
 require "securerandom"
 require "stackup"
 require "stackup/differ"
+require "stackup/source"
 require "stackup/version"
 require "stackup/yaml"
 
@@ -126,25 +127,10 @@ Clamp do
     puts final_status unless final_status.nil?
   end
 
-  def read(file)
-    File.read(file, mode: 'r:bom|utf-8')
-  rescue Errno::ENOENT => e
-    signal_error "no such file: #{file.inspect}"
-  end
-
-  def load_data(file)
-    case File.extname(file)
-    when ".json"
-      MultiJson.load(read(file))
-    when ".yaml", ".yml"
-      Stackup::YAML.load(read(file))
-    else
-      signal_error "unknown file type: #{file.inspect}"
-    end
-  end
-
-  def load_parameters(file)
-    Stackup::Parameters.new(load_data(file)).to_hash
+  def parameters_from_files
+    parameter_sources.map { |source|
+      Stackup::Parameters.new(source.data).to_hash
+    }.inject(:merge)
   end
 
   subcommand "status", "Print stack status." do
@@ -157,46 +143,50 @@ Clamp do
 
   subcommand "up", "Create/update the stack." do
 
-    option ["-t", "--template"], "FILE", "template file",
-           :attribute_name => :template_location
+    option ["-t", "--template"], "FILE", "template source",
+           :attribute_name => :template_source,
+           &Stackup::Source.method(:new)
 
     option ["-T", "--use-previous-template"], :flag,
            "reuse the existing template"
 
     option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
            :multivalued => true,
-           :attribute_name => :parameter_file_list
+           :attribute_name => :parameter_sources,
+           &Stackup::Source.method(:new)
 
     option ["-o", "--override"], "PARAM=VALUE", "parameter overrides",
            :multivalued => true,
            :attribute_name => :override_list
 
     option "--tags", "FILE", "stack tags file",
-           :attribute_name => :tags_file
+           :attribute_name => :tag_source,
+           &Stackup::Source.method(:new)
 
     option "--policy", "FILE", "stack policy file",
-           :attribute_name => :policy_file
+           :attribute_name => :policy_source,
+           &Stackup::Source.method(:new)
 
     option "--on-failure", "ACTION",
            "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
            :default => "ROLLBACK"
 
     def execute
-      unless template_location || use_previous_template?
+      unless template_source || use_previous_template?
         signal_usage_error "Specify either --template or --use-previous-template"
       end
       options = {}
-      if template_location
-        if template_location =~ %r{^https://}
-          options[:template_url] = template_location
+      if template_source
+        if template_source.location =~ %r{^https://}
+          options[:template_url] = template_source.location
         else
-          options[:template] = load_data(template_location)
+          options[:template] = template_source.data
         end
       end
       options[:on_failure] = on_failure
       options[:parameters] = parameters
-      options[:tags] = load_data(tags_file) if tags_file
-      options[:stack_policy] = load_data(policy_file) if policy_file
+      options[:tags] = tag_source.data if tag_source
+      options[:stack_policy] = policy_source.data if policy_source
       options[:use_previous_template] = use_previous_template?
       report_change do
         stack.create_or_update(options)
@@ -206,9 +196,7 @@ Clamp do
     private
 
     def parameters
-      hashes = parameter_file_list.map(&method(:load_parameters))
-      hashes << parameter_overrides
-      hashes.inject(:merge)
+      parameters_from_files.merge(parameter_overrides)
     end
 
     def parameter_overrides
@@ -224,32 +212,35 @@ Clamp do
 
   subcommand "diff", "Compare template/params to current stack." do
 
-    option ["-t", "--template"], "FILE", "template file",
-           :attribute_name => :template_location
+    option ["-t", "--template"], "FILE", "template source",
+           :attribute_name => :template_source,
+           &Stackup::Source.method(:new)
 
     option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
            :multivalued => true,
-           :attribute_name => :parameter_file_list
+           :attribute_name => :parameter_sources,
+           &Stackup::Source.method(:new)
 
     option "--tags", "FILE", "stack tags file",
-           :attribute_name => :tags_file
+           :attribute_name => :tag_source,
+           &Stackup::Source.method(:new)
 
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
       current = {}
       planned = {}
-      if template_location
+      if template_source
         current["Template"] = stack.template
-        planned["Template"] = load_data(template_location)
+        planned["Template"] = template_source.data
       end
-      unless parameter_file_list.empty?
+      unless parameter_sources.empty?
         current["Parameters"] = existing_parameters.sort.to_h
         planned["Parameters"] = new_parameters.sort.to_h
       end
-      if tags_file
+      if tag_source
         current["Tags"] = stack.tags.sort.to_h
-        planned["Tags"] = load_data(tags_file).sort.to_h
+        planned["Tags"] = tag_source.data.sort.to_h
       end
       signal_usage_error "specify '--template' or '--parameters'" if planned.empty?
       puts differ.diff(current, planned)
@@ -263,10 +254,6 @@ Clamp do
 
     def existing_parameters
       @existing_parameters ||= stack.parameters
-    end
-
-    def parameters_from_files
-      parameter_file_list.map(&method(:load_parameters)).inject(:merge)
     end
 
     def new_parameters
