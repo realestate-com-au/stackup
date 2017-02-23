@@ -200,7 +200,7 @@ Stackup is also published as a Docker image. Basic usage is:
         -e AWS_DEFAULT_REGION \
         realestate/stackup:latest ...
 
-Replace "latest" with a specific version for added safety.
+If you're sensible, you'll replace "latest", with a specific [version](https://rubygems.org/gems/stackup/versions).
 
 The default working-directory within the container is `/cwd`;
 hence the volume mount to make files available from the host system.
