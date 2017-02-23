@@ -1,3 +1,9 @@
+## 1.1.0 (2017-02-23)
+
+* The `stackup` CLI now allows stack template and policy documents to be specified as URLs.
+  * Template URL must point to a template stored in an Amazon S3 bucket, e.g. `https://s3-ap-southeast-2.amazonaws.com/bucket/template.json`.
+  * Policy URL must point to an object located in an S3 bucket in the same region as the stack.
+
 ## 1.0.4 (2017-01-04)
 
 * Fix #34: make YAML parsing work in ruby-2.0.
