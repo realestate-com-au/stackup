@@ -6,6 +6,23 @@
 Stackup provides a CLI and a simplified Ruby API for dealing with
 AWS CloudFormation stacks.
 
+<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Why?](#why)
+- [Installation](#installation)
+- [Command-line usage](#command-line-usage)
+	- [Stack create/update](#stack-createupdate)
+	- [Specifying parameters](#specifying-parameters)
+	- [YAML support](#yaml-support)
+	- [AWS credentials](#aws-credentials)
+	- [Stack deletion](#stack-deletion)
+	- [Stack inspection](#stack-inspection)
+- [Programmatic usage](#programmatic-usage)
+- [Rake integration](#rake-integration)
+- [Docker image](#docker-image)
+
+<!-- /TOC -->
+
 ## Why?
 
 Stackup provides some advantages over using `awscli` or `aws-sdk` directly:
@@ -48,6 +65,63 @@ This will:
 
   * update (or create) the named CloudFormation stack, using the specified template
   * monitor events until the stack update is complete
+
+For more details on usage, see
+
+    $ stackup STACK up --help
+
+### Specifying parameters
+
+Stack parameters can be be read from a file, e.g.
+
+    $ stackup myapp-test up -t template.json -p parameters.json
+
+Parameters can be specified as simple key-value pairs:
+
+```json
+{
+  "IndexDoc": "index.html"
+}
+```
+
+but also supports the [extended JSON format used by the AWS CLI](http://docs.aws.amazon.com/cli/latest/reference/cloudformation/create-stack.html):
+
+
+```json
+[
+  {
+    "ParameterKey": "IndexDoc",
+    "ParameterValue": "index.html",
+    "UsePreviousValue": false
+  }
+]
+```
+
+You may specify `-p` multiple times; `stackup` will read and merge all the files:
+
+    $ stackup myapp-test up -t template.json \
+      -p defaults.json \
+      -p overrides.json
+
+Or, you can specify parameters on the command-line, via `-o`:
+
+    $ stackup myapp-test up -t template.json \
+      -o IndexDoc=index.html
+
+### YAML support
+
+`stackup` supports input files (template, parameters, tags) in YAML format, as well as JSON.
+
+It also supports the [abbreviated YAML syntax for Cloudformation functions](https://aws.amazon.com/blogs/aws/aws-cloudformation-update-yaml-cross-stack-references-simplified-substitution/), though unlike the [AWS CLI](https://aws.amazon.com/cli/), Stackup normalises YAML input to JSON before invoking CloudFormation APIs.
+
+### AWS credentials
+
+The stackup command-line looks for AWS credentials in the [standard environment variables](https://blogs.aws.amazon.com/security/post/Tx3D6U6WSFGOK2H/A-New-and-Standardized-Way-to-Manage-Credentials-in-the-AWS-SDKs).
+
+You can also use the `--with-role` option to temporarily assume a different IAM role, for stack operations:
+
+    $ stackup myapp-test up -t template.json \
+      --with-role arn:aws:iam::862905684840:role/deployment
 
 ### Stack deletion
 
@@ -101,12 +175,6 @@ Parameters and tags may be specified via files, or as a Hash, e.g.
       t.tags = { "environment" => "production" }
     end
 
-## YAML support
-
-Stackup supports input files (template, parameters, tags) in either JSON or YAML format.
-
-It also supports the [abbreviated YAML syntax for Cloudformation functions](https://aws.amazon.com/blogs/aws/aws-cloudformation-update-yaml-cross-stack-references-simplified-substitution/), though unlike the [AWS CLI](https://aws.amazon.com/cli/), Stackup normalises YAML input to JSON before invoking CloudFormation APIs.
-
 ## Docker image
 
 Stackup is also published as a Docker image. Basic usage is:
@@ -121,12 +189,3 @@ Replace "latest" with a specific version for added safety.
 
 The default working-directory within the container is `/cwd`;
 hence the volume mount to make files available from the host system.
-
-## AWS credentials
-
-The stackup command-line looks for AWS credentials in the [standard environment variables](https://blogs.aws.amazon.com/security/post/Tx3D6U6WSFGOK2H/A-New-and-Standardized-Way-to-Manage-Credentials-in-the-AWS-SDKs).
-
-You can also use the `--with-role` option to temporarily assume a different IAM role, for stack operations:
-
-    $ stackup myapp-test up -t template.json \
-      --with-role arn:aws:iam::862905684840:role/deployment
