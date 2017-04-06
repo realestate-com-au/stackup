@@ -29,8 +29,6 @@ module Stackup
 
     private
 
-    LOOKS_LIKE_JSON = /^\s*[\{\[]/
-
     def uri
       URI(location)
     end
@@ -52,11 +50,17 @@ module Stackup
     end
 
     def parse_body
-      if body =~ LOOKS_LIKE_JSON
-        MultiJson.load(body)
-      else
-        Stackup::YAML.load(body)
-      end
+        begin
+            JSON.parse(body)
+            type="json"
+          rescue JSON::ParserError
+            type="yaml"
+        end
+        if type == "json"
+            MultiJson.load(body)
+          elsif type == "yaml"
+            Stackup::YAML.load(body)
+        end
     end
 
     class ReadError < StandardError
