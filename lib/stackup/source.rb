@@ -51,14 +51,8 @@ module Stackup
 
     def parse_body
         begin
-            JSON.parse(body)
-            type="json"
-          rescue JSON::ParserError
-            type="yaml"
-        end
-        if type == "json"
             MultiJson.load(body)
-          elsif type == "yaml"
+          rescue MultiJson::ParseError
             Stackup::YAML.load(body)
         end
     end
