@@ -1,3 +1,7 @@
+## 1.1.3 (PENDING)
+
+* Fix #39: parse error when JSON-like text is embedded in YAML.
+
 ## 1.1.1 (2017-02-23)
 
 * The `stackup` CLI now allows stack template and policy documents to be specified as URLs.
