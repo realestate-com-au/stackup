@@ -29,7 +29,7 @@ module Stackup
 
     private
 
-    LOOKS_LIKE_JSON = /^\s*[\{\[]/
+    LOOKS_LIKE_JSON = /\A\s*[\{\[]/
 
     def uri
       URI(location)

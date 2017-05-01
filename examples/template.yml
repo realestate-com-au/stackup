@@ -15,6 +15,16 @@ Resources:
         IndexDocument:
           Ref: IndexDoc
         ErrorDocument: error.html
+  Whatever:
+    Type: Whatever
+    Properties:
+      Content: |
+        /etc/awslogs/awscli.conf:
+          content: !Sub: |
+              [default]
+              region = ${AWS::Region}
+              [plugins]
+              cwlogs = cwlogs
 Outputs:
   WebsiteURL:
     Value:
