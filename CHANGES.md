@@ -1,4 +1,4 @@
-## 1.1.3 (PENDING)
+## 1.1.3 (2017-05-01)
 
 * Fix #39: parse error when JSON-like text is embedded in YAML.
 
