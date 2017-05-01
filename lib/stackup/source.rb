@@ -53,6 +53,8 @@ module Stackup
 
     def parse_body
       if body =~ LOOKS_LIKE_JSON
+        # Psych has issues parsing some JSON, so let's use a JSON parser.
+        # (see https://github.com/realestate-com-au/stackup/issues/35)
         MultiJson.load(body)
       else
         Stackup::YAML.load(body)
