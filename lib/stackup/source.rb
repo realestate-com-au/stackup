@@ -29,6 +29,8 @@ module Stackup
 
     private
 
+    LOOKS_LIKE_JSON = /\A\s*[\{\[]/
+
     def uri
       URI(location)
     end
@@ -50,11 +52,13 @@ module Stackup
     end
 
     def parse_body
-        begin
-            MultiJson.load(body)
-          rescue MultiJson::ParseError
-            Stackup::YAML.load(body)
-        end
+      if body =~ LOOKS_LIKE_JSON
+        # Psych has issues parsing some JSON, so let's use a JSON parser.
+        # (see https://github.com/realestate-com-au/stackup/issues/35)
+        MultiJson.load(body)
+      else
+        Stackup::YAML.load(body)
+      end
     end
 
     class ReadError < StandardError
