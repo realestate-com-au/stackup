@@ -195,7 +195,7 @@ Parameters and tags may be specified via files, or as a Hash, e.g.
 Stackup is also published as a Docker image. Basic usage is:
 
     docker run --rm \
-        -v `pwd`:/cwd \
+        -v "`pwd`:/cwd" \
         -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
         -e AWS_DEFAULT_REGION \
         realestate/stackup:latest ...
