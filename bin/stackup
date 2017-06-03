@@ -218,6 +218,33 @@ Clamp do
 
   end
 
+  subcommand ["change-sets"], "List change-sets." do
+
+    def execute
+      stack.change_set_summaries.each do |change_set|
+        puts [
+          pad(change_set.change_set_name, 36),
+          pad(change_set.status, 20),
+          pad(change_set.execution_status, 24)
+        ].join("  ")
+      end
+    end
+
+    private
+
+    def pad(s, width)
+      (s || "").ljust(width)
+    end
+
+  end
+
+  # subcommand ["change-set"], "Change-set operations." do
+  #
+  #   parameter "NAME", "Name of change-set", :attribute_name => :change_set_name
+  #
+  #
+  # end
+
   subcommand "diff", "Compare template/params to current stack." do
 
     option ["-t", "--template"], "FILE", "template source",

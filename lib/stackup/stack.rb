@@ -240,6 +240,17 @@ module Stackup
       extract_hash(:resource_summaries, :logical_resource_id, :physical_resource_id)
     end
 
+    # List change-sets.
+    #
+    # @return [Array<ChangeSetSummary>]
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
+    def change_set_summaries
+      handling_validation_error do
+        cf_client.list_change_sets(:stack_name => name).summaries
+      end
+    end
+
     def watch(zero = true)
       watcher = Stackup::StackWatcher.new(cf_stack)
       watcher.zero if zero
