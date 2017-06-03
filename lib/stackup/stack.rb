@@ -251,6 +251,14 @@ module Stackup
       end
     end
 
+    # Delete a change-set.
+    def delete_change_set(change_set_name)
+      handling_validation_error do
+        cf_client.delete_change_set(:stack_name => name, :change_set_name => change_set_name)
+      end
+      "DELETED"
+    end
+
     def watch(zero = true)
       watcher = Stackup::StackWatcher.new(cf_stack)
       watcher.zero if zero

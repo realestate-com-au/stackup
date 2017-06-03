@@ -238,12 +238,21 @@ Clamp do
 
   end
 
-  # subcommand ["change-set"], "Change-set operations." do
-  #
-  #   parameter "NAME", "Name of change-set", :attribute_name => :change_set_name
-  #
-  #
-  # end
+  subcommand ["change-set"], "Change-set operations." do
+
+    parameter "NAME", "Name of change-set", :attribute_name => :change_set_name
+
+    subcommand "delete", "Delete the change-set." do
+
+      def execute
+        report_change do
+          stack.delete_change_set(change_set_name)
+        end
+      end
+
+    end
+
+  end
 
   subcommand "diff", "Compare template/params to current stack." do
 
