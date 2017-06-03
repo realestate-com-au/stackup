@@ -252,6 +252,13 @@ module Stackup
     end
 
     # Delete a change-set.
+    def execute_change_set(change_set_name)
+      modify_stack("UPDATE_COMPLETE", "update failed") do
+        cf_client.execute_change_set(:stack_name => name, :change_set_name => change_set_name)
+      end
+    end
+
+    # Delete a change-set.
     def delete_change_set(change_set_name)
       handling_validation_error do
         cf_client.delete_change_set(:stack_name => name, :change_set_name => change_set_name)

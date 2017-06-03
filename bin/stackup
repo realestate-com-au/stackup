@@ -242,6 +242,16 @@ Clamp do
 
     parameter "NAME", "Name of change-set", :attribute_name => :change_set_name
 
+    subcommand "execute", "Apply the change-set." do
+
+      def execute
+        report_change do
+          stack.execute_change_set(change_set_name)
+        end
+      end
+
+    end
+
     subcommand "delete", "Delete the change-set." do
 
       def execute
