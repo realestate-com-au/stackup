@@ -107,7 +107,7 @@ module Stackup
     #   stack creation timeout
     # @option options [boolean] :use_previous_template
     #   if true, reuse the existing template
-    # @return [Symbol] +:created+ or +:updated+ if successful
+    # @return [String] resulting stack status
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def create_or_update(options)
@@ -140,7 +140,7 @@ module Stackup
 
     # Delete the stack.
     #
-    # @return [Symbol] +:deleted+ if successful
+    # @return [String] "DELETE_COMPLETE"
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def delete
@@ -162,7 +162,7 @@ module Stackup
 
     # Cancel update in-progress.
     #
-    # @return [Symbol] +:update_cancelled+ if successful
+    # @return [String] resulting stack status
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def cancel_update
