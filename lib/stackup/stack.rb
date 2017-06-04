@@ -49,7 +49,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def status
-      handling_validation_error do
+      handling_cf_errors do
         cf_stack.stack_status
       end
     end
@@ -145,7 +145,7 @@ module Stackup
     #
     def delete
       begin
-        @stack_id = handling_validation_error do
+        @stack_id = handling_cf_errors do
           cf_stack.stack_id
         end
       rescue NoSuchStack
@@ -189,7 +189,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def template_body
-      handling_validation_error do
+      handling_cf_errors do
         cf_client.get_template(:stack_name => name).template_body
       end
     end
@@ -246,7 +246,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def change_set_summaries
-      handling_validation_error do
+      handling_cf_errors do
         cf_client.list_change_sets(:stack_name => name).summaries
       end
     end
@@ -255,6 +255,7 @@ module Stackup
     #
     # @param change_set_name [String] name of change-set to execute
     # @return [String] resulting stack status
+    # @raise [Stackup::NoSuchChangeSet] if the change-set doesn't exist
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     # @raise [Stackup::StackUpdateError] if operation fails
     #
@@ -270,7 +271,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def delete_change_set(change_set_name)
-      handling_validation_error do
+      handling_cf_errors do
         cf_client.delete_change_set(:stack_name => name, :change_set_name => change_set_name)
       end
       nil
@@ -349,7 +350,7 @@ module Stackup
     #
     def modify_stack_synchronously
       watch do |watcher|
-        handling_validation_error do
+        handling_cf_errors do
           yield
         end
         loop do
@@ -367,7 +368,7 @@ module Stackup
     # @return the stack status
     #
     def modify_stack_asynchronously
-      handling_validation_error do
+      handling_cf_errors do
         yield
       end
       self.status
@@ -391,7 +392,7 @@ module Stackup
     # @return [Hash<String, String>] mapping of collection
     #
     def extract_hash(collection_name, key_name, value_name)
-      handling_validation_error do
+      handling_cf_errors do
         {}.tap do |result|
           cf_stack.public_send(collection_name).each do |item|
             key = item.public_send(key_name)

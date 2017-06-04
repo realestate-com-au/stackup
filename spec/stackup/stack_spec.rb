@@ -25,16 +25,20 @@ describe Stackup::Stack do
     allow(cf_client).to receive(:delete_change_set).and_call_original
   end
 
-  def validation_error(message)
+  def error(type, message)
     {
       :status_code => 400,
       :headers => {},
       :body => [
-        "<ErrorResponse><Error><Code>ValidationError</Code><Message>",
+        "<ErrorResponse><Error><Code>#{type}</Code><Message>",
         message,
         "</Message></Error></ErrorResponse>"
       ].join
     }
+  end
+
+  def validation_error(message)
+    error("ValidationError", message)
   end
 
   def stack_description(stack_status, details = {})
@@ -476,6 +480,21 @@ describe Stackup::Stack do
 
       it "returns status" do
         expect(execute_change_set).to eq("UPDATE_COMPLETE")
+      end
+
+      context "if change-set doesn't exist" do
+
+        before do
+          cf_client.stub_responses(
+            :execute_change_set,
+            error("ChangeSetNotFound", "ChangeSet [foo] does not exist")
+          )
+        end
+
+        it "raises a NoSuchChangeSet error" do
+          expect { execute_change_set }.to raise_error(Stackup::NoSuchChangeSet)
+        end
+
       end
 
     end

@@ -6,8 +6,14 @@ module Stackup
   # Raised when something else dodgy happened
   class ValidationError < ServiceError; end
 
+  # Raised when the specified thing does not exist
+  class NoSuchThing < ValidationError; end
+
   # Raised when the specified stack does not exist
-  class NoSuchStack < ValidationError; end
+  class NoSuchStack < NoSuchThing; end
+
+  # Raised when the specified change-set does not exist
+  class NoSuchChangeSet < NoSuchThing; end
 
   # Raised if we can't perform that operation now
   class InvalidStateError < ValidationError; end
