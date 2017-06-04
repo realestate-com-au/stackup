@@ -251,7 +251,13 @@ module Stackup
       end
     end
 
-    # Delete a change-set.
+    # Execute a change-set.
+    #
+    # @param change_set_name [String] name of change-set to execute
+    # @return [String] resulting stack status
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    # @raise [Stackup::StackUpdateError] if operation fails
+    #
     def execute_change_set(change_set_name)
       modify_stack("UPDATE_COMPLETE", "update failed") do
         cf_client.execute_change_set(:stack_name => name, :change_set_name => change_set_name)
@@ -259,6 +265,10 @@ module Stackup
     end
 
     # Delete a change-set.
+    #
+    # @param change_set_name [String] name of change-set to delete
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
     def delete_change_set(change_set_name)
       handling_validation_error do
         cf_client.delete_change_set(:stack_name => name, :change_set_name => change_set_name)
