@@ -20,6 +20,8 @@ describe Stackup::Stack do
     allow(cf_client).to receive(:delete_stack).and_call_original
     allow(cf_client).to receive(:update_stack).and_call_original
     allow(cf_client).to receive(:cancel_update_stack).and_call_original
+    allow(cf_client).to receive(:list_change_sets).and_call_original
+    allow(cf_client).to receive(:delete_change_set).and_call_original
   end
 
   def validation_error(message)
@@ -422,6 +424,37 @@ describe Stackup::Stack do
             .with(hash_not_including(:disable_rollback))
         end
 
+      end
+
+    end
+
+    describe "#change_set_summaries" do
+
+      it "calls :list_change_sets" do
+        cf_client.stub_responses(:list_change_sets, :summaries => [
+          { :change_set_name => "take1" },
+          { :change_set_name => "take2" },
+        ])
+        summaries = stack.change_set_summaries
+        expect(summaries.map(&:change_set_name)).to eql(%w(take1 take2))
+        expect(cf_client).to have_received(:list_change_sets)
+          .with(:stack_name => stack_name)
+      end
+
+    end
+
+    describe "#delete_change_set" do
+
+      let(:change_set_name) { "change-it" }
+
+      it "calls :delete_change_set" do
+        stack.delete_change_set(change_set_name)
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name
+        }
+        expect(cf_client).to have_received(:delete_change_set)
+          .with(hash_including(expected_args))
       end
 
     end

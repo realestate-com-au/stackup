@@ -273,7 +273,7 @@ module Stackup
       handling_validation_error do
         cf_client.delete_change_set(:stack_name => name, :change_set_name => change_set_name)
       end
-      "DELETED"
+      nil
     end
 
     def watch(zero = true)
