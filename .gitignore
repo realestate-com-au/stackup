@@ -1,9 +1,11 @@
 *.gem
 *.rbc
 .bundle
+.byebug_history
 .config
 .rbenv-*
 .ruby-version
+.rvmrc
 .yardoc
 Gemfile.lock
 InstalledFiles
@@ -17,4 +19,3 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
-.rvmrc

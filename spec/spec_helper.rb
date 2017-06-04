@@ -1,3 +1,4 @@
+require "byebug"
 require "console_logger"
 
 module CfStubbing

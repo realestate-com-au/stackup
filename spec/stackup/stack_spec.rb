@@ -21,6 +21,7 @@ describe Stackup::Stack do
     allow(cf_client).to receive(:update_stack).and_call_original
     allow(cf_client).to receive(:cancel_update_stack).and_call_original
     allow(cf_client).to receive(:list_change_sets).and_call_original
+    allow(cf_client).to receive(:execute_change_set).and_call_original
     allow(cf_client).to receive(:delete_change_set).and_call_original
   end
 
@@ -439,6 +440,42 @@ describe Stackup::Stack do
         expect(summaries.map(&:change_set_name)).to eql(%w(take1 take2))
         expect(cf_client).to have_received(:list_change_sets)
           .with(:stack_name => stack_name)
+      end
+
+    end
+
+    describe "#execute_change_set" do
+
+      let(:change_set_name) { "change-it" }
+
+      let(:describe_stacks_responses) do
+        [
+          stack_description("UPDATE_IN_PROGRESS"),
+          stack_description("UPDATE_COMPLETE")
+        ]
+      end
+
+      def execute_change_set
+        stack.execute_change_set(change_set_name)
+      end
+
+      it "calls :execute_change_set" do
+        execute_change_set
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name
+        }
+        expect(cf_client).to have_received(:execute_change_set)
+          .with(hash_including(expected_args))
+      end
+
+      it "it sleeps" do
+        execute_change_set
+        expect(stack).to have_received(:sleep).with(5)
+      end
+
+      it "returns status" do
+        expect(execute_change_set).to eq("UPDATE_COMPLETE")
       end
 
     end
