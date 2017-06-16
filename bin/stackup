@@ -129,16 +129,46 @@ Clamp do
     puts final_status unless final_status.nil?
   end
 
-  def parameters_from_files
-    parameter_sources.map { |src|
-      Stackup::Parameters.new(src.data).to_hash
-    }.inject({}, :merge)
-  end
-
   subcommand "status", "Print stack status." do
 
     def execute
       puts stack.status
+    end
+
+  end
+
+  module HasParameters
+
+    extend Clamp::Option::Declaration
+
+    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
+           :multivalued => true,
+           :attribute_name => :parameter_sources,
+           &Stackup::Source.method(:new)
+
+    option ["-o", "--override"], "PARAM=VALUE", "parameter overrides",
+           :multivalued => true,
+           :attribute_name => :override_list
+
+    private
+
+    def parameters
+      parameters_from_files.merge(parameter_overrides)
+    end
+
+    def parameters_from_files
+      parameter_sources.map { |src|
+        Stackup::Parameters.new(src.data).to_hash
+      }.inject({}, :merge)
+    end
+
+    def parameter_overrides
+      {}.tap do |result|
+        override_list.each do |override|
+          key, value = override.split("=", 2)
+          result[key] = value
+        end
+      end
     end
 
   end
@@ -152,14 +182,7 @@ Clamp do
     option ["-T", "--use-previous-template"], :flag,
            "reuse the existing template"
 
-    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
-           :multivalued => true,
-           :attribute_name => :parameter_sources,
-           &Stackup::Source.method(:new)
-
-    option ["-o", "--override"], "PARAM=VALUE", "parameter overrides",
-           :multivalued => true,
-           :attribute_name => :override_list
+    include HasParameters
 
     option "--tags", "FILE", "stack tags file",
            :attribute_name => :tag_source,
@@ -198,21 +221,6 @@ Clamp do
       options[:use_previous_template] = use_previous_template?
       report_change do
         stack.create_or_update(options)
-      end
-    end
-
-    private
-
-    def parameters
-      parameters_from_files.merge(parameter_overrides)
-    end
-
-    def parameter_overrides
-      {}.tap do |result|
-        override_list.each do |override|
-          key, value = override.split("=", 2)
-          result[key] = value
-        end
       end
     end
 
@@ -266,20 +274,17 @@ Clamp do
 
   subcommand "diff", "Compare template/params to current stack." do
 
+    option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
+
     option ["-t", "--template"], "FILE", "template source",
            :attribute_name => :template_source,
            &Stackup::Source.method(:new)
 
-    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
-           :multivalued => true,
-           :attribute_name => :parameter_sources,
-           &Stackup::Source.method(:new)
+    include HasParameters
 
     option "--tags", "FILE", "stack tags file",
            :attribute_name => :tag_source,
            &Stackup::Source.method(:new)
-
-    option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
       current = {}
@@ -311,7 +316,7 @@ Clamp do
     end
 
     def new_parameters
-      existing_parameters.merge(parameters_from_files)
+      existing_parameters.merge(parameters)
     end
 
   end
