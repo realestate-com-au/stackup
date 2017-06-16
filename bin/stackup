@@ -248,7 +248,9 @@ Clamp do
 
   subcommand ["change-set"], "Change-set operations." do
 
-    parameter "NAME", "Name of change-set", :attribute_name => :change_set_name
+    option "--name", "NAME", "Name of change-set",
+           :attribute_name => :change_set_name,
+           :default => "pending"
 
     subcommand "execute", "Apply the change-set." do
 
