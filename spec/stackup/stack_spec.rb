@@ -272,6 +272,32 @@ describe Stackup::Stack do
 
     end
 
+    describe "#create_change_set" do
+
+      let(:template) { "stack template" }
+
+      let(:options) do
+        { :template_body => template }
+      end
+
+      def create_change_set
+        stack.create_change_set(change_set_name, options)
+      end
+
+      it "calls :create_change_set" do
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name,
+          :change_set_type => "CREATE",
+          :template_body => template
+        }
+        create_change_set
+        expect(cf_client).to have_received(:create_change_set)
+          .with(hash_including(expected_args))
+      end
+
+    end
+
   end
 
   context "with existing stack" do
