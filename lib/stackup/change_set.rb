@@ -49,7 +49,6 @@ module Stackup
     #
     # @return [String] change-set id
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
-    # @raise [Stackup::StackUpdateError] if operation fails
     #
     def create(options = {})
       options = options.dup
@@ -70,6 +69,19 @@ module Stackup
       delete if force
       handling_cf_errors do
         cf_client.create_change_set(options)
+        loop do
+          current = describe_change_set
+          logger.debug("change_set_status=#{current.status}")
+          case current.status
+          when /COMPLETE/
+            return current.status
+          when "FAILED"
+            logger.error(current.status_reason)
+            fail StackUpdateError, "change-set creation failed" if status == "FAILED"
+          end
+          sleep(wait_poll_interval)
+        end
+        status
       end
     end
 
@@ -97,7 +109,17 @@ module Stackup
       nil
     end
 
+    def status
+      describe_change_set.status
+    end
+
     private
+
+    def describe_change_set
+      handling_cf_errors do
+        cf_client.describe_change_set(:stack_name => stack.name, :change_set_name => name)
+      end
+    end
 
     def cf_client
       stack.send(:cf_client)
@@ -109,6 +131,14 @@ module Stackup
 
     def normalize_tags(tags)
       stack.send(:normalize_tags, tags)
+    end
+
+    def logger
+      stack.send(:logger)
+    end
+
+    def wait_poll_interval
+      stack.send(:wait_poll_interval)
     end
 
   end
