@@ -252,6 +252,45 @@ Clamp do
            :attribute_name => :change_set_name,
            :default => "pending"
 
+    subcommand "create", "Create a change-set." do
+
+      option ["-d", "--description"], "DESC",
+             "Change-set description"
+
+      option ["-t", "--template"], "FILE", "template source",
+             :attribute_name => :template_source,
+             &Stackup::Source.method(:new)
+
+      option ["-T", "--use-previous-template"], :flag,
+             "reuse the existing template"
+
+      include HasParameters
+
+      option "--tags", "FILE", "stack tags file",
+             :attribute_name => :tag_source,
+             &Stackup::Source.method(:new)
+
+      def execute
+        unless template_source || use_previous_template?
+          signal_usage_error "Specify either --template or --use-previous-template"
+        end
+        options = {}
+        if template_source
+          if template_source.s3?
+            options[:template_url] = template_source.location
+          else
+            options[:template] = template_source.data
+          end
+        end
+        options[:parameters] = parameters
+        options[:description] = description if description
+        options[:tags] = tag_source.data if tag_source
+        options[:use_previous_template] = use_previous_template?
+        stack.create_change_set(change_set_name, options)
+      end
+
+    end
+
     subcommand "execute", "Apply the change-set." do
 
       def execute
