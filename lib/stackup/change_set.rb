@@ -44,6 +44,8 @@ module Stackup
     #   location of stack template
     # @option options [boolean] :use_previous_template
     #   if true, reuse the existing template
+    # @option options [boolean] :force
+    #   if true, delete any existing change-set of the same name
     #
     # @return [String] change-set id
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
@@ -54,6 +56,7 @@ module Stackup
       options[:stack_name] = stack.name
       options[:change_set_name] = name
       options[:change_set_type] = stack.exists? ? "UPDATE" : "CREATE"
+      force = options.delete(:force)
       if (template_data = options.delete(:template))
         options[:template_body] = MultiJson.dump(template_data)
       end
@@ -64,6 +67,7 @@ module Stackup
         options[:tags] = normalize_tags(tags)
       end
       options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
+      delete if force
       handling_cf_errors do
         cf_client.create_change_set(options)
       end
