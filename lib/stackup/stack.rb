@@ -1,6 +1,7 @@
 require "aws-sdk-resources"
 require "logger"
 require "multi_json"
+require "stackup/change_set"
 require "stackup/error_handling"
 require "stackup/parameters"
 require "stackup/stack_watcher"
@@ -251,85 +252,13 @@ module Stackup
       end
     end
 
-    # Create a change-set.
+    # An abstraction of a CloudFormation change-set.
     #
-    # Refer +Aws::CloudFormation::Client#create_change_set+
-    #   (see http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#create_change_set-instance_method)
+    # @param [String] name change-set name
+    # @return [ChangeSet] an handle for change-set operations
     #
-    # @param change_set_name [String] name of change-set
-    # @param [Hash] options change-set options
-    #   accepts a superset of the options supported by
-    # @option options [Array<String>] :capabilities (CAPABILITY_NAMED_IAM)
-    #   list of capabilities required for stack template
-    # @option options [String] :description
-    #   change-set description
-    # @option options [String] :notification_arns
-    #   ARNs for the Amazon SNS topics associated with this stack
-    # @option options [Hash, Array<Hash>] :parameters
-    #   stack parameters, either as a Hash, or an Array of
-    #   +Aws::CloudFormation::Types::Parameter+ structures
-    # @option options [Hash, Array<Hash>] :tags
-    #   stack tags, either as a Hash, or an Array of
-    #   +Aws::CloudFormation::Types::Tag+ structures
-    # @option options [Array<String>] :resource_types
-    #   resource types that you have permissions to work with
-    # @option options [Hash] :template
-    #   stack template, as Ruby data
-    # @option options [String] :template_body
-    #   stack template, as JSON or YAML
-    # @option options [String] :template_url
-    #   location of stack template
-    # @option options [boolean] :use_previous_template
-    #   if true, reuse the existing template
-    #
-    # @return [String] change-set id
-    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
-    # @raise [Stackup::StackUpdateError] if operation fails
-    #
-    def create_change_set(change_set_name, options = {})
-      options = options.dup
-      options[:stack_name] = name
-      options[:change_set_name] = change_set_name
-      options[:change_set_type] = exists? ? "UPDATE" : "CREATE"
-      if (template_data = options.delete(:template))
-        options[:template_body] = MultiJson.dump(template_data)
-      end
-      if (parameters = options[:parameters])
-        options[:parameters] = Parameters.new(parameters).to_a
-      end
-      if (tags = options[:tags])
-        options[:tags] = normalize_tags(tags)
-      end
-      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
-      handling_cf_errors do
-        cf_client.create_change_set(options)
-      end
-    end
-
-    # Execute a change-set.
-    #
-    # @param change_set_name [String] name of change-set to execute
-    # @return [String] resulting stack status
-    # @raise [Stackup::NoSuchChangeSet] if the change-set doesn't exist
-    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
-    # @raise [Stackup::StackUpdateError] if operation fails
-    #
-    def execute_change_set(change_set_name)
-      modify_stack("UPDATE_COMPLETE", "update failed") do
-        cf_client.execute_change_set(:stack_name => name, :change_set_name => change_set_name)
-      end
-    end
-
-    # Delete a change-set.
-    #
-    # @param change_set_name [String] name of change-set to delete
-    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
-    #
-    def delete_change_set(change_set_name)
-      handling_cf_errors do
-        cf_client.delete_change_set(:stack_name => name, :change_set_name => change_set_name)
-      end
-      nil
+    def change_set(name)
+      ChangeSet.new(name, self)
     end
 
     def watch(zero = true)

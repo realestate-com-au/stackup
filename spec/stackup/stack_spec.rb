@@ -272,7 +272,7 @@ describe Stackup::Stack do
 
     end
 
-    describe "#create_change_set" do
+    describe "#change_set#create" do
 
       let(:template) { "stack template" }
 
@@ -281,7 +281,7 @@ describe Stackup::Stack do
       end
 
       def create_change_set
-        stack.create_change_set(change_set_name, options)
+        stack.change_set(change_set_name).create(options)
       end
 
       it "calls :create_change_set" do
@@ -531,7 +531,7 @@ describe Stackup::Stack do
 
     end
 
-    describe "#create_change_set" do
+    describe "#change_set#create" do
 
       let(:template) { "stack template" }
 
@@ -540,7 +540,7 @@ describe Stackup::Stack do
       end
 
       def create_change_set
-        stack.create_change_set(change_set_name, options)
+        stack.change_set(change_set_name).create(options)
       end
 
       it "calls :create_change_set" do
@@ -557,7 +557,7 @@ describe Stackup::Stack do
 
     end
 
-    describe "#execute_change_set" do
+    describe "#change_set#execute" do
 
       let(:change_set_name) { "change-it" }
 
@@ -569,7 +569,7 @@ describe Stackup::Stack do
       end
 
       def execute_change_set
-        stack.execute_change_set(change_set_name)
+        stack.change_set(change_set_name).execute
       end
 
       it "calls :execute_change_set" do
@@ -608,12 +608,12 @@ describe Stackup::Stack do
 
     end
 
-    describe "#delete_change_set" do
+    describe "#change_set#delete" do
 
       let(:change_set_name) { "change-it" }
 
       it "calls :delete_change_set" do
-        stack.delete_change_set(change_set_name)
+        stack.change_set(change_set_name).delete
         expected_args = {
           :stack_name => stack_name,
           :change_set_name => change_set_name

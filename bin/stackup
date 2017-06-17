@@ -286,7 +286,7 @@ Clamp do
         options[:description] = description if description
         options[:tags] = tag_source.data if tag_source
         options[:use_previous_template] = use_previous_template?
-        stack.create_change_set(change_set_name, options)
+        stack.change_set(change_set_name).create(options)
       end
 
     end
