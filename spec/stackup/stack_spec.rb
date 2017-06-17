@@ -296,6 +296,60 @@ describe Stackup::Stack do
           .with(hash_including(expected_args))
       end
 
+      context "with :template as data" do
+
+        let(:options) do
+          { :template => { "foo" => "bar" } }
+        end
+
+        it "converts the template to JSON" do
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set)
+            .with(hash_including(:template_body))
+        end
+
+      end
+
+      context "with :parameters as Hash" do
+
+        before do
+          options[:parameters] = { "foo" => "bar" }
+        end
+
+        it "converts them to an Array" do
+          expected_parameters = [
+            {
+              :parameter_key => "foo",
+              :parameter_value => "bar"
+            }
+          ]
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set) do |options|
+            expect(options[:parameters]).to eq(expected_parameters)
+          end
+        end
+
+      end
+
+      context "with :tags as Hash" do
+
+        before do
+          options[:tags] = { "foo" => "bar", "code" => 123 }
+        end
+
+        it "converts them to an Array" do
+          expected_tags = [
+            { :key => "foo", :value => "bar" },
+            { :key => "code", :value => "123" }
+          ]
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set) do |options|
+            expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
     end
 
   end
