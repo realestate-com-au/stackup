@@ -10,6 +10,8 @@ describe Stackup::Stack do
   let(:unique_stack_id) { "ID:#{stack_name}" }
   let(:stack_options) { {} }
 
+  let(:change_set_name) { "ch-ch-changes" }
+
   subject(:stack) { described_class.new(stack_name, cf_client, stack_options) }
 
   before do
@@ -21,6 +23,7 @@ describe Stackup::Stack do
     allow(cf_client).to receive(:update_stack).and_call_original
     allow(cf_client).to receive(:cancel_update_stack).and_call_original
     allow(cf_client).to receive(:list_change_sets).and_call_original
+    allow(cf_client).to receive(:create_change_set).and_call_original
     allow(cf_client).to receive(:execute_change_set).and_call_original
     allow(cf_client).to receive(:delete_change_set).and_call_original
   end
@@ -444,6 +447,32 @@ describe Stackup::Stack do
         expect(summaries.map(&:change_set_name)).to eql(%w(take1 take2))
         expect(cf_client).to have_received(:list_change_sets)
           .with(:stack_name => stack_name)
+      end
+
+    end
+
+    describe "#create_change_set" do
+
+      let(:template) { "stack template" }
+
+      let(:options) do
+        { :template_body => template }
+      end
+
+      def create_change_set
+        stack.create_change_set(change_set_name, options)
+      end
+
+      it "calls :create_change_set" do
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name,
+          :change_set_type => "UPDATE",
+          :template_body => template
+        }
+        create_change_set
+        expect(cf_client).to have_received(:create_change_set)
+          .with(hash_including(expected_args))
       end
 
     end

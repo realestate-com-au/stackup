@@ -290,6 +290,7 @@ module Stackup
       options = options.dup
       options[:stack_name] = name
       options[:change_set_name] = change_set_name
+      options[:change_set_type] = "UPDATE"
       if (template_data = options.delete(:template))
         options[:template_body] = MultiJson.dump(template_data)
       end
