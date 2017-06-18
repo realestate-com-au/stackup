@@ -291,7 +291,7 @@ Clamp do
         options[:use_previous_template] = use_previous_template?
         options[:force] = force?
         report_change do
-          stack.change_set(change_set_name).create(options)
+          change_set.create(options)
         end
       end
 
@@ -300,7 +300,7 @@ Clamp do
     subcommand "changes", "Describe the change-set." do
 
       def execute
-        display_data(stack.change_set(change_set_name).describe.changes.map(&:to_h))
+        display_data(change_set.describe.changes.map(&:to_h))
       end
 
     end
@@ -308,7 +308,7 @@ Clamp do
     subcommand "inspect", "Show full change-set details." do
 
       def execute
-        display_data(stack.change_set(change_set_name).describe.to_h)
+        display_data(change_set.describe.to_h)
       end
 
     end
@@ -317,7 +317,7 @@ Clamp do
 
       def execute
         report_change do
-          stack.execute_change_set(change_set_name)
+          change_set.execute
         end
       end
 
@@ -327,10 +327,16 @@ Clamp do
 
       def execute
         report_change do
-          stack.delete_change_set(change_set_name)
+          change_set.delete
         end
       end
 
+    end
+
+    private
+
+    def change_set
+      stack.change_set(change_set_name)
     end
 
   end
