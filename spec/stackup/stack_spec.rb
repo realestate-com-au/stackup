@@ -16,6 +16,7 @@ describe Stackup::Stack do
 
   before do
     cf_client.stub_responses(:describe_stacks, *describe_stacks_responses)
+    cf_client.stub_responses(:describe_change_set, *describe_change_set_responses)
     allow(stack).to receive(:sleep).at_most(5).times
     # partial stubbing, to support spying
     allow(cf_client).to receive(:create_stack).and_call_original
@@ -26,6 +27,7 @@ describe Stackup::Stack do
     allow(cf_client).to receive(:create_change_set).and_call_original
     allow(cf_client).to receive(:execute_change_set).and_call_original
     allow(cf_client).to receive(:delete_change_set).and_call_original
+    allow(cf_client).to receive(:describe_change_set).and_call_original
   end
 
   def error(type, message)
@@ -55,6 +57,14 @@ describe Stackup::Stack do
         }.merge(details)
       ]
     }
+  end
+
+  let(:describe_change_set_responses) do
+    [
+      {
+        :status => "CREATE_COMPLETE"
+      }
+    ]
   end
 
   context "before stack exists" do
