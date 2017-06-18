@@ -313,7 +313,7 @@ Clamp do
 
     end
 
-    subcommand "execute", "Apply the change-set." do
+    subcommand ["apply", "execute"], "Apply the change-set." do
 
       def execute
         report_change do
