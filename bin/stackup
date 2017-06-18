@@ -297,6 +297,22 @@ Clamp do
 
     end
 
+    subcommand "changes", "Describe the change-set." do
+
+      def execute
+        display_data(stack.change_set(change_set_name).describe.changes.map(&:to_h))
+      end
+
+    end
+
+    subcommand "inspect", "Show full change-set details." do
+
+      def execute
+        display_data(stack.change_set(change_set_name).describe.to_h)
+      end
+
+    end
+
     subcommand "execute", "Apply the change-set." do
 
       def execute

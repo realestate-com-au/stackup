@@ -70,7 +70,7 @@ module Stackup
       handling_cf_errors do
         cf_client.create_change_set(options)
         loop do
-          current = describe_change_set
+          current = describe
           logger.debug("change_set_status=#{current.status}")
           case current.status
           when /COMPLETE/
@@ -110,16 +110,23 @@ module Stackup
     end
 
     def status
-      describe_change_set.status
+      describe.status
     end
 
-    private
-
-    def describe_change_set
+    # Describe the change-set.
+    #
+    # Refer +Aws::CloudFormation::Client#describe_change_set+
+    #   (http://docs.aws.amazon.com/sdkforruby/api/Aws/CloudFormation/Client.html#describe_change_set-instance_method)
+    #
+    # @return change-set state, as data
+    #
+    def describe
       handling_cf_errors do
         cf_client.describe_change_set(:stack_name => stack.name, :change_set_name => name)
       end
     end
+
+    private
 
     def cf_client
       stack.send(:cf_client)
