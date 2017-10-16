@@ -64,7 +64,7 @@ module Stackup
 
       def array_or_dotted_string(arg)
         if arg.respond_to?(:split)
-          arg.split(".")
+          arg.split(".", 2)
         else
           arg
         end

@@ -100,6 +100,30 @@ describe Stackup::YAML do
 
       end
 
+      context "with a string with multiple dots" do
+
+        let(:input) do
+          <<-YAML
+          Outputs:
+            Foo: !GetAtt Bar.Baz.Some.More.Things
+          YAML
+        end
+
+        it "splits on the first dot" do
+          expect(data).to eql(
+            "Outputs" => {
+              "Foo" => {
+                "Fn::GetAtt" => [
+                  "Bar",
+                  "Baz.Some.More.Things"
+                ]
+              }
+            }
+          )
+        end
+
+      end
+
     end
 
     describe "!GetAZs" do
