@@ -16,8 +16,12 @@ module Stackup
       def hashify(parameters)
         {}.tap do |result|
           parameters.each do |p|
-            p_struct = ParameterStruct.new(p)
-            result[p_struct.key] = p_struct.value
+            begin
+              p_struct = ParameterStruct.new(p)
+              result[p_struct.key] = p_struct.value
+            rescue ArgumentError
+              raise ArgumentError, "invalid parameter record: #{p.inspect}"
+            end
           end
         end
       end
@@ -53,7 +57,12 @@ module Stackup
         if name.respond_to?(:gsub)
           name = name.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
         end
-        public_send("#{name}=", value)
+        writer = "#{name}="
+        if respond_to?(writer)
+          public_send(writer, value)
+        else
+          raise ArgumentError, "invalid attribute: #{name.inspect}"
+        end
       end
     end
 
