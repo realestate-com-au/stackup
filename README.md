@@ -18,6 +18,7 @@ AWS CloudFormation stacks.
 	- [Using URLs as inputs](#using-urls-as-inputs)
 	- [Stack deletion](#stack-deletion)
 	- [Stack inspection](#stack-inspection)
+	- [Change-set support](#change-set-support)
 - [Programmatic usage](#programmatic-usage)
 - [Rake integration](#rake-integration)
 - [Docker image](#docker-image)
@@ -149,6 +150,17 @@ Inspect details of a stack with:
     $ stackup myapp-test status
     $ stackup myapp-test resources
     $ stackup myapp-test outputs
+
+### Change-set support
+
+You can also create, list, inspect, apply and delete [change sets](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html) using `stackup`.
+
+    $ stackup myapp-test change-sets
+    $ stackup myapp-test change-set create -t template.json
+    $ stackup myapp-test change-set inspect
+    $ stackup myapp-test change-set apply
+
+The change-set name defaults to "pending", but can be overridden using `--name`.
 
 ## Programmatic usage
 
