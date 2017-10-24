@@ -1,4 +1,4 @@
-## PENDING
+## 1.2.0 (2017-10-24)
 
 * Add support for change-sets.
 
