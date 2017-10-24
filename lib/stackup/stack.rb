@@ -1,6 +1,7 @@
 require "aws-sdk-resources"
 require "logger"
 require "multi_json"
+require "stackup/change_set"
 require "stackup/error_handling"
 require "stackup/parameters"
 require "stackup/stack_watcher"
@@ -49,7 +50,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def status
-      handling_validation_error do
+      handling_cf_errors do
         cf_stack.stack_status
       end
     end
@@ -145,7 +146,7 @@ module Stackup
     #
     def delete
       begin
-        @stack_id = handling_validation_error do
+        @stack_id = handling_cf_errors do
           cf_stack.stack_id
         end
       rescue NoSuchStack
@@ -189,7 +190,7 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def template_body
-      handling_validation_error do
+      handling_cf_errors do
         cf_client.get_template(:stack_name => name).template_body
       end
     end
@@ -238,6 +239,26 @@ module Stackup
     #
     def resources
       extract_hash(:resource_summaries, :logical_resource_id, :physical_resource_id)
+    end
+
+    # List change-sets.
+    #
+    # @return [Array<ChangeSetSummary>]
+    # @raise [Stackup::NoSuchStack] if the stack doesn't exist
+    #
+    def change_set_summaries
+      handling_cf_errors do
+        cf_client.list_change_sets(:stack_name => name).summaries
+      end
+    end
+
+    # An abstraction of a CloudFormation change-set.
+    #
+    # @param [String] name change-set name
+    # @return [ChangeSet] an handle for change-set operations
+    #
+    def change_set(name)
+      ChangeSet.new(name, self)
     end
 
     def watch(zero = true)
@@ -313,7 +334,7 @@ module Stackup
     #
     def modify_stack_synchronously
       watch do |watcher|
-        handling_validation_error do
+        handling_cf_errors do
           yield
         end
         loop do
@@ -331,7 +352,7 @@ module Stackup
     # @return the stack status
     #
     def modify_stack_asynchronously
-      handling_validation_error do
+      handling_cf_errors do
         yield
       end
       self.status
@@ -355,7 +376,7 @@ module Stackup
     # @return [Hash<String, String>] mapping of collection
     #
     def extract_hash(collection_name, key_name, value_name)
-      handling_validation_error do
+      handling_cf_errors do
         {}.tap do |result|
           cf_stack.public_send(collection_name).each do |item|
             key = item.public_send(key_name)

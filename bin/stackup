@@ -129,16 +129,46 @@ Clamp do
     puts final_status unless final_status.nil?
   end
 
-  def parameters_from_files
-    parameter_sources.map { |src|
-      Stackup::Parameters.new(src.data).to_hash
-    }.inject({}, :merge)
-  end
-
   subcommand "status", "Print stack status." do
 
     def execute
       puts stack.status
+    end
+
+  end
+
+  module HasParameters
+
+    extend Clamp::Option::Declaration
+
+    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
+           :multivalued => true,
+           :attribute_name => :parameter_sources,
+           &Stackup::Source.method(:new)
+
+    option ["-o", "--override"], "PARAM=VALUE", "parameter overrides",
+           :multivalued => true,
+           :attribute_name => :override_list
+
+    private
+
+    def parameters
+      parameters_from_files.merge(parameter_overrides)
+    end
+
+    def parameters_from_files
+      parameter_sources.map { |src|
+        Stackup::Parameters.new(src.data).to_hash
+      }.inject({}, :merge)
+    end
+
+    def parameter_overrides
+      {}.tap do |result|
+        override_list.each do |override|
+          key, value = override.split("=", 2)
+          result[key] = value
+        end
+      end
     end
 
   end
@@ -152,14 +182,7 @@ Clamp do
     option ["-T", "--use-previous-template"], :flag,
            "reuse the existing template"
 
-    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
-           :multivalued => true,
-           :attribute_name => :parameter_sources,
-           &Stackup::Source.method(:new)
-
-    option ["-o", "--override"], "PARAM=VALUE", "parameter overrides",
-           :multivalued => true,
-           :attribute_name => :override_list
+    include HasParameters
 
     option "--tags", "FILE", "stack tags file",
            :attribute_name => :tag_source,
@@ -201,39 +224,136 @@ Clamp do
       end
     end
 
-    private
+  end
 
-    def parameters
-      parameters_from_files.merge(parameter_overrides)
+  subcommand ["change-sets"], "List change-sets." do
+
+    def execute
+      stack.change_set_summaries.each do |change_set|
+        puts [
+          pad(change_set.change_set_name, 36),
+          pad(change_set.status, 20),
+          pad(change_set.execution_status, 24)
+        ].join("  ")
+      end
     end
 
-    def parameter_overrides
-      {}.tap do |result|
-        override_list.each do |override|
-          key, value = override.split("=", 2)
-          result[key] = value
+    private
+
+    def pad(s, width)
+      (s || "").ljust(width)
+    end
+
+  end
+
+  subcommand ["change-set"], "Change-set operations." do
+
+    option "--name", "NAME", "Name of change-set",
+           :attribute_name => :change_set_name,
+           :default => "pending"
+
+    subcommand "create", "Create a change-set." do
+
+      option ["-d", "--description"], "DESC",
+             "Change-set description"
+
+      option ["-t", "--template"], "FILE", "template source",
+             :attribute_name => :template_source,
+             &Stackup::Source.method(:new)
+
+      option ["-T", "--use-previous-template"], :flag,
+             "reuse the existing template"
+
+      option ["--force"], :flag,
+             "replace existing change-set of the same name"
+
+      include HasParameters
+
+      option "--tags", "FILE", "stack tags file",
+             :attribute_name => :tag_source,
+             &Stackup::Source.method(:new)
+
+      def execute
+        unless template_source || use_previous_template?
+          signal_usage_error "Specify either --template or --use-previous-template"
+        end
+        options = {}
+        if template_source
+          if template_source.s3?
+            options[:template_url] = template_source.location
+          else
+            options[:template] = template_source.data
+          end
+        end
+        options[:parameters] = parameters
+        options[:description] = description if description
+        options[:tags] = tag_source.data if tag_source
+        options[:use_previous_template] = use_previous_template?
+        options[:force] = force?
+        report_change do
+          change_set.create(options)
         end
       end
+
+    end
+
+    subcommand "changes", "Describe the change-set." do
+
+      def execute
+        display_data(change_set.describe.changes.map(&:to_h))
+      end
+
+    end
+
+    subcommand "inspect", "Show full change-set details." do
+
+      def execute
+        display_data(change_set.describe.to_h)
+      end
+
+    end
+
+    subcommand ["apply", "execute"], "Apply the change-set." do
+
+      def execute
+        report_change do
+          change_set.execute
+        end
+      end
+
+    end
+
+    subcommand "delete", "Delete the change-set." do
+
+      def execute
+        report_change do
+          change_set.delete
+        end
+      end
+
+    end
+
+    private
+
+    def change_set
+      stack.change_set(change_set_name)
     end
 
   end
 
   subcommand "diff", "Compare template/params to current stack." do
 
+    option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
+
     option ["-t", "--template"], "FILE", "template source",
            :attribute_name => :template_source,
            &Stackup::Source.method(:new)
 
-    option ["-p", "--parameters"], "FILE", "parameters file (last wins)",
-           :multivalued => true,
-           :attribute_name => :parameter_sources,
-           &Stackup::Source.method(:new)
+    include HasParameters
 
     option "--tags", "FILE", "stack tags file",
            :attribute_name => :tag_source,
            &Stackup::Source.method(:new)
-
-    option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
     def execute
       current = {}
@@ -265,7 +385,7 @@ Clamp do
     end
 
     def new_parameters
-      existing_parameters.merge(parameters_from_files)
+      existing_parameters.merge(parameters)
     end
 
   end

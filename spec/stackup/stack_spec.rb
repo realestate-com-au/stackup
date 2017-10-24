@@ -10,28 +10,40 @@ describe Stackup::Stack do
   let(:unique_stack_id) { "ID:#{stack_name}" }
   let(:stack_options) { {} }
 
+  let(:change_set_name) { "ch-ch-changes" }
+
   subject(:stack) { described_class.new(stack_name, cf_client, stack_options) }
 
   before do
     cf_client.stub_responses(:describe_stacks, *describe_stacks_responses)
+    cf_client.stub_responses(:describe_change_set, *describe_change_set_responses)
     allow(stack).to receive(:sleep).at_most(5).times
     # partial stubbing, to support spying
     allow(cf_client).to receive(:create_stack).and_call_original
     allow(cf_client).to receive(:delete_stack).and_call_original
     allow(cf_client).to receive(:update_stack).and_call_original
     allow(cf_client).to receive(:cancel_update_stack).and_call_original
+    allow(cf_client).to receive(:list_change_sets).and_call_original
+    allow(cf_client).to receive(:create_change_set).and_call_original
+    allow(cf_client).to receive(:execute_change_set).and_call_original
+    allow(cf_client).to receive(:delete_change_set).and_call_original
+    allow(cf_client).to receive(:describe_change_set).and_call_original
   end
 
-  def validation_error(message)
+  def error(type, message)
     {
       :status_code => 400,
       :headers => {},
       :body => [
-        "<ErrorResponse><Error><Code>ValidationError</Code><Message>",
+        "<ErrorResponse><Error><Code>#{type}</Code><Message>",
         message,
         "</Message></Error></ErrorResponse>"
       ].join
     }
+  end
+
+  def validation_error(message)
+    error("ValidationError", message)
   end
 
   def stack_description(stack_status, details = {})
@@ -45,6 +57,14 @@ describe Stackup::Stack do
         }.merge(details)
       ]
     }
+  end
+
+  let(:describe_change_set_responses) do
+    [
+      {
+        :status => "CREATE_COMPLETE"
+      }
+    ]
   end
 
   context "before stack exists" do
@@ -262,6 +282,86 @@ describe Stackup::Stack do
 
     end
 
+    describe "#change_set#create" do
+
+      let(:template) { "stack template" }
+
+      let(:options) do
+        { :template_body => template }
+      end
+
+      def create_change_set
+        stack.change_set(change_set_name).create(options)
+      end
+
+      it "calls :create_change_set" do
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name,
+          :change_set_type => "CREATE",
+          :template_body => template
+        }
+        create_change_set
+        expect(cf_client).to have_received(:create_change_set)
+          .with(hash_including(expected_args))
+      end
+
+      context "with :template as data" do
+
+        let(:options) do
+          { :template => { "foo" => "bar" } }
+        end
+
+        it "converts the template to JSON" do
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set)
+            .with(hash_including(:template_body))
+        end
+
+      end
+
+      context "with :parameters as Hash" do
+
+        before do
+          options[:parameters] = { "foo" => "bar" }
+        end
+
+        it "converts them to an Array" do
+          expected_parameters = [
+            {
+              :parameter_key => "foo",
+              :parameter_value => "bar"
+            }
+          ]
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set) do |options|
+            expect(options[:parameters]).to eq(expected_parameters)
+          end
+        end
+
+      end
+
+      context "with :tags as Hash" do
+
+        before do
+          options[:tags] = { "foo" => "bar", "code" => 123 }
+        end
+
+        it "converts them to an Array" do
+          expected_tags = [
+            { :key => "foo", :value => "bar" },
+            { :key => "code", :value => "123" }
+          ]
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set) do |options|
+            expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
+    end
+
   end
 
   context "with existing stack" do
@@ -422,6 +522,114 @@ describe Stackup::Stack do
             .with(hash_not_including(:disable_rollback))
         end
 
+      end
+
+    end
+
+    describe "#change_set_summaries" do
+
+      it "calls :list_change_sets" do
+        cf_client.stub_responses(:list_change_sets, :summaries => [
+          { :change_set_name => "take1" },
+          { :change_set_name => "take2" },
+        ])
+        summaries = stack.change_set_summaries
+        expect(summaries.map(&:change_set_name)).to eql(%w(take1 take2))
+        expect(cf_client).to have_received(:list_change_sets)
+          .with(:stack_name => stack_name)
+      end
+
+    end
+
+    describe "#change_set#create" do
+
+      let(:template) { "stack template" }
+
+      let(:options) do
+        { :template_body => template }
+      end
+
+      def create_change_set
+        stack.change_set(change_set_name).create(options)
+      end
+
+      it "calls :create_change_set" do
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name,
+          :change_set_type => "UPDATE",
+          :template_body => template
+        }
+        create_change_set
+        expect(cf_client).to have_received(:create_change_set)
+          .with(hash_including(expected_args))
+      end
+
+    end
+
+    describe "#change_set#execute" do
+
+      let(:change_set_name) { "change-it" }
+
+      let(:describe_stacks_responses) do
+        [
+          stack_description("UPDATE_IN_PROGRESS"),
+          stack_description("UPDATE_COMPLETE")
+        ]
+      end
+
+      def execute_change_set
+        stack.change_set(change_set_name).execute
+      end
+
+      it "calls :execute_change_set" do
+        execute_change_set
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name
+        }
+        expect(cf_client).to have_received(:execute_change_set)
+          .with(hash_including(expected_args))
+      end
+
+      it "it sleeps" do
+        execute_change_set
+        expect(stack).to have_received(:sleep).with(5)
+      end
+
+      it "returns status" do
+        expect(execute_change_set).to eq("UPDATE_COMPLETE")
+      end
+
+      context "if change-set doesn't exist" do
+
+        before do
+          cf_client.stub_responses(
+            :execute_change_set,
+            error("ChangeSetNotFound", "ChangeSet [foo] does not exist")
+          )
+        end
+
+        it "raises a NoSuchChangeSet error" do
+          expect { execute_change_set }.to raise_error(Stackup::NoSuchChangeSet)
+        end
+
+      end
+
+    end
+
+    describe "#change_set#delete" do
+
+      let(:change_set_name) { "change-it" }
+
+      it "calls :delete_change_set" do
+        stack.change_set(change_set_name).delete
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name
+        }
+        expect(cf_client).to have_received(:delete_change_set)
+          .with(hash_including(expected_args))
       end
 
     end

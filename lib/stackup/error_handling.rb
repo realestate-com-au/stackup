@@ -6,14 +6,15 @@ module Stackup
   #
   module ErrorHandling
 
-    # Invoke an Aws::CloudFormation operation
+    # Invoke an Aws::CloudFormation operation.
     #
-    # If a +ValidationError+ is raised, check the message; there's often
-    # useful information is hidden inside.  If that's the case, convert it to
-    # an appropriate Stackup exception.
+    # If an exception is raised, convert it to a Stackup exception,
+    # if appropriate.
     #
-    def handling_validation_error
+    def handling_cf_errors
       yield
+    rescue Aws::CloudFormation::Errors::ChangeSetNotFound => e
+      raise NoSuchChangeSet, "no such change-set"
     rescue Aws::CloudFormation::Errors::ValidationError => e
       case e.message
       when /Stack .* does not exist/
