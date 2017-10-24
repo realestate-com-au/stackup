@@ -2,7 +2,7 @@ source "https://rubygems.org" do
 
   gemspec
 
-  gem "rake", "~> 10.0"
+  gem "rake", "~> 12.1"
   gem "rubocop", "~> 0.32"
 
   group :test do
