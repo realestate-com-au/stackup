@@ -216,3 +216,32 @@ If you're sensible, you'll replace "latest", with a specific [version](https://r
 
 The default working-directory within the container is `/cwd`;
 hence the volume mount to make files available from the host system.
+
+## IAM Permissions
+
+### up
+
+This policy grants the principal all actions required by `stackup up` for any cloudformation stack:
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:DeleteStack",
+                "cloudformation:DescribeStackEvents",
+                "cloudformation:DescribeStackResource",
+                "cloudformation:DescribeStacks",
+                "cloudformation:SetStackPolicy",
+                "cloudformation:UpdateStack"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+```
