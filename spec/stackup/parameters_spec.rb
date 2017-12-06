@@ -143,6 +143,22 @@ describe Stackup::Parameters do
       end
 
     end
+    context "with empty parameter file" do
+
+      let(:input_records) { false }
+
+      subject(:parameters) { Stackup::Parameters.new(input_records) }
+
+      describe "#to_hash" do
+
+        it "doesn't crash" do
+          expected = {}
+          expect(parameters.to_hash).to eql(expected)
+        end
+
+      end
+
+    end
 
   end
 

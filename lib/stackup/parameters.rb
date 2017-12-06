@@ -7,6 +7,7 @@ module Stackup
     class << self
 
       def new(arg)
+        arg ||= {}
         arg = hashify(arg) unless arg.is_a?(Hash)
         super(arg)
       end
