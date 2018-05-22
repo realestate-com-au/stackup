@@ -125,6 +125,15 @@ You can also use the `--with-role` option to temporarily assume a different IAM 
     $ stackup myapp-test up -t template.json \
       --with-role arn:aws:iam::862905684840:role/deployment
 
+You can use the `--sercvice-role-arn` option to pass a specific IAM service role for CloudFormation to use for stack
+operations:
+
+    $ stackup myapp-test up -t template.json \
+	    --service-role-arn arn:aws:iam::862905684840:role/cloudformation-role
+
+
+(for more information on CloudFormation service roles, see [AWS' documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-servicerole.html)).
+
 ### Using URLs as inputs
 
 You can use either local files, or HTTP URLs, to specify inputs; stack template, parameters, etc.

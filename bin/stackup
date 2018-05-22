@@ -192,6 +192,13 @@ Clamp do
            :attribute_name => :policy_source,
            &Stackup::Source.method(:new)
 
+    option "--service-role-arn", "SERVICE_ROLE_ARN", "cloudformation service role ARN" do |arg|
+      unless arg =~ %r{^arn:aws:iam::\d+:role/}
+        fail ArgumentError, "#{arg.inspect} doesn't look like a role ARN"
+      end
+      arg
+    end
+
     option "--on-failure", "ACTION",
            "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
            :default => "ROLLBACK"
@@ -218,6 +225,7 @@ Clamp do
           options[:stack_policy] = policy_source.data
         end
       end
+      options[:role_arn] = service_role_arn if service_role_arn
       options[:use_previous_template] = use_previous_template?
       report_change do
         stack.create_or_update(options)
