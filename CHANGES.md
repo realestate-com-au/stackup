@@ -1,3 +1,7 @@
+## 1.3.0 (2018-05-22)
+
+* Fix #53: Add support for CloudFormation Service Role
+
 ## 1.2.0 (2017-10-24)
 
 * Add support for change-sets.
