@@ -126,7 +126,7 @@ You can also use the `--with-role` option to temporarily assume a different IAM 
     $ stackup myapp-test up -t template.json \
       --with-role arn:aws:iam::862905684840:role/deployment
 
-You can use the `--sercvice-role-arn` option to pass a specific IAM service role for CloudFormation to use for stack
+You can use the `--service-role-arn` option to pass a specific IAM service role for CloudFormation to use for stack
 operations:
 
     $ stackup myapp-test up -t template.json \
