@@ -22,6 +22,7 @@ AWS CloudFormation stacks.
 - [Programmatic usage](#programmatic-usage)
 - [Rake integration](#rake-integration)
 - [Docker image](#docker-image)
+- [Releasing](#releasing)
 
 <!-- /TOC -->
 
@@ -253,4 +254,20 @@ This policy grants the principal all actions required by `stackup up` for any cl
         }
     ]
 }
+```
+
+## Releasing
+
+The release process will push tags to GitHub, push the gem to rubygems and push the docker image to DockerHub.
+
+Prerequisites:
+
+* logged into dockerhub via `docker login`. Your user must have permission to push to `realestate/stackup`
+* logged into rubygems via `gem push`. Your user must have permission to push to the `stackup` gem.
+
+To release:
+
+```
+bundle install
+auto/release
 ```
