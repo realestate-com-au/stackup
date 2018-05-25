@@ -69,6 +69,9 @@ This will:
   * update (or create) the named CloudFormation stack, using the specified template
   * monitor events until the stack update is complete
 
+Requests will retry 3 times by default. After this limit is exceeded, `ERROR: Rate exceeded` failures will be logged.
+You can increase the limit using the `--retry-limit` option, or by setting the `$AWS_RETRY_LIMIT` environment variable.
+
 For more details on usage, see
 
     $ stackup STACK up --help
