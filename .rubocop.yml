@@ -20,20 +20,16 @@ Style/Documentation:
   Exclude:
     - "spec/**/*"
 
-Style/EmptyLinesAroundBlockBody:
+Layout/EmptyLinesAroundBlockBody:
   Enabled: false
 
-Style/EmptyLinesAroundClassBody:
+Layout/EmptyLinesAroundClassBody:
   EnforcedStyle: empty_lines
 
-Style/EmptyLinesAroundModuleBody:
+Layout/EmptyLinesAroundModuleBody:
   Enabled: false
 
-Style/Encoding:
-  EnforcedStyle: when_needed
-  Enabled: true
-
-Style/FileName:
+Naming/FileName:
   Exclude:
     - "bin/*"
 
