@@ -143,7 +143,7 @@ describe Stackup::Parameters do
       end
 
     end
-    
+
     context "with empty parameter file" do
 
       let(:input_records) { false }

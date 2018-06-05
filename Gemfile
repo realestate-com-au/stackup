@@ -6,8 +6,8 @@ source "https://rubygems.org" do
   gem "rubocop", "~> 0.56"
 
   group :test do
-    gem "rspec", "~> 3.7"
     gem "byebug"
+    gem "rspec", "~> 3.7"
   end
 
 end

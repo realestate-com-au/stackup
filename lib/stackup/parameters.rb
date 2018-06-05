@@ -55,9 +55,7 @@ module Stackup
 
     def initialize(attributes)
       attributes.each do |name, value|
-        if name.respond_to?(:gsub)
-          name = name.gsub(/([a-z])([A-Z])/, '\1_\2').downcase
-        end
+        name = name.gsub(/([a-z])([A-Z])/, '\1_\2').downcase if name.respond_to?(:gsub)
         writer = "#{name}="
         if respond_to?(writer)
           public_send(writer, value)
@@ -71,7 +69,7 @@ module Stackup
     attr_accessor :parameter_value
     attr_accessor :use_previous_value
 
-    alias_method :key, :parameter_key
+    alias key parameter_key
 
     def value
       if use_previous_value

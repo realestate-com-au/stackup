@@ -7,7 +7,7 @@ module Stackup
     def normalize_data(data)
       case data
       when Hash
-        pairs = data.sort.map { |k,v| [k, normalize_data(v)] }
+        pairs = data.sort.map { |k, v| [k, normalize_data(v)] }
         Hash[pairs]
       when Array
         pairs = data.map { |x| normalize_data(x) }

@@ -40,7 +40,7 @@ module Stackup
     #
     def on_event(event_handler = nil, &block)
       event_handler ||= block
-      fail ArgumentError, "no event_handler provided" if event_handler.nil?
+      raise ArgumentError, "no event_handler provided" if event_handler.nil?
       @event_handler = event_handler
     end
 
@@ -135,9 +135,9 @@ module Stackup
       create(options)
     end
 
-    alias_method :up, :create_or_update
+    alias up create_or_update
 
-    ALMOST_DEAD_STATUSES = %w(CREATE_FAILED ROLLBACK_COMPLETE)
+    ALMOST_DEAD_STATUSES = %w[CREATE_FAILED ROLLBACK_COMPLETE].freeze
 
     # Delete the stack.
     #
@@ -159,7 +159,7 @@ module Stackup
       @stack_id = nil
     end
 
-    alias_method :down, :delete
+    alias down delete
 
     # Cancel update in-progress.
     #
@@ -321,7 +321,7 @@ module Stackup
     def modify_stack(target_status, failure_message, &block)
       if wait?
         status = modify_stack_synchronously(&block)
-        fail StackUpdateError, failure_message unless target_status === status
+        raise StackUpdateError, failure_message unless target_status === status
         status
       else
         modify_stack_asynchronously(&block)
@@ -355,7 +355,7 @@ module Stackup
       handling_cf_errors do
         yield
       end
-      self.status
+      status
     end
 
     def normalize_tags(tags)

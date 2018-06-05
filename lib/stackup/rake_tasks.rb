@@ -14,20 +14,20 @@ module Stackup
     attr_accessor :parameters
     attr_accessor :tags
 
-    alias_method :namespace=, :name=
+    alias namespace= name=
 
     def initialize(name, template = nil)
       @name = name
       @stack = name
       @template = template
       yield self if block_given?
-      fail ArgumentError, "no name provided" unless @name
-      fail ArgumentError, "no template provided" unless @template
+      raise ArgumentError, "no name provided" unless @name
+      raise ArgumentError, "no template provided" unless @template
       define
     end
 
     # path to the "stackup" executable
-    STACKUP_CLI = File.expand_path("../../../bin/stackup", __FILE__)
+    STACKUP_CLI = File.expand_path("../../bin/stackup", __dir__)
 
     def stackup(*rest)
       sh STACKUP_CLI, "-Y", stack, *rest

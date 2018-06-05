@@ -183,7 +183,7 @@ describe Stackup::YAML do
         expect(data).to eql(
           "Stuff" => [
             {
-              "Fn::FindInMap" => ["RegionMap", {"Ref"=>"AWS::Region"}, "AMI"]
+              "Fn::FindInMap" => ["RegionMap", { "Ref" => "AWS::Region" }, "AMI"]
             },
             {
               "Fn::If" => ["CreateProdResources", "c1.xlarge", "m1.small"]

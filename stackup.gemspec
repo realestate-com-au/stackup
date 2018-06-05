@@ -1,4 +1,4 @@
-lib = File.expand_path("../lib", __FILE__)
+lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require "stackup/version"
@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/realestate-com-au/stackup"
   spec.license       = "MIT"
 
-  spec.files         = Dir.glob("{bin,lib,spec}/**/*") + %w(README.md CHANGES.md)
+  spec.files         = Dir.glob("{bin,lib,spec}/**/*") + %w[README.md CHANGES.md]
   spec.test_files    = spec.files.grep(/^spec/)
 
   spec.require_paths = ["lib"]

@@ -6,7 +6,7 @@ require "stackup/yaml"
 
 describe Stackup::Source do
 
-  let(:example_dir) { File.expand_path("../../../examples", __FILE__) }
+  let(:example_dir) { File.expand_path("../../examples", __dir__) }
 
   context "from a JSON file" do
 
@@ -69,7 +69,7 @@ describe Stackup::Source do
     describe "#body" do
 
       it "raises a ReadError" do
-        expect { subject.body }.to raise_error(Stackup::Source::ReadError, %q(no such file: "notreallythere.json"))
+        expect { subject.body }.to raise_error(Stackup::Source::ReadError, 'no such file: "notreallythere.json"')
       end
 
     end

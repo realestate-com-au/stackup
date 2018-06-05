@@ -32,7 +32,7 @@ module Stackup
       # Supports CloudFormation extensions as per `load`.
       #
       def load_file(filename)
-        File.open(filename, 'r:bom|utf-8') do |f|
+        File.open(filename, "r:bom|utf-8") do |f|
           load(f, filename)
         end
       end
@@ -44,7 +44,9 @@ module Stackup
     class CloudFormationToRuby < Psych::Visitors::ToRuby
 
       class << self
-        alias_method :create, :new unless method_defined?(:create)
+
+        alias create new unless method_defined?(:create)
+
       end
 
       def accept(target)
@@ -56,7 +58,7 @@ module Stackup
         when "!GetAZs"
           { "Fn::GetAZs" => (super || "") }
         when /^!(\w+)$/
-          { "Fn::#{$1}" => super }
+          { "Fn::#{Regexp.last_match(1)}" => super }
         else
           super
         end

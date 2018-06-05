@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH << File.expand_path("../../lib", __FILE__)
+$LOAD_PATH << File.expand_path("../lib", __dir__)
 
 require "clamp"
 require "console_logger"
@@ -25,25 +25,23 @@ Clamp do
   option ["-Y", "--yaml"], :flag, "output data in YAML format"
 
   option ["--region"], "REGION", "set region" do |arg|
-    unless arg =~ /^[a-z]{2}-[a-z]+-\d$/
-      fail ArgumentError, "#{arg.inspect} doesn't look like a region"
-    end
+    raise ArgumentError, "#{arg.inspect} doesn't look like a region" unless arg =~ /^[a-z]{2}-[a-z]+-\d$/
     arg
   end
 
   option ["--with-role"], "ROLE_ARN", "assume this role",
-    :attribute_name => :role_arn
+         :attribute_name => :role_arn
 
   option ["--retry-limit"], "N", "maximum number of retries for API calls",
-    :environment_variable => "AWS_API_RETRY_LIMIT" do |arg|
+         :environment_variable => "AWS_API_RETRY_LIMIT" do |arg|
     Integer(arg)
   end
 
   option ["--[no-]wait"], :flag, "wait for stack updates to complete",
-    :default => true
+         :default => true
 
   option ["--wait-poll-interval"], "N", "polling interval while waiting for updates",
-    :default => 5, &method(:Integer)
+         :default => 5, &method(:Integer)
 
   option "--debug", :flag, "enable debugging"
 
@@ -85,9 +83,7 @@ Clamp do
   end
 
   def role_arn=(arg)
-    unless arg =~ %r{^arn:aws:iam::\d+:role/}
-      fail ArgumentError, "#{arg.inspect} doesn't look like a role ARN"
-    end
+    raise ArgumentError, "#{arg.inspect} doesn't look like a role ARN" unless arg =~ %r{^arn:aws:iam::\d+:role/}
     @role_arn = arg
   end
 
@@ -157,9 +153,9 @@ Clamp do
     end
 
     def parameters_from_files
-      parameter_sources.map { |src|
+      parameter_sources.map do |src|
         Stackup::Parameters.new(src.data).to_hash
-      }.inject({}, :merge)
+      end.inject({}, :merge)
     end
 
     def parameter_overrides
@@ -193,9 +189,7 @@ Clamp do
            &Stackup::Source.method(:new)
 
     option "--service-role-arn", "SERVICE_ROLE_ARN", "cloudformation service role ARN" do |arg|
-      unless arg =~ %r{^arn:aws:iam::\d+:role/}
-        fail ArgumentError, "#{arg.inspect} doesn't look like a role ARN"
-      end
+      raise ArgumentError, "#{arg.inspect} doesn't look like a role ARN" unless arg =~ %r{^arn:aws:iam::\d+:role/}
       arg
     end
 

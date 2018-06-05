@@ -33,7 +33,6 @@ module Stackup
     # Consume all new events
     #
     def zero
-      # rubocop:disable Lint/HandleExceptions
       last_event = stack.events.first
       @last_processed_event_id = last_event.id unless last_event.nil?
       nil

@@ -46,7 +46,7 @@ describe Stackup::StackWatcher do
 
     before do
       allow(stack).to receive(:events) do
-        fail Aws::CloudFormation::Errors::ValidationError.new("test", "no such stack")
+        raise Aws::CloudFormation::Errors::ValidationError.new("test", "no such stack")
       end
     end
 

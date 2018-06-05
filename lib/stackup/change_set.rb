@@ -77,7 +77,7 @@ module Stackup
             return current.status
           when "FAILED"
             logger.error(current.status_reason)
-            fail StackUpdateError, "change-set creation failed" if status == "FAILED"
+            raise StackUpdateError, "change-set creation failed" if status == "FAILED"
           end
           sleep(wait_poll_interval)
         end

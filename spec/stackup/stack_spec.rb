@@ -530,11 +530,11 @@ describe Stackup::Stack do
 
       it "calls :list_change_sets" do
         cf_client.stub_responses(:list_change_sets, :summaries => [
-          { :change_set_name => "take1" },
-          { :change_set_name => "take2" },
-        ])
+                                   { :change_set_name => "take1" },
+                                   { :change_set_name => "take2" }
+                                 ])
         summaries = stack.change_set_summaries
-        expect(summaries.map(&:change_set_name)).to eql(%w(take1 take2))
+        expect(summaries.map(&:change_set_name)).to eql(%w[take1 take2])
         expect(cf_client).to have_received(:list_change_sets)
           .with(:stack_name => stack_name)
       end
@@ -634,7 +634,7 @@ describe Stackup::Stack do
 
     end
 
-    %w(CREATE_FAILED ROLLBACK_COMPLETE).each do |initial_status|
+    %w[CREATE_FAILED ROLLBACK_COMPLETE].each do |initial_status|
       context "when status is #{initial_status}" do
 
         let(:stack_status) { initial_status }
