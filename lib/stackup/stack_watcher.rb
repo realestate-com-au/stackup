@@ -14,10 +14,11 @@ module Stackup
 
     attr_accessor :stack
 
+    # rubocop:disable Lint/HandleExceptions
+
     # Yield all events since the last call
     #
     def each_new_event
-      # rubocop:disable Lint/HandleExceptions
       new_events = []
       stack.events.each do |event|
         break if event.id == @last_processed_event_id
@@ -27,7 +28,7 @@ module Stackup
         yield event
         @last_processed_event_id = event.id
       end
-    rescue Aws::CloudFormation::Errors::ValidationError
+    rescue Aws::CloudFormation::Errors::ValidationError => _e
     end
 
     # Consume all new events
@@ -38,6 +39,8 @@ module Stackup
       nil
     rescue Aws::CloudFormation::Errors::ValidationError
     end
+
+    # rubocop:enable Lint/HandleExceptions
 
     private
 

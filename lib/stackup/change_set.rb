@@ -56,15 +56,9 @@ module Stackup
       options[:change_set_name] = name
       options[:change_set_type] = stack.exists? ? "UPDATE" : "CREATE"
       force = options.delete(:force)
-      if (template_data = options.delete(:template))
-        options[:template_body] = MultiJson.dump(template_data)
-      end
-      if (parameters = options[:parameters])
-        options[:parameters] = Parameters.new(parameters).to_a
-      end
-      if (tags = options[:tags])
-        options[:tags] = normalize_tags(tags)
-      end
+      options[:template_body] = MultiJson.dump(options.delete(:template)) if options[:template]
+      options[:parameters] = Parameters.new(options[:parameters]).to_a if options[:parameters]
+      options[:tags] = normalize_tags(options[:tags]) if options[:tags]
       options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
       delete if force
       handling_cf_errors do

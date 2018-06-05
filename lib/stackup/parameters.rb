@@ -57,11 +57,8 @@ module Stackup
       attributes.each do |name, value|
         name = name.gsub(/([a-z])([A-Z])/, '\1_\2').downcase if name.respond_to?(:gsub)
         writer = "#{name}="
-        if respond_to?(writer)
-          public_send(writer, value)
-        else
-          raise ArgumentError, "invalid attribute: #{name.inspect}"
-        end
+        raise(ArgumentError, "invalid attribute: #{name.inspect}") unless respond_to?(writer)
+        public_send(writer, value)
       end
     end
 

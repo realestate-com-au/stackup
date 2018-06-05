@@ -14,11 +14,11 @@ Metrics/MethodLength:
 Style/ClassAndModuleChildren:
   EnforcedStyle: nested
   Exclude:
+    - "bin/*"
     - "spec/**/*"
 
 Style/Documentation:
-  Exclude:
-    - "spec/**/*"
+  Enabled: false
 
 Layout/EmptyLinesAroundBlockBody:
   Enabled: false
@@ -40,4 +40,22 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/WordArray:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
+Style/CaseEquality:
   Enabled: false

@@ -13,7 +13,7 @@ module Stackup
     #
     def handling_cf_errors
       yield
-    rescue Aws::CloudFormation::Errors::ChangeSetNotFound => e
+    rescue Aws::CloudFormation::Errors::ChangeSetNotFound => _e
       raise NoSuchChangeSet, "no such change-set"
     rescue Aws::CloudFormation::Errors::ValidationError => e
       case e.message

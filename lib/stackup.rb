@@ -25,3 +25,5 @@ end
 def Stackup(*args)
   Stackup.service(*args)
 end
+
+# rubocop:enable Naming/MethodName
