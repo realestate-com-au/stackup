@@ -1,4 +1,4 @@
-FROM ruby:2.3-alpine
+FROM ruby:2.5-alpine@sha256:26bdf378e71fcb122349d973541862fe27c6acd2b3664fb0fe24dae75fef22b4
 
 MAINTAINER https://github.com/realestate-com-au/stackup
 
