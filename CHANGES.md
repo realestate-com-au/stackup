@@ -1,3 +1,7 @@
+## 1.3.1 (2018-06-05)
+
+* Dependency upgrades. Notably ruby 2.5 in the docker release, and aws-sdk v3
+
 ## 1.3.0 (2018-05-22)
 
 * Fix #53: Add support for CloudFormation Service Role
