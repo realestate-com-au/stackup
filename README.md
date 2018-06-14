@@ -109,7 +109,7 @@ You may specify `-p` multiple times; `stackup` will read and merge all the files
       -p defaults.json \
       -p overrides.json
 
-Or, you may also specify one or more override parameter on the command-line, via `-o` along with `-p`:
+Or, you can specify one or more override parameters on the command-line, using `-o` with `-p`:
 
     $ stackup myapp-test up -t template.json \
       -p defaults.json \
