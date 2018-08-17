@@ -1,4 +1,4 @@
-require "aws-sdk-resources"
+require "aws-sdk-cloudformation"
 require "logger"
 require "multi_json"
 require "stackup/change_set"

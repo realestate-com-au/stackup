@@ -1,4 +1,4 @@
-require "aws-sdk-core"
+require "aws-sdk-cloudformation"
 
 module Stackup
 

@@ -1,4 +1,3 @@
-require "aws-sdk-core"
 require "open-uri"
 require "stackup/stack"
 

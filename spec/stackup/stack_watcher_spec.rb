@@ -1,6 +1,6 @@
 require "spec_helper"
 
-require "aws-sdk-resources"
+require "aws-sdk-cloudformation"
 require "securerandom"
 require "stackup/stack_watcher"
 
