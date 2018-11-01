@@ -2,6 +2,7 @@
 
 ## PENDING
 
+* Add `--context-lines` option to `diff`.
 * Fix #60: requiring all of "aws-sdk-resources" causes slow gem loading.
 
 ## 1.3.1 (2018-06-05)
