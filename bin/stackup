@@ -347,7 +347,7 @@ Clamp do
 
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
-    option "--context-lines", "LINES", "number of lines of context to show", :default => 10_000
+    option ["-C", "--context-lines"], "LINES", "number of lines of context to show", :default => 10_000
 
     option ["-t", "--template"], "FILE", "template source",
            :attribute_name => :template_source,
