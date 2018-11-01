@@ -17,10 +17,10 @@ module Stackup
 
     include Utils
 
-    def diff(existing_data, pending_data)
+    def diff(existing_data, pending_data, context_lines)
       existing = format(normalize_data(existing_data)) + "\n"
       pending = format(normalize_data(pending_data)) + "\n"
-      diff = Diffy::Diff.new(existing, pending).to_s(diff_style)
+      diff = Diffy::Diff.new(existing, pending, context: context_lines).to_s(diff_style)
       diff unless diff =~ /\A\s*\Z/
     end
 

@@ -347,6 +347,8 @@ Clamp do
 
     option "--diff-format", "FORMAT", "'text', 'color', or 'html'", :default => "color"
 
+    option "--context-lines", "LINES", "number of lines of context to show", :default => 10_000
+
     option ["-t", "--template"], "FILE", "template source",
            :attribute_name => :template_source,
            &Stackup::Source.method(:new)
@@ -373,7 +375,7 @@ Clamp do
         planned["Tags"] = tag_source.data.sort.to_h
       end
       signal_usage_error "specify '--template' or '--parameters'" if planned.empty?
-      puts differ.diff(current, planned)
+      puts differ.diff(current, planned, context_lines)
     end
 
     private
