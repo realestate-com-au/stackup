@@ -1,3 +1,9 @@
+# CHANGES
+
+## PENDING
+
+* Fix #60: requiring all of "aws-sdk-resources" causes slow gem loading.
+
 ## 1.3.1 (2018-06-05)
 
 * Dependency upgrades. Notably ruby 2.5 in the docker release, and aws-sdk v3
