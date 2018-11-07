@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.4.1 (2018-11-07)
+
+* Fix: diff method had a new required value in v1.4.0. This now defaults to nil in the method signature.
+
 ## 1.4.0 (2018-11-01)
 
 * Add `--context-lines` option to `diff`.
