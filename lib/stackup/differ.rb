@@ -17,7 +17,7 @@ module Stackup
 
     include Utils
 
-    def diff(existing_data, pending_data, context_lines)
+    def diff(existing_data, pending_data, context_lines = nil)
       existing = format(normalize_data(existing_data)) + "\n"
       pending = format(normalize_data(pending_data)) + "\n"
       diff = Diffy::Diff.new(existing, pending, context: context_lines).to_s(diff_style)
