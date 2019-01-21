@@ -11,6 +11,7 @@ COPY lib /app/lib
 COPY spec /app/spec
 COPY README.md /app/
 COPY CHANGES.md /app/
+COPY LICENSE.md /app/
 COPY stackup.gemspec /app/
 
 RUN gem build stackup.gemspec
