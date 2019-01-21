@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/realestate-com-au/stackup"
   spec.license       = "MIT"
 
-  spec.files         = Dir.glob("{bin,lib,spec}/**/*") + %w[README.md CHANGES.md]
+  spec.files         = Dir.glob("{bin,lib,spec}/**/*") + %w[README.md CHANGES.md LICENSE.md]
   spec.test_files    = spec.files.grep(/^spec/)
 
   spec.require_paths = ["lib"]
