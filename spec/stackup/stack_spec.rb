@@ -644,7 +644,7 @@ describe Stackup::Stack do
           let(:template) { "stack template" }
 
           def create_or_update
-            stack.create_or_update(:template_body => template)
+            stack.create_or_update(:template_body => template, :disable_rollback => true)
           end
 
           let(:describe_stacks_responses) do
@@ -667,6 +667,14 @@ describe Stackup::Stack do
             create_or_update
             expect(cf_client).to have_received(:delete_stack)
             expect(cf_client).to have_received(:create_stack)
+
+            expected_args = {
+              :stack_name => stack_name,
+              :template_body => template,
+              :disable_rollback => true
+            }
+            expect(cf_client).to have_received(:create_stack)
+              .with(hash_including(expected_args))
           end
 
         end

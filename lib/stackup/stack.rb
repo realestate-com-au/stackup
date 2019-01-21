@@ -281,6 +281,7 @@ module Stackup
     end
 
     def create(options)
+      options = options.dup
       options[:stack_name] = name
       options.delete(:stack_policy_during_update_body)
       options.delete(:stack_policy_during_update_url)
@@ -290,6 +291,7 @@ module Stackup
     end
 
     def update(options)
+      options = options.dup
       options.delete(:disable_rollback)
       options.delete(:on_failure)
       options.delete(:timeout_in_minutes)
