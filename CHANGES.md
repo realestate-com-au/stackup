@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.4.2 (2019-01-21)
+
+* Fix #64: Create and Update functions should not mutate the options parameter
+
 ## 1.4.1 (2018-11-07)
 
 * Fix: diff method had a new required value in v1.4.0. This now defaults to nil in the method signature.
