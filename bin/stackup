@@ -26,6 +26,7 @@ Clamp do
 
   option ["--region"], "REGION", "set region" do |arg|
     raise ArgumentError, "#{arg.inspect} doesn't look like a region" unless arg =~ /^[a-z]{2}-[a-z]+-\d$/
+
     arg
   end
 
@@ -84,6 +85,7 @@ Clamp do
 
   def role_arn=(arg)
     raise ArgumentError, "#{arg.inspect} doesn't look like a role ARN" unless arg =~ %r{^arn:aws:iam::\d+:role/}
+
     @role_arn = arg
   end
 
@@ -102,6 +104,7 @@ Clamp do
 
   def aws_config
     return base_aws_config unless role_arn
+
     assumed_credentials = Aws::AssumeRoleCredentials.new(
       :client => Aws::STS::Client.new(base_aws_config),
       :role_arn => role_arn,
@@ -190,6 +193,7 @@ Clamp do
 
     option "--service-role-arn", "SERVICE_ROLE_ARN", "cloudformation service role ARN" do |arg|
       raise ArgumentError, "#{arg.inspect} doesn't look like a role ARN" unless arg =~ %r{^arn:aws:iam::\d+:role/}
+
       arg
     end
 
@@ -434,6 +438,7 @@ Clamp do
             display_event(event)
           end
           break unless follow?
+
           sleep 5
         end
       end
