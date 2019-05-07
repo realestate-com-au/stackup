@@ -23,6 +23,7 @@ module Stackup
       yield self if block_given?
       raise ArgumentError, "no name provided" unless @name
       raise ArgumentError, "no template provided" unless @template
+
       define
     end
 
@@ -101,6 +102,7 @@ module Stackup
 
       def maybe_tempfile(file_or_data, type)
         return file_or_data if file_or_data.is_a?(String)
+
         tempfile = Tempfile.new([type, ".yml"])
         tempfile.write(YAML.dump(file_or_data))
         tempfile.close

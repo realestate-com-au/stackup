@@ -22,6 +22,7 @@ module Stackup
       new_events = []
       stack.events.each do |event|
         break if event.id == @last_processed_event_id
+
         new_events.unshift(event)
       end
       new_events.each do |event|

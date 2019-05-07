@@ -24,6 +24,7 @@ module Stackup
       def load(yaml, filename = nil)
         tree = ::YAML.parse(yaml, filename)
         return tree unless tree
+
         CloudFormationToRuby.create.accept(tree)
       end
 

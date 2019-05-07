@@ -41,6 +41,7 @@ module Stackup
     def on_event(event_handler = nil, &block)
       event_handler ||= block
       raise ArgumentError, "no event_handler provided" if event_handler.nil?
+
       @event_handler = event_handler
     end
 
@@ -324,6 +325,7 @@ module Stackup
       if wait?
         status = modify_stack_synchronously(&block)
         raise StackUpdateError, failure_message unless target_status === status
+
         status
       else
         modify_stack_asynchronously(&block)
@@ -344,6 +346,7 @@ module Stackup
           status = self.status
           logger.debug("stack_status=#{status}")
           return status if status.nil? || status =~ /_(COMPLETE|FAILED)$/
+
           sleep(wait_poll_interval)
         end
       end
