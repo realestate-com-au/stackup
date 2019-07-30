@@ -362,6 +362,37 @@ describe Stackup::Stack do
 
     end
 
+    describe "#change_set#execute" do
+
+      let(:change_set_name) { "create-it" }
+
+      let(:describe_stacks_responses) do
+        [
+          stack_description("CREATE_IN_PROGRESS"),
+          stack_description("CREATE_COMPLETE")
+        ]
+      end
+
+      def execute_change_set
+        stack.change_set(change_set_name).execute
+      end
+
+      it "calls :execute_change_set" do
+        execute_change_set
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name
+        }
+        expect(cf_client).to have_received(:execute_change_set)
+          .with(hash_including(expected_args))
+      end
+
+      it "returns status" do
+        expect(execute_change_set).to eq("CREATE_COMPLETE")
+      end
+
+    end
+
   end
 
   context "with existing stack" do
