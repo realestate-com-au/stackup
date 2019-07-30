@@ -279,6 +279,12 @@ Clamp do
              :attribute_name => :tag_source,
              &Stackup::Source.method(:new)
 
+      option "--service-role-arn", "SERVICE_ROLE_ARN", "cloudformation service role ARN" do |arg|
+        raise ArgumentError, "#{arg.inspect} doesn't look like a role ARN" unless arg =~ %r{^arn:aws:iam::\d+:role/}
+
+        arg
+      end
+
       def execute
         unless template_source || use_previous_template?
           signal_usage_error "Specify either --template or --use-previous-template"
@@ -294,6 +300,7 @@ Clamp do
         options[:parameters] = parameters
         options[:description] = description if description
         options[:tags] = tag_source.data if tag_source
+        options[:role_arn] = service_role_arn if service_role_arn
         options[:use_previous_template] = use_previous_template?
         options[:force] = force?
         report_change do
