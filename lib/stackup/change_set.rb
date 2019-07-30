@@ -87,7 +87,7 @@ module Stackup
     # @raise [Stackup::StackUpdateError] if operation fails
     #
     def execute
-      modify_stack("UPDATE_COMPLETE", "update failed") do
+      modify_stack(/(CREATE|UPDATE)_COMPLETE/, "update failed") do
         cf_client.execute_change_set(:stack_name => stack.name, :change_set_name => name)
       end
     end
