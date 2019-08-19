@@ -129,7 +129,7 @@ module Stackup
       if (policy_data = options.delete(:stack_policy_during_update))
         options[:stack_policy_during_update_body] = MultiJson.dump(policy_data)
       end
-      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
+      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
       delete if ALMOST_DEAD_STATUSES.include?(status)
       update(options)
     rescue NoSuchStack

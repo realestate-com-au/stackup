@@ -59,7 +59,7 @@ module Stackup
       options[:template_body] = MultiJson.dump(options.delete(:template)) if options[:template]
       options[:parameters] = Parameters.new(options[:parameters]).to_a if options[:parameters]
       options[:tags] = normalize_tags(options[:tags]) if options[:tags]
-      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
+      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND"]
       delete if force
       handling_cf_errors do
         cf_client.create_change_set(options)
