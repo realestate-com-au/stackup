@@ -1,6 +1,7 @@
 require "rake/tasklib"
 require "tempfile"
 require "yaml"
+require "Pathname"
 
 module Stackup
 
@@ -13,6 +14,7 @@ module Stackup
     attr_accessor :template
     attr_accessor :parameters
     attr_accessor :tags
+    attr_accessor :capabilities
 
     alias namespace= name=
 
@@ -37,14 +39,15 @@ module Stackup
     def define
       namespace(name) do
 
-        data_options = DataOptions.new
-        data_options["--template"] = template
-        data_options["--parameters"] = parameters if parameters
-        data_options["--tags"] = tags if tags
+        data_options = []
+        data_options += DataOption.for("--template", template).to_a
+        data_options += DataOption.for("--parameters", parameters).to_a if parameters
+        data_options += DataOption.for("--tags", tags).to_a if tags
+        data_options += DataOption.for("--capability", capabilities).to_a if capabilities
 
         desc "Update #{stack} stack"
-        task "up" => data_options.files do
-          stackup "up", *data_options.to_a
+        task "up" => data_options.grep(DataOptionFile) do
+          stackup "up", *data_options
         end
 
         desc "Cancel update of #{stack} stack"
@@ -53,8 +56,8 @@ module Stackup
         end
 
         desc "Show pending changes to #{stack} stack"
-        task "diff" => data_options.files do
-          stackup "diff", *data_options.to_a
+        task "diff" => data_options.grep(DataOptionFile) do
+          stackup "diff", *data_options
         end
 
         desc "Show #{stack} stack outputs and resources"
@@ -75,41 +78,68 @@ module Stackup
       end
     end
 
-    # Options to "stackup up".
-    #
-    class DataOptions
+    # A flag with optional argument that will be passed to stackup
+    class DataOption
 
-      def initialize
-        @options = {}
-      end
-
-      def []=(option, file_or_value)
-        @options[option] = file_or_value
-      end
-
-      def files
-        @options.values.grep(String)
+      def initialize(flag, argument)
+        @flag = flag
+        @argument = argument if argument
       end
 
       def to_a
-        [].tap do |result|
-          @options.each do |option, file_or_data|
-            result << option
-            result << maybe_tempfile(file_or_data, option[2..-1])
-          end
+        [@flag, @argument]
+      end
+
+      # Factory method for initialising DataOptions based on class
+      def self.for(flag, argument)
+        case argument
+        when Hash
+          DataOptionHash.new(flag, argument)
+        when Array
+          DataOptionArray.new(flag, argument)
+        when String && File.exist?(argument)
+          DataOptionFile.new(flag, argument)
+        else
+          DataOption.new(flag, argument)
         end
       end
 
-      def maybe_tempfile(file_or_data, type)
-        return file_or_data if file_or_data.is_a?(String)
+    end
 
-        tempfile = Tempfile.new([type, ".yml"])
-        tempfile.write(YAML.dump(file_or_data))
+    # An option with a Hash argument
+    # Hash content is stored in a temporary file upon conversion
+    class DataOptionHash < DataOption
+
+      def as_tempfile(filename, data)
+        tempfile = Tempfile.new(filename)
+        tempfile.write(YAML.dump(data))
         tempfile.close
         tempfile.path.to_s
       end
 
+      def to_a
+        [@flag, as_tempfile([@flag[2..-1], ".yml"], @argument)]
+      end
+
     end
+
+    # An option with an Array argument
+    # Flag is repeated for every Array member upon conversion
+    class DataOptionArray < DataOption
+
+      def to_a
+        [].tap do |result|
+          @argument.each do |argument|
+            result << @flag
+            result << argument
+          end
+        end
+      end
+
+    end
+
+    # An option with a File argument
+    class DataOptionFile < DataOption; end
 
   end
 
