@@ -40,14 +40,14 @@ module Stackup
       namespace(name) do
 
         data_options = []
-        data_options += DataOption.for("--template", template).to_a
-        data_options += DataOption.for("--parameters", parameters).to_a if parameters
-        data_options += DataOption.for("--tags", tags).to_a if tags
-        data_options += DataOption.for("--capability", capabilities).to_a if capabilities
+        data_options << DataOption.for("--template", template)
+        data_options << DataOption.for("--parameters", parameters) if parameters
+        data_options << DataOption.for("--tags", tags) if tag
 
         desc "Update #{stack} stack"
-        task "up" => data_options.grep(DataOptionFile) do
-          stackup "up", *data_options
+        task "up" => data_options.grep(DataOptionFile).map(&:argument) do
+          data_options << DataOption.for("--capability", capabilities) if capabilities
+          stackup "up", *data_options.map(&:to_a).flatten
         end
 
         desc "Cancel update of #{stack} stack"
@@ -56,8 +56,8 @@ module Stackup
         end
 
         desc "Show pending changes to #{stack} stack"
-        task "diff" => data_options.grep(DataOptionFile) do
-          stackup "diff", *data_options
+        task "diff" => data_options.grep(DataOptionFile).map(&:argument) do
+          stackup "diff", *data_options.map(&:to_a).flatten
         end
 
         desc "Show #{stack} stack outputs and resources"
@@ -92,17 +92,19 @@ module Stackup
 
       # Factory method for initialising DataOptions based on class
       def self.for(flag, argument)
-        case argument
-        when Hash
+        if argument.is_a?(Hash)
           DataOptionHash.new(flag, argument)
-        when Array
+        elsif argument.is_a?(Array)
           DataOptionArray.new(flag, argument)
-        when String && File.exist?(argument)
+        elsif argument.is_a?(String) && File.exist?(argument)
           DataOptionFile.new(flag, argument)
         else
           DataOption.new(flag, argument)
         end
       end
+
+      attr_reader :flag
+      attr_reader :argument
 
     end
 
