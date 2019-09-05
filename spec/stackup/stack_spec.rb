@@ -280,6 +280,22 @@ describe Stackup::Stack do
 
       end
 
+      context "with :capabilities as an Array" do
+
+        before do
+          options[:capabilities] = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+        end
+
+        it "passes them through" do
+          expected_capabilities = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+          create_or_update
+          expect(cf_client).to have_received(:create_stack) do |options|
+            expect(options[:capabilities]).to eq(expected_capabilities)
+          end
+        end
+
+      end
+
     end
 
     describe "#change_set#create" do
@@ -355,6 +371,22 @@ describe Stackup::Stack do
           create_change_set
           expect(cf_client).to have_received(:create_change_set) do |options|
             expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
+      context "with :capabilities as an Array" do
+
+        before do
+          options[:capabilities] = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+        end
+
+        it "passes them through" do
+          expected_capabilities = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set) do |options|
+            expect(options[:capabilities]).to eq(expected_capabilities)
           end
         end
 
