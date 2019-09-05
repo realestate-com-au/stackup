@@ -1,5 +1,10 @@
 # CHANGES
 
+## 1.4.3 (2019-09-05)
+
+* Add support for CloudFormation capabilities via CLI and Rake
+* Fix: Prevent failure when creating a stack with change sets
+
 ## 1.4.2 (2019-01-21)
 
 * Fix #64: Create and Update functions should not mutate the options parameter

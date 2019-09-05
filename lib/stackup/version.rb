@@ -1,5 +1,5 @@
 module Stackup
 
-  VERSION = "1.4.2".freeze
+  VERSION = "1.4.3".freeze
 
 end
