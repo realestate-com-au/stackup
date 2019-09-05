@@ -83,7 +83,7 @@ module Stackup
 
       def initialize(flag, argument)
         @flag = flag
-        @argument = argument if argument
+        @argument = argument
       end
 
       def to_a
@@ -111,14 +111,14 @@ module Stackup
     class DataOptionHash < DataOption
 
       def as_tempfile(filename, data)
-        tempfile = Tempfile.new(filename)
+        tempfile = Tempfile.new([filename, ".yml"])
         tempfile.write(YAML.dump(data))
         tempfile.close
         tempfile.path.to_s
       end
 
       def to_a
-        [@flag, as_tempfile([@flag[2..-1], ".yml"], @argument)]
+        [@flag, as_tempfile(@flag[2..-1], @argument)]
       end
 
     end
@@ -128,12 +128,7 @@ module Stackup
     class DataOptionArray < DataOption
 
       def to_a
-        [].tap do |result|
-          @argument.each do |argument|
-            result << @flag
-            result << argument
-          end
-        end
+        @argument.map { |a| [@flag, a] }.flatten
       end
 
     end
