@@ -116,6 +116,23 @@ Or, you can specify one or more override parameters on the command-line, using `
       -o IndexDoc=index-override.html
       -o ContentDoc=content-override.html
 
+### Acknowledging Capabilities
+
+CloudFormation requires that some stacks explicitly acknowledge certain capabilities before creation. This helps to prevent the creation of stacks with unintended privileges.
+
+If your stack includes IAM resources, you must specify either the `CAPABILITY_IAM` capability, or the `CAPABILITY_NAMED_IAM` capability if they have custom names.
+
+If your stack template contains macros or nested stacks, you must specify the `CAPABILITY_AUTO_EXPAND` capability.
+
+Capabilities can be provided via the `--capability` CLI option.
+
+    $ stackup myapp-test up -t template.json \
+      --capability CAPABILITY_NAMED_IAM \
+      --capability CAPABILITY_AUTO_EXPAND
+
+`stackup` includes defaults to including `CAPABILITY_NAMED_IAM` capability if, and only if, no capabilities are specified.
+This is to provide backwards compatibility with previously deployed stacks and may be removed in a future release.
+
 ### YAML support
 
 `stackup` supports input files (template, parameters, tags) in YAML format, as well as JSON.
