@@ -1,7 +1,7 @@
 require "rake/tasklib"
 require "tempfile"
 require "yaml"
-require "Pathname"
+require "pathname"
 
 module Stackup
 
