@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.4.5 (2019-10-03)
+
+* Fix: Tags in RakeTasks
+
 ## 1.4.4 (2019-10-03)
 
 * Fix: Loading RakeTasks

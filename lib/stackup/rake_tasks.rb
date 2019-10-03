@@ -42,7 +42,7 @@ module Stackup
         data_options = []
         data_options << DataOption.for("--template", template)
         data_options << DataOption.for("--parameters", parameters) if parameters
-        data_options << DataOption.for("--tags", tags) if tag
+        data_options << DataOption.for("--tags", tags) if tags
 
         desc "Update #{stack} stack"
         task "up" => data_options.grep(DataOptionFile).map(&:argument) do
