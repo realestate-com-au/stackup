@@ -1,5 +1,10 @@
 # CHANGES
 
+## 1.4.4 (2019-10-03)
+
+* Fix: Loading RakeTasks
+* Removes CI support for older rubies
+
 ## 1.4.3 (2019-09-05)
 
 * Add support for CloudFormation capabilities via CLI and Rake
