@@ -78,9 +78,11 @@ For more details on usage, see
 
 ### Specifying parameters
 
-Stack parameters can be be read from a file, e.g.
+Stack parameters can be read from a file, e.g.
 
     $ stackup myapp-test up -t template.json -p parameters.json
+
+These files can be either JSON or YAML format, see [YAML support](#yaml-support) for more information.
 
 Parameters can be specified as simple key-value pairs:
 
@@ -115,6 +117,22 @@ Or, you can specify one or more override parameters on the command-line, using `
       -p defaults.json \
       -o IndexDoc=index-override.html
       -o ContentDoc=content-override.html
+
+### Specifying tags
+
+Stack tags can be read from a file, e.g.
+
+    $ stackup myapp-test up -t template.json --tags tags.json
+
+These files can be either JSON or YAML format, see [YAML support](#yaml-support) for more information.
+
+Tags are specified as simple key-value pairs:
+
+```json
+{
+  "environment": "dev"
+}
+```
 
 ### Acknowledging Capabilities
 
