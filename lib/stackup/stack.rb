@@ -364,13 +364,21 @@ module Stackup
     end
 
     def normalize_tags(tags)
+      tag_array = []
       if tags.is_a?(Hash)
         tags.map do |key, value|
-          { :key => key, :value => value.to_s }
+          tag_array += [{ :key => key, :value => value.to_s }]
         end
       else
-        tags
+        for tag in tags do
+          if tag.key?('Key')
+            tag_array += [{ :key => tag['Key'], :value => tag['Value'].to_s }]
+          else
+            tag_array += [{ :key => tag[:key], :value => tag[:value].to_s }]
+          end
+        end
       end
+      return tag_array
     end
 
     # Extract data from a collection attribute of the stack.
