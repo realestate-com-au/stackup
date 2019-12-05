@@ -260,6 +260,26 @@ describe Stackup::Stack do
 
       end
 
+      context "with :tags in SDK form as they arrive from file" do
+
+        before do
+          options[:tags] = [
+            { "Key" => "foo", "Value" => "bar" }
+          ]
+        end
+
+        it "converts them to an Array, that uses symbols as keys" do
+          expected_tags = [
+            { :key => "foo", :value => "bar" },
+          ]
+          create_or_update
+          expect(cf_client).to have_received(:create_stack) do |options|
+            expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
       context "with :tags in SDK form" do
 
         before do
