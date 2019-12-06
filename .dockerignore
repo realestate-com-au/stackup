@@ -1,4 +1,3 @@
 .git
 *.gem
-Gemfile*
 pkg/

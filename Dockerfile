@@ -1,3 +1,19 @@
+#--- Multistage Dockerfile: must pass tests first
+FROM ruby:2.6 as test
+
+MAINTAINER https://github.com/realestate-com-au/stackup
+
+RUN apt-get update \
+ && apt-get install -y \
+        diffutils
+
+ADD . /app
+WORKDIR /app
+
+RUN bundle install
+RUN bundle exec rake
+
+#--- Multistage Dockerfile: run-time container
 FROM ruby:2.6-alpine@sha256:65c14862929f88ba54cebd63177d9437c46dda2e7c47484fb1d3178825dd1585
 
 MAINTAINER https://github.com/realestate-com-au/stackup
