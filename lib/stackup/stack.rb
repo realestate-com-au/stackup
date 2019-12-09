@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "aws-sdk-cloudformation"
 require "logger"
 require "multi_json"
@@ -16,10 +18,10 @@ module Stackup
     DEFAULT_WAIT_POLL_INTERVAL = 5 # seconds
 
     def initialize(name, client = {}, options = {})
-      client = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
-      @name = name
+      client     = Aws::CloudFormation::Client.new(client) if client.is_a?(Hash)
+      @name      = name
       @cf_client = client
-      @wait = true
+      @wait      = true
       options.each do |key, value|
         public_send("#{key}=", value)
       end
@@ -282,7 +284,7 @@ module Stackup
     end
 
     def create(options)
-      options = options.dup
+      options              = options.dup
       options[:stack_name] = name
       options.delete(:stack_policy_during_update_body)
       options.delete(:stack_policy_during_update_url)
@@ -312,7 +314,7 @@ module Stackup
     def event_handler
       @event_handler ||= lambda do |e|
         fields = [e.logical_resource_id, e.resource_status, e.resource_status_reason]
-        time = e.timestamp.localtime.strftime("%H:%M:%S")
+        time   = e.timestamp.localtime.strftime("%H:%M:%S")
         logger.info("[#{time}] #{fields.compact.join(' - ')}")
       end
     end
@@ -364,21 +366,19 @@ module Stackup
     end
 
     def normalize_tags(tags)
-      tag_array = []
       if tags.is_a?(Hash)
         tags.map do |key, value|
-          tag_array += [{ :key => key, :value => value.to_s }]
+          { :key => key, :value => value.to_s }
         end
       else
-        for tag in tags do
-          if tag.key?('Key')
-            tag_array += [{ :key => tag['Key'], :value => tag['Value'].to_s }]
+        tags.map do |tag|
+          if tag.key?("Key")
+            { :key => tag["Key"], :value => tag["Value"].to_s }
           else
-            tag_array += [{ :key => tag[:key], :value => tag[:value].to_s }]
+            { :key => tag[:key], :value => tag[:value].to_s }
           end
         end
       end
-      return tag_array
     end
 
     # Extract data from a collection attribute of the stack.
@@ -392,8 +392,8 @@ module Stackup
       handling_cf_errors do
         {}.tap do |result|
           cf_stack.public_send(collection_name).each do |item|
-            key = item.public_send(key_name)
-            value = item.public_send(value_name)
+            key         = item.public_send(key_name)
+            value       = item.public_send(value_name)
             result[key] = value
           end
         end
