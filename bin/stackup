@@ -41,7 +41,7 @@ Clamp do
   option ["--[no-]wait"], :flag, "wait for stack updates to complete",
          :default => true
 
-  option ["--wait-poll-interval"], "N", "polling interval while waiting for updates",
+  option ["--wait-poll-interval"], "N", "polling interval (in seconds) while waiting for updates",
          :default => 5, &method(:Integer)
 
   option "--debug", :flag, "enable debugging"
