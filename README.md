@@ -78,9 +78,11 @@ For more details on usage, see
 
 ### Specifying parameters
 
-Stack parameters can be be read from a file, e.g.
+Stack parameters can be read from a file, e.g.
 
     $ stackup myapp-test up -t template.json -p parameters.json
+
+These files can be either JSON or YAML format, see [YAML support](#yaml-support) for more information.
 
 Parameters can be specified as simple key-value pairs:
 
@@ -115,6 +117,39 @@ Or, you can specify one or more override parameters on the command-line, using `
       -p defaults.json \
       -o IndexDoc=index-override.html
       -o ContentDoc=content-override.html
+
+### Specifying tags
+
+Stack tags can be read from a file, e.g.
+
+    $ stackup myapp-test up -t template.json --tags tags.json
+
+These files can be either JSON or YAML format, see [YAML support](#yaml-support) for more information.
+
+Tags are specified as simple key-value pairs:
+
+```json
+{
+  "environment": "dev"
+}
+```
+
+### Acknowledging Capabilities
+
+CloudFormation requires that some stacks explicitly acknowledge certain capabilities before creation. This helps to prevent the creation of stacks with unintended privileges.
+
+If your stack includes IAM resources, you must specify either the `CAPABILITY_IAM` capability, or the `CAPABILITY_NAMED_IAM` capability if they have custom names.
+
+If your stack template contains macros or nested stacks, you must specify the `CAPABILITY_AUTO_EXPAND` capability.
+
+Capabilities can be provided via the `--capability` CLI option.
+
+    $ stackup myapp-test up -t template.json \
+      --capability CAPABILITY_NAMED_IAM \
+      --capability CAPABILITY_AUTO_EXPAND
+
+`stackup` includes defaults to including `CAPABILITY_NAMED_IAM` capability if, and only if, no capabilities are specified.
+This is to provide backwards compatibility with previously deployed stacks and may be removed in a future release.
 
 ### YAML support
 

@@ -260,6 +260,26 @@ describe Stackup::Stack do
 
       end
 
+      context "with :tags in SDK form as they arrive from file" do
+
+        before do
+          options[:tags] = [
+            { "Key" => "foo", "Value" => "bar" }
+          ]
+        end
+
+        it "converts them to an Array, that uses symbols as keys" do
+          expected_tags = [
+            { :key => "foo", :value => "bar" },
+          ]
+          create_or_update
+          expect(cf_client).to have_received(:create_stack) do |options|
+            expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
       context "with :tags in SDK form" do
 
         before do
@@ -275,6 +295,22 @@ describe Stackup::Stack do
           create_or_update
           expect(cf_client).to have_received(:create_stack) do |options|
             expect(options[:tags]).to eq(expected_tags)
+          end
+        end
+
+      end
+
+      context "with :capabilities as an Array" do
+
+        before do
+          options[:capabilities] = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+        end
+
+        it "passes them through" do
+          expected_capabilities = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+          create_or_update
+          expect(cf_client).to have_received(:create_stack) do |options|
+            expect(options[:capabilities]).to eq(expected_capabilities)
           end
         end
 
@@ -358,6 +394,53 @@ describe Stackup::Stack do
           end
         end
 
+      end
+
+      context "with :capabilities as an Array" do
+
+        before do
+          options[:capabilities] = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+        end
+
+        it "passes them through" do
+          expected_capabilities = %w[CAPABILITY_IAM CAPABILITY_NAMED_IAM]
+          create_change_set
+          expect(cf_client).to have_received(:create_change_set) do |options|
+            expect(options[:capabilities]).to eq(expected_capabilities)
+          end
+        end
+
+      end
+
+    end
+
+    describe "#change_set#execute" do
+
+      let(:change_set_name) { "create-it" }
+
+      let(:describe_stacks_responses) do
+        [
+          stack_description("CREATE_IN_PROGRESS"),
+          stack_description("CREATE_COMPLETE")
+        ]
+      end
+
+      def execute_change_set
+        stack.change_set(change_set_name).execute
+      end
+
+      it "calls :execute_change_set" do
+        execute_change_set
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name
+        }
+        expect(cf_client).to have_received(:execute_change_set)
+          .with(hash_including(expected_args))
+      end
+
+      it "returns status" do
+        expect(execute_change_set).to eq("CREATE_COMPLETE")
       end
 
     end

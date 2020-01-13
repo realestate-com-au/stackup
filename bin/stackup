@@ -41,7 +41,7 @@ Clamp do
   option ["--[no-]wait"], :flag, "wait for stack updates to complete",
          :default => true
 
-  option ["--wait-poll-interval"], "N", "polling interval while waiting for updates",
+  option ["--wait-poll-interval"], "N", "polling interval (in seconds) while waiting for updates",
          :default => 5, &method(:Integer)
 
   option "--debug", :flag, "enable debugging"
@@ -201,6 +201,9 @@ Clamp do
            "when stack creation fails: DO_NOTHING, ROLLBACK, or DELETE",
            :default => "ROLLBACK"
 
+    option "--capability", "CAPABILITY", "cloudformation capability",
+           :multivalued => true, :default => ["CAPABILITY_NAMED_IAM"]
+
     def execute
       unless template_source || use_previous_template?
         signal_usage_error "Specify either --template or --use-previous-template"
@@ -225,6 +228,7 @@ Clamp do
       end
       options[:role_arn] = service_role_arn if service_role_arn
       options[:use_previous_template] = use_previous_template?
+      options[:capabilities] = capability_list
       report_change do
         stack.create_or_update(options)
       end
@@ -285,6 +289,9 @@ Clamp do
         arg
       end
 
+      option "--capability", "CAPABILITY", "cloudformation capability",
+             :multivalued => true, :default => ["CAPABILITY_NAMED_IAM"]
+
       def execute
         unless template_source || use_previous_template?
           signal_usage_error "Specify either --template or --use-previous-template"
@@ -303,6 +310,7 @@ Clamp do
         options[:role_arn] = service_role_arn if service_role_arn
         options[:use_previous_template] = use_previous_template?
         options[:force] = force?
+        options[:capabilities] = capability_list
         report_change do
           change_set.create(options)
         end
