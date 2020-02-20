@@ -119,6 +119,10 @@ module Stackup
       if (template_data = options.delete(:template))
         options[:template_body] = MultiJson.dump(template_data)
       end
+      # override template_body with the original template to preserve formatting (& comments in YAML)
+      if (template_orig = options.delete(:template_orig))
+        options[:template_body] = template_orig
+      end
       if (parameters = options[:parameters])
         options[:parameters] = Parameters.new(parameters).to_a
       end

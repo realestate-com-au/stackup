@@ -214,6 +214,7 @@ Clamp do
           options[:template_url] = template_source.location
         else
           options[:template] = template_source.data
+          options[:template_orig] = template_source.body
         end
       end
       options[:on_failure] = on_failure
