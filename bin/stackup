@@ -181,6 +181,9 @@ Clamp do
     option ["-T", "--use-previous-template"], :flag,
            "reuse the existing template"
 
+    option ["-P", "--preserve-template-formatting"], :flag,
+           "do not normalise the template when calling the Cloudformation APIs; useful for preserving YAML and comments"
+
     include HasParameters
 
     option "--tags", "FILE", "stack tags file",
@@ -230,6 +233,7 @@ Clamp do
       options[:role_arn] = service_role_arn if service_role_arn
       options[:use_previous_template] = use_previous_template?
       options[:capabilities] = capability_list
+      options[:preserve] = preserve_template_formatting?
       report_change do
         stack.create_or_update(options)
       end
@@ -275,6 +279,9 @@ Clamp do
       option ["-T", "--use-previous-template"], :flag,
              "reuse the existing template"
 
+      option ["-P", "--preserve-template-formatting"], :flag,
+             "do not normalise the template when calling the Cloudformation APIs; useful for preserving YAML and comments"
+
       option ["--force"], :flag,
              "replace existing change-set of the same name"
 
@@ -297,6 +304,7 @@ Clamp do
             options[:template_url] = template_source.location
           else
             options[:template] = template_source.data
+            options[:template_orig] = template_source.body
           end
         end
         options[:parameters] = parameters
@@ -305,6 +313,7 @@ Clamp do
         options[:use_previous_template] = use_previous_template?
         options[:force] = force?
         options[:capabilities] = capability_list
+        options[:preserve] = preserve_template_formatting?
         report_change do
           change_set.create(options)
         end
