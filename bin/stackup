@@ -375,6 +375,9 @@ Clamp do
            :attribute_name => :template_source,
            &Stackup::Source.method(:new)
 
+    option ["-P", "--preserve-template-formatting"], :flag,
+           "do not normalise the templates when performing the diff"
+
     include HasParameters
 
     option "--tags", "FILE", "stack tags file",
@@ -387,6 +390,10 @@ Clamp do
       if template_source
         current["Template"] = stack.template
         planned["Template"] = template_source.data
+        if preserve_template_formatting?
+          current["Template"] = stack.template_body
+          planned["Template"] = template_source.body
+        end
       end
       unless parameter_sources.empty?
         current["Parameters"] = existing_parameters.sort.to_h
