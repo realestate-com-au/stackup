@@ -1,5 +1,13 @@
 # CHANGES
 
+## 1.5.0 (2020-04-21)
+
+* Feature: --preserve-template-formatting
+
+## 1.4.6 (2019-12-09)
+
+* Fix: Don't error out when receiving tags in AWS style (array of hashes) from YAML or JSON file
+
 ## 1.4.5 (2019-10-03)
 
 * Fix: Tags in RakeTasks
