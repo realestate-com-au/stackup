@@ -121,9 +121,7 @@ module Stackup
       end
       # optionally override template_body with the original template to preserve formatting (& comments in YAML)
       template_orig = options.delete(:template_orig)
-      if (options.delete(:preserve))
-        options[:template_body] = template_orig
-      end
+      options[:template_body] = template_orig if options.delete(:preserve)
       if (parameters = options[:parameters])
         options[:parameters] = Parameters.new(parameters).to_a
       end

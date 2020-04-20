@@ -59,9 +59,7 @@ module Stackup
       options[:template_body] = MultiJson.dump(options.delete(:template)) if options[:template]
       # optionally override template_body with the original template to preserve formatting (& comments in YAML)
       template_orig = options.delete(:template_orig)
-      if (options.delete(:preserve))
-        options[:template_body] = template_orig
-      end
+      options[:template_body] = template_orig if options.delete(:preserve)
       options[:parameters] = Parameters.new(options[:parameters]).to_a if options[:parameters]
       options[:tags] = normalize_tags(options[:tags]) if options[:tags]
       options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]

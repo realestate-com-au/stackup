@@ -5,11 +5,11 @@ Stackup::RakeTasks.new("demo") do |t|
   t.template = "template.json"
   t.parameters = "parameters-verbose.json"
   t.tags = {
-      "environment" => "dev",
-      "team" => "rea-oss"
+    "environment" => "dev",
+    "team" => "rea-oss"
   }
   t.capabilities = [
-      "CAPABILITY_IAM",
-      "CAPABILITY_NAMED_IAM"
+    "CAPABILITY_IAM",
+    "CAPABILITY_NAMED_IAM"
   ]
 end
