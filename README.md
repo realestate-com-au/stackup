@@ -155,7 +155,11 @@ This is to provide backwards compatibility with previously deployed stacks and m
 
 `stackup` supports input files (template, parameters, tags) in YAML format, as well as JSON.
 
-It also supports the [abbreviated YAML syntax for Cloudformation functions](https://aws.amazon.com/blogs/aws/aws-cloudformation-update-yaml-cross-stack-references-simplified-substitution/), though unlike the [AWS CLI](https://aws.amazon.com/cli/), Stackup normalises YAML input to JSON before invoking CloudFormation APIs.
+It also supports the [abbreviated YAML syntax for Cloudformation functions](https://aws.amazon.com/blogs/aws/aws-cloudformation-update-yaml-cross-stack-references-simplified-substitution/), though unlike the [AWS CLI](https://aws.amazon.com/cli/), Stackup (by default) normalises YAML input to JSON before invoking CloudFormation APIs.
+
+If you don't want normalisation of the YAML input to JSON, then use the `--preserve-template-formatting` flag to the `up` or `change-set create` commands.
+
+Note: normalisation of S3 / HTTP URL stored templates is never done, as Cloudformation collects these directly.
 
 ### AWS credentials
 
