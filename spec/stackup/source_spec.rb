@@ -124,6 +124,16 @@ describe Stackup::Source do
 
     end
 
+    context "with dot separated bucket and region" do
+
+      let(:s3_url) { "https://bucket.s3.us-east-1.amazonaws.com/cfn/template.yml" }
+
+      it "is S3" do
+        expect(subject).to be_s3
+      end
+
+    end
+
   end
 
 end
