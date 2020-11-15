@@ -15,7 +15,7 @@ module Stackup
 
     def s3?
       uri.scheme == "https" &&
-        uri.host =~ /(^|\.)s3(-\w+-\w+-\d)?\.amazonaws\.com$/
+        uri.host =~ /(^|\.)s3((\.|-)\w+-\w+-\d)?\.amazonaws\.com$/
     end
 
     def body
