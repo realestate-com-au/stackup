@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.5.1 (2020-11-16)
+
+* Fix: Recognise that template is in S3 when URL is formatted like `s3.REGION.amazonaws.com`
+
 ## 1.5.0 (2020-04-21)
 
 * Feature: --preserve-template-formatting
