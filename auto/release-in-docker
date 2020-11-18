@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+# Ask the user for their rubygems.org credentials
+gem signin
+
+apk add --no-cache make gcc musl-dev git
+bundle install
+
+# Push the tag to github, and the gem to rubygems
+# As part of this, if the repo was cloned over HTTPS, the git command will ask the user for their github credentials
+echo 'When it asks for your password for github, enter your *personal access token*, not your password'
+bundle exec rake release
