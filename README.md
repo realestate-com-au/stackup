@@ -300,13 +300,19 @@ This policy grants the principal all actions required by `stackup up` for any cl
 }
 ```
 
-## Releasing
+## Development
 
-The release process will push tags to GitHub, push the gem to rubygems and push the docker image to DockerHub.
+### Running tests
+
+`auto/test` will run the tests in a Docker container.
+
+### Releasing
+
+Releasing is done manually, not by CI. The release process will push tags to GitHub, push the gem to rubygems and push the docker image to DockerHub.
 
 Prerequisites:
 
-* logged into dockerhub via `docker login`. Your user must have permission to push to `realestate/stackup`
+* You must be logged into docker hub via `docker login`. Your user must have permission to push to `realestate/stackup`
 * You must have a rubygems account with permission to push to the `stackup` gem. (`auto/release` will ask for your username and password)
 * You must have cloned this repo via HTTPS and have a github account with permission to push. (`auto/release` will ask for your username and a GitHub personal access token)
 
