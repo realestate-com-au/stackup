@@ -280,6 +280,9 @@ module Stackup
         option ["--force"], :flag,
                "replace existing change-set of the same name"
 
+        option ["--no-fail-on-empty-change-set"], :flag, "dont fail on empty change-set",
+               :attribute_name => :fail_change_set
+
         include HasParameters
 
         option "--tags", "FILE", "stack tags file",
@@ -314,6 +317,7 @@ module Stackup
           options[:role_arn] = service_role_arn if service_role_arn
           options[:use_previous_template] = use_previous_template?
           options[:force] = force?
+          options[:fail_change_set] = fail_change_set?
           options[:capabilities] = capability_list
           options[:preserve] = preserve_template_formatting?
           report_change do
