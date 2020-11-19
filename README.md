@@ -155,7 +155,11 @@ This is to provide backwards compatibility with previously deployed stacks and m
 
 `stackup` supports input files (template, parameters, tags) in YAML format, as well as JSON.
 
-It also supports the [abbreviated YAML syntax for Cloudformation functions](https://aws.amazon.com/blogs/aws/aws-cloudformation-update-yaml-cross-stack-references-simplified-substitution/), though unlike the [AWS CLI](https://aws.amazon.com/cli/), Stackup normalises YAML input to JSON before invoking CloudFormation APIs.
+It also supports the [abbreviated YAML syntax for Cloudformation functions](https://aws.amazon.com/blogs/aws/aws-cloudformation-update-yaml-cross-stack-references-simplified-substitution/), though unlike the [AWS CLI](https://aws.amazon.com/cli/), Stackup (by default) normalises YAML input to JSON before invoking CloudFormation APIs.
+
+If you don't want normalisation of the YAML input to JSON, then use the `--preserve-template-formatting` flag to the `up` or `change-set create` commands.
+
+Note: normalisation of S3 / HTTP URL stored templates is never done, as Cloudformation collects these directly.
 
 ### AWS credentials
 
@@ -303,11 +307,11 @@ The release process will push tags to GitHub, push the gem to rubygems and push 
 Prerequisites:
 
 * logged into dockerhub via `docker login`. Your user must have permission to push to `realestate/stackup`
-* logged into rubygems via `gem push`. Your user must have permission to push to the `stackup` gem.
+* You must have a rubygems account with permission to push to the `stackup` gem. (`auto/release` will ask for your username and password)
+* You must have cloned this repo via HTTPS and have a github account with permission to push. (`auto/release` will ask for your username and a GitHub personal access token)
 
 To release:
 
 ```
-bundle install
 auto/release
 ```

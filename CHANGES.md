@@ -1,5 +1,17 @@
 # CHANGES
 
+## 1.5.1 (2020-11-16)
+
+* Fix: Recognise that template is in S3 when URL is formatted like `s3.REGION.amazonaws.com`
+
+## 1.5.0 (2020-04-21)
+
+* Feature: --preserve-template-formatting
+
+## 1.4.6 (2019-12-09)
+
+* Fix: Don't error out when receiving tags in AWS style (array of hashes) from YAML or JSON file
+
 ## 1.4.5 (2019-10-03)
 
 * Fix: Tags in RakeTasks

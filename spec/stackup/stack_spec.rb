@@ -270,7 +270,7 @@ describe Stackup::Stack do
 
         it "converts them to an Array, that uses symbols as keys" do
           expected_tags = [
-            { :key => "foo", :value => "bar" },
+            { :key => "foo", :value => "bar" }
           ]
           create_or_update
           expect(cf_client).to have_received(:create_stack) do |options|
