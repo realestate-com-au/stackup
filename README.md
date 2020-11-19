@@ -216,6 +216,8 @@ You can also create, list, inspect, apply and delete [change sets](http://docs.a
 
 The change-set name defaults to "pending", but can be overridden using `--name`.
 
+The `change-set create` subcommand, like the `up` command, supports `--service-role-arn` to specify a service role.
+
 ## Programmatic usage
 
 Get a handle to a `Stack` object as follows:
