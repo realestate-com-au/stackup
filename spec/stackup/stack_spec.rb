@@ -342,6 +342,23 @@ describe Stackup::Stack do
           .with(hash_including(expected_args))
       end
 
+      it "passes options through to :create_change_set" do
+        options = {
+          :template_body => template,
+          :role_arn => "service role arn"
+        }
+        expected_args = {
+          :stack_name => stack_name,
+          :change_set_name => change_set_name,
+          :change_set_type => "CREATE",
+          :template_body => template,
+          :role_arn => "service role arn"
+        }
+        stack.change_set(change_set_name).create(options)
+        expect(cf_client).to have_received(:create_change_set)
+          .with(hash_including(expected_args))
+      end
+
       context "with :template as data" do
 
         let(:options) do

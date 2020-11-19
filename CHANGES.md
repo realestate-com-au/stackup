@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.6.0 (2020-11-19)
+
+* Feature: Support --service-role-arn on "change-set create"
+
 ## 1.5.1 (2020-11-16)
 
 * Fix: Recognise that template is in S3 when URL is formatted like `s3.REGION.amazonaws.com`

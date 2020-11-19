@@ -216,6 +216,8 @@ You can also create, list, inspect, apply and delete [change sets](http://docs.a
 
 The change-set name defaults to "pending", but can be overridden using `--name`.
 
+The `change-set create` subcommand, like the `up` command, supports `--service-role-arn` to specify a service role.
+
 ## Programmatic usage
 
 Get a handle to a `Stack` object as follows:
@@ -300,13 +302,19 @@ This policy grants the principal all actions required by `stackup up` for any cl
 }
 ```
 
-## Releasing
+## Development
 
-The release process will push tags to GitHub, push the gem to rubygems and push the docker image to DockerHub.
+### Running tests
+
+`auto/test` will run the tests in a Docker container.
+
+### Releasing
+
+Releasing is done manually, not by CI. The release process will push tags to GitHub, push the gem to rubygems and push the docker image to DockerHub.
 
 Prerequisites:
 
-* logged into dockerhub via `docker login`. Your user must have permission to push to `realestate/stackup`
+* You must be logged into docker hub via `docker login`. Your user must have permission to push to `realestate/stackup`
 * You must have a rubygems account with permission to push to the `stackup` gem. (`auto/release` will ask for your username and password)
 * You must have cloned this repo via HTTPS and have a github account with permission to push. (`auto/release` will ask for your username and a GitHub personal access token)
 

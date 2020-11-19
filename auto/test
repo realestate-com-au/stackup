@@ -1,0 +1,8 @@
+#! /bin/bash -eu
+#
+# Run tests
+
+cd $(dirname $0)/..
+
+echo "--- Running specs"
+./auto/dev-environment rake spec
