@@ -75,7 +75,7 @@ module Stackup
             return current.status
           when "FAILED"
             if fail_change_set
-              return current.status_reason if current.execution_status == "UNAVAILABLE"
+              return current.status_reason if current.status_reason == "The submitted information didn't contain changes. Submit different information to create a change set."
             else
               logger.error(current.status_reason)
               raise StackUpdateError, "change-set creation failed" if status == "FAILED"
