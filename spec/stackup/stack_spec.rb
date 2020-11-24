@@ -429,6 +429,38 @@ describe Stackup::Stack do
 
       end
 
+      context "when allow_empty_change_set is nil and there are no changes" do
+        it "raises an exception" do
+          cf_client.stub_responses(:describe_change_set, [{
+            status: "FAILED",
+            status_reason: "The submitted information didn't contain changes. Submit different information to create a change set."
+          }])
+          expect { create_change_set }.to raise_error(Stackup::StackUpdateError)
+        end
+      end
+
+      context "when allow_empty_change_set is true and there are no changes" do
+        it "does not raise an exception" do
+          cf_client.stub_responses(:describe_change_set, [{
+            status: "FAILED",
+            status_reason: "The submitted information didn't contain changes. Submit different information to create a change set."
+          }])
+          options[:allow_empty_change_set] = true
+          expect { create_change_set }.not_to raise_error
+        end
+      end
+
+      context "when allow_empty_change_set is true and there is some other failure" do
+        it "raises an exception" do
+          cf_client.stub_responses(:describe_change_set, [{
+            status: "FAILED",
+            status_reason: "some other failure message"
+          }])
+          options[:allow_empty_change_set] = true
+          expect { create_change_set }.to raise_error(Stackup::StackUpdateError)
+        end
+      end
+
     end
 
     describe "#change_set#execute" do
