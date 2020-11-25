@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.7.0 (2020-11-25)
+
+* Feature: --no-fail-on-empty-change-set
+
 ## 1.6.0 (2020-11-19)
 
 * Feature: Support --service-role-arn on "change-set create"

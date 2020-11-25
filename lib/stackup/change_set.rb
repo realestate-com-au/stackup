@@ -56,6 +56,7 @@ module Stackup
       options[:change_set_name] = name
       options[:change_set_type] = stack.exists? ? "UPDATE" : "CREATE"
       force = options.delete(:force)
+      allow_empty_change_set = options.delete(:allow_empty_change_set)
       options[:template_body] = MultiJson.dump(options.delete(:template)) if options[:template]
       # optionally override template_body with the original template to preserve formatting (& comments in YAML)
       template_orig = options.delete(:template_orig)
@@ -73,8 +74,12 @@ module Stackup
           when /COMPLETE/
             return current.status
           when "FAILED"
-            logger.error(current.status_reason)
-            raise StackUpdateError, "change-set creation failed" if status == "FAILED"
+            if allow_empty_change_set and current.status_reason == "The submitted information didn't contain changes. Submit different information to create a change set."
+              return current.status_reason
+            else
+              logger.error(current.status_reason)
+              raise StackUpdateError, "change-set creation failed" if status == "FAILED"
+            end
           end
           sleep(wait_poll_interval)
         end

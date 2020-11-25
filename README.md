@@ -218,6 +218,8 @@ The change-set name defaults to "pending", but can be overridden using `--name`.
 
 The `change-set create` subcommand, like the `up` command, supports `--service-role-arn` to specify a service role.
 
+It is impossible to create a change set with no changes. By default, stackup will only return successfully if a change set was actually created, and will otherwise fail. If the `--no-fail-on-empty-change-set` option is provided, stackup will return successfully if a change set was created _or_ if no change set was created because no changes were needed.
+
 ## Programmatic usage
 
 Get a handle to a `Stack` object as follows:
