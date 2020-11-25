@@ -321,7 +321,8 @@ Prerequisites:
 * You must have cloned this repo via HTTPS and have a github account with permission to push. (`auto/release` will ask for your username and a GitHub personal access token)
 
 To release:
+1.  ```
+    auto/release
+    ```
+2. At https://github.com/realestate-com-au/stackup/releases, manually create a release, following the format of previous releases.
 
-```
-auto/release
-```
