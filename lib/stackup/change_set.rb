@@ -53,20 +53,9 @@ module Stackup
     # @raise [Stackup::NoSuchStack] if the stack doesn't exist
     #
     def create(options = {})
-      options = options.dup
-      options[:stack_name] = stack.name
-      options[:change_set_name] = name
-      options[:change_set_type] = stack.exists? ? "UPDATE" : "CREATE"
-      force = options.delete(:force)
+      options = validate_options(options)
+      delete if options.delete(:force)
       allow_empty_change_set = options.delete(:allow_empty_change_set)
-      options[:template_body] = MultiJson.dump(options.delete(:template)) if options[:template]
-      # optionally override template_body with the original template to preserve formatting (& comments in YAML)
-      template_orig = options.delete(:template_orig)
-      options[:template_body] = template_orig if options.delete(:preserve)
-      options[:parameters] = Parameters.new(options[:parameters]).to_a if options[:parameters]
-      options[:tags] = normalize_tags(options[:tags]) if options[:tags]
-      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
-      delete if force
       handling_cf_errors do
         cf_client.create_change_set(options)
         loop do
@@ -150,6 +139,21 @@ module Stackup
 
     def wait_poll_interval
       stack.send(:wait_poll_interval)
+    end
+
+    def validate_options(original)
+      options = original.dup
+      options[:stack_name] = stack.name
+      options[:change_set_name] = name
+      options[:change_set_type] = stack.exists? ? "UPDATE" : "CREATE"
+      options[:template_body] = MultiJson.dump(options.delete(:template)) if options[:template]
+      # optionally override template_body with the original template to preserve formatting (& comments in YAML)
+      template_orig = options.delete(:template_orig)
+      options[:template_body] = template_orig if options.delete(:preserve)
+      options[:parameters] = Parameters.new(options[:parameters]).to_a if options[:parameters]
+      options[:tags] = normalize_tags(options[:tags]) if options[:tags]
+      options[:capabilities] ||= ["CAPABILITY_NAMED_IAM"]
+      options
     end
 
   end

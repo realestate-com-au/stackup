@@ -41,8 +41,7 @@ module Stackup
     def define
       namespace(name) do
 
-        data_options = []
-        data_options << DataOption.for("--template", template)
+        data_options = [DataOption.for("--template", template)]
         data_options << DataOption.for("--parameters", parameters) if parameters
         data_options << DataOption.for("--tags", tags) if tags
 
