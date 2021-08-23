@@ -18,6 +18,7 @@ module Stackup
 
     # Yield all events since the last call
     #
+    # rubocop:disable Lint/SuppressedException
     def each_new_event
       new_events = []
       stack.events.each do |event|
@@ -40,6 +41,7 @@ module Stackup
       nil
     rescue Aws::CloudFormation::Errors::ValidationError
     end
+    # rubocop:enable Lint/SuppressedException
 
     private
 

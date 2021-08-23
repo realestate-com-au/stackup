@@ -19,12 +19,12 @@ module Stackup
       def hashify(parameters)
         {}.tap do |result|
           parameters.each do |p|
-            begin
-              p_struct = ParameterStruct.new(p)
-              result[p_struct.key] = p_struct.value
-            rescue ArgumentError
-              raise ArgumentError, "invalid parameter record: #{p.inspect}"
-            end
+
+            p_struct = ParameterStruct.new(p)
+            result[p_struct.key] = p_struct.value
+          rescue ArgumentError
+            raise ArgumentError, "invalid parameter record: #{p.inspect}"
+
           end
         end
       end

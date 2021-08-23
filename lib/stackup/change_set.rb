@@ -78,10 +78,10 @@ module Stackup
           when "FAILED"
             if allow_empty_change_set && (current.status_reason == "The submitted information didn't contain changes. Submit different information to create a change set.")
               return current.status_reason
-            else
-              logger.error(current.status_reason)
-              raise StackUpdateError, "change-set creation failed" if status == "FAILED"
             end
+
+            logger.error(current.status_reason)
+            raise StackUpdateError, "change-set creation failed" if status == "FAILED"
           end
           sleep(wait_poll_interval)
         end

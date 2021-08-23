@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "diffy", "~> 3.2"
   spec.add_dependency "multi_json"
 
+  spec.required_ruby_version = "2.6"
 end
