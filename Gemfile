@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org" do
 
   gemspec
@@ -7,7 +9,7 @@ source "https://rubygems.org" do
   group :test do
     gem "byebug"
     gem "rspec", "~> 3.7"
-    gem "rubocop", "~> 0.65"
+    gem "rubocop", "~> 0.93"
   end
 
 end

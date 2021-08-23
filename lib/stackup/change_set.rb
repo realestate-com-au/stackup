@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "stackup/error_handling"
 
 module Stackup
@@ -74,7 +76,7 @@ module Stackup
           when /COMPLETE/
             return current.status
           when "FAILED"
-            if allow_empty_change_set and current.status_reason == "The submitted information didn't contain changes. Submit different information to create a change set."
+            if allow_empty_change_set && (current.status_reason == "The submitted information didn't contain changes. Submit different information to create a change set.")
               return current.status_reason
             else
               logger.error(current.status_reason)

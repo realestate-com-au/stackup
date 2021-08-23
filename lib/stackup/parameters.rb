@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Stackup
 
   # Parameters to a CloudFormation template.
