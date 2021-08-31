@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "clamp"
 require "console_logger"
 require "multi_json"
@@ -203,9 +205,7 @@ module Stackup
              :multivalued => true, :default => ["CAPABILITY_NAMED_IAM"]
 
       def execute
-        unless template_source || use_previous_template?
-          signal_usage_error "Specify either --template or --use-previous-template"
-        end
+        signal_usage_error "Specify either --template or --use-previous-template" unless template_source || use_previous_template?
         options = {}
         if template_source
           if template_source.s3?
@@ -247,8 +247,6 @@ module Stackup
           ].join("  ")
         end
       end
-
-      private
 
       def pad(s, width)
         (s || "").ljust(width)
@@ -299,9 +297,7 @@ module Stackup
                :multivalued => true, :default => ["CAPABILITY_NAMED_IAM"]
 
         def execute
-          unless template_source || use_previous_template?
-            signal_usage_error "Specify either --template or --use-previous-template"
-          end
+          signal_usage_error "Specify either --template or --use-previous-template" unless template_source || use_previous_template?
           options = {}
           if template_source
             if template_source.s3?
@@ -363,8 +359,6 @@ module Stackup
 
       end
 
-      private
-
       def change_set
         stack.change_set(change_set_name)
       end
@@ -405,8 +399,6 @@ module Stackup
         signal_usage_error "specify '--template' or '--parameters'" if planned.empty?
         puts differ.diff(current, planned, context_lines)
       end
-
-      private
 
       def differ
         Stackup::Differ.new(diff_format, &method(:format_data))
@@ -467,8 +459,6 @@ module Stackup
           end
         end
       end
-
-      private
 
       def display_event(e)
         if data?

@@ -1,3 +1,6 @@
+AllCops:
+  TargetRubyVersion: 2.6
+
 Eval:
   Exclude:
     - "Rakefile"
@@ -6,7 +9,7 @@ Metrics/AbcSize:
   Enabled: false
 
 Metrics/LineLength:
-  Max: 120
+  Max: 180
 
 Metrics/MethodLength:
   Max: 30
@@ -54,7 +57,7 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Enabled: false
 
 Style/CaseEquality:

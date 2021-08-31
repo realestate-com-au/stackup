@@ -4,5 +4,5 @@
 
 cd $(dirname $0)/..
 
-echo "--- Running specs"
+echo "+++ Running specs"
 ./auto/dev-environment rake spec

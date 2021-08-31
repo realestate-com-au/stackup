@@ -1,0 +1,8 @@
+#! /bin/bash -eu
+#
+# Run linter
+
+cd $(dirname $0)/..
+
+echo "+++ Running linter"
+./auto/dev-environment rake rubocop

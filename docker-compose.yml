@@ -2,7 +2,7 @@ version: "2"
 
 services:
   dev:
-    image: ruby:2.6@sha256:f38fce2b70ba23e90d6397995bea8419b86dd3f20b73846681adb52c63c0b002
+    image: ruby:2.6@sha256:83963ce90bf49a1e7baaf1bc73e1d57ae8f631949452c3dfcddf8fe8402c64b8
     volumes:
       - .:/work
       - ruby2.6-bundle-cache:/usr/local/bundle

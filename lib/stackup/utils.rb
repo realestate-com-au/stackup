@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Stackup
 
   # Generates diffs of data.

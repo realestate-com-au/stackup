@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "aws-sdk-cloudformation"
 
 module Stackup
@@ -14,10 +16,9 @@ module Stackup
 
     attr_accessor :stack
 
-    # rubocop:disable Lint/HandleExceptions
-
     # Yield all events since the last call
     #
+    # rubocop:disable Lint/SuppressedException
     def each_new_event
       new_events = []
       stack.events.each do |event|
@@ -40,8 +41,7 @@ module Stackup
       nil
     rescue Aws::CloudFormation::Errors::ValidationError
     end
-
-    # rubocop:enable Lint/HandleExceptions
+    # rubocop:enable Lint/SuppressedException
 
     private
 

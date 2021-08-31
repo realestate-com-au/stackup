@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module Stackup
 
-  VERSION = "1.7.0".freeze
+  VERSION = "1.7.0"
 
 end
