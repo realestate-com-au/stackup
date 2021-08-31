@@ -1,5 +1,10 @@
 # CHANGES
 
+## 1.7.1 (2021-08-31)
+
+* Dependency upgrades. Uplift of release process.
+* M1/arm64 support for docker image releases.
+
 ## 1.7.0 (2020-11-25)
 
 * Feature: --no-fail-on-empty-change-set
