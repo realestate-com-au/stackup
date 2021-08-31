@@ -18,8 +18,8 @@ COPY --from=build /app/stackup-*.gem /tmp/
 
 RUN apk --no-cache add diffutils \
  && gem install --no-document /tmp/stackup-*.gem \
- && rm -f /tmp/stackup-*.gem \
- && rm -rf /usr/local/bundle/gems/stackup-*/{spec,*.md}
+ && rm -f /tmp/stackup-*.gem /usr/local/bundle/gems/stackup-*/*.md \
+ && rm -rf /usr/local/bundle/gems/stackup-*/spec
 
 WORKDIR /cwd
 ENTRYPOINT ["stackup"]
