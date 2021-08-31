@@ -191,7 +191,7 @@ Where a template URL references an object in S3, `stackup` leverages [CloudForma
 Non-S3 URLs are also supported, though in that case `stackup` must fetch the content itself:
 
     $ stackup mystack up \
-      -t https://raw.githubusercontent.com/realestate-com-au/stackup/master/examples/template.yml
+      -t https://raw.githubusercontent.com/realestate-com-au/stackup/main/examples/template.yml
 
 ### Stack deletion
 
