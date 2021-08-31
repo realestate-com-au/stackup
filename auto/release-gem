@@ -4,6 +4,8 @@
 
 cd $(dirname $0)/..
 
+rm stackup-*.gem
+
 echo "--- Check that we're releasing from main"
 git fetch origin
 git diff origin/main --exit-code
