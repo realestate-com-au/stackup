@@ -1,0 +1,12 @@
+#! /bin/bash -eu
+#
+# Release Stackup
+
+cd $(dirname $0)/..
+
+echo "--- Check that we're releasing from master"
+git fetch origin
+git diff origin/master --exit-code
+
+echo "--- Releasing gem"
+docker run --rm -itw /cwd -v "$PWD:/cwd" ruby:2.6-alpine auto/release-in-docker

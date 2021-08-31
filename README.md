@@ -309,20 +309,18 @@ This policy grants the principal all actions required by `stackup up` for any cl
 ### Running tests
 
 `auto/test` will run the tests in a Docker container.
+`auto/lint` will run the linter in a Docker container.
 
 ### Releasing
 
-Releasing is done manually, not by CI. The release process will push tags to GitHub, push the gem to rubygems and push the docker image to DockerHub.
+Releasing is done mostly by CI. The automated process will push tags to GitHub, push the docker images to DockerHub. It won't yet push the gem to `rubygems.org`, but we're working ok it..
 
 Prerequisites:
 
-* You must be logged into docker hub via `docker login`. Your user must have permission to push to `realestate/stackup`
-* You must have a rubygems account with permission to push to the `stackup` gem. (`auto/release` will ask for your username and password)
-* You must have cloned this repo via HTTPS and have a github account with permission to push. (`auto/release` will ask for your username and a GitHub personal access token)
+* You must have a rubygems account with permission to push to the `stackup` gem. (`auto/release-gem` will ask for your username and password)
+* You have bumped the version number in `lib/stackup/version.rb`.
+* You have checked the `CHANGES.md` file to make sure it is reasonable and has the changes for this new version.
 
-To release:
-1.  ```
-    auto/release
-    ```
-2. At https://github.com/realestate-com-au/stackup/releases, manually create a release, following the format of previous releases.
-
+To release the rubygem.
+1. `auto/release-gem`
+2. On REA's internal CI tool of choice, find the build for `stackup-ci` and trigger a new build from `HEAD`. This will always grab the latest code from here and release the rest of the parts.
