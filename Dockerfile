@@ -1,4 +1,4 @@
-FROM ruby:2.6-alpine@sha256:fff44cacf0eee17e86eb66a8047d7a14e851e009f4c9e2bf0bd787b7bb324893 as build
+FROM ruby:3.0-alpine@sha256:9afcc885895358e84929c19ea53cb62ecc50daf93dcbd45de469f2e668d96e9a as build
 
 WORKDIR /app
 COPY bin /app/bin
@@ -10,7 +10,7 @@ COPY LICENSE.md /app/
 COPY stackup.gemspec /app/
 RUN gem build stackup.gemspec
 
-FROM ruby:2.6-alpine@sha256:fff44cacf0eee17e86eb66a8047d7a14e851e009f4c9e2bf0bd787b7bb324893
+FROM ruby:3.0-alpine@sha256:9afcc885895358e84929c19ea53cb62ecc50daf93dcbd45de469f2e668d96e9a
 
 MAINTAINER https://github.com/realestate-com-au/stackup
 

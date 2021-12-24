@@ -11,4 +11,4 @@ git fetch origin
 git diff origin/main --exit-code
 
 echo "--- Releasing gem"
-docker run --rm -itw /cwd -v "$PWD:/cwd" ruby:2.6-alpine auto/release-in-docker
+docker run --rm -itw /cwd -v "$PWD:/cwd" ruby:3.0-alpine auto/release-in-docker

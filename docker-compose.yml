@@ -2,10 +2,10 @@ version: "2"
 
 services:
   dev:
-    image: ruby:2.6@sha256:83963ce90bf49a1e7baaf1bc73e1d57ae8f631949452c3dfcddf8fe8402c64b8
+    image: ruby:3.0@sha256:f6c236c1474acd83216ccacbaf7019778cbaea73c8048652087a4b64a862af63
     volumes:
       - .:/work
-      - ruby2.6-bundle-cache:/usr/local/bundle
+      - ruby3.0-bundle-cache:/usr/local/bundle
     environment:
       BUNDLE_GEMFILE: /work/Gemfile
       AWS_ACCESS_KEY_ID:
@@ -16,5 +16,5 @@ services:
     command: ["bash"]
 
 volumes:
-  ruby2.6-bundle-cache:
+  ruby3.0-bundle-cache:
     external: true

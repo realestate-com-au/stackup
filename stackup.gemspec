@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
 
   spec.name          = "stackup"
   spec.version       = Stackup::VERSION
-  spec.authors       = ["Mike Williams", "Arvind Kunday"]
-  spec.email         = ["mike.williams@rea-group.com", "arvind.kunday@rea-group.com"]
+  spec.authors       = ["Danial Pearce", "Ahmed Shash"]
+  spec.email         = ["danial.pearce@rea-group.com", "ahmed.shash@rea-group.com"]
   spec.summary       = "Manage CloudFormation stacks"
   spec.homepage      = "https://github.com/realestate-com-au/stackup"
   spec.license       = "MIT"
@@ -29,5 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "diffy", "~> 3.2"
   spec.add_dependency "multi_json"
 
-  spec.required_ruby_version = "~> 2.6"
+  spec.required_ruby_version = "> 2.6"
 end

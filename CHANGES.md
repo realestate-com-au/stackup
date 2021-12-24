@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.7.2 (2021-12-24)
+
+* Upgrade dev setup and base docker image to ruby 3.0
+
 ## 1.7.1 (2021-08-31)
 
 * Dependency upgrades. Uplift of release process.

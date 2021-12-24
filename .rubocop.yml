@@ -1,5 +1,8 @@
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 3.0
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false
 
 Eval:
   Exclude:
