@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+cd $(dirname $0)/..
+
+if [ -z "${RUBY_IMAGE:-}" ]; then
+  2>&1 echo "Please use one of the auto/ruby-* wrappers and not this one."
+  exit 1
+fi
+
+echo "~~~ Building dev image"
+docker build \
+  --quiet \
+  --build-arg BASE_IMAGE="${RUBY_IMAGE}" \
+  --tag stackup:dev \
+  --file Dockerfile.dev \
+  .
+
+echo "~~~ Running dev image"
+docker run --rm --interactive --tty stackup:dev $@

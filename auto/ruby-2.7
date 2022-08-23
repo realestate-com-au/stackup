@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+cd $(dirname $0)/..
+
+RUBY_IMAGE="ruby:2.7@sha256:3d9c2a2d305318710c9e5a4ee001e07e227f356a40e0b6003d8440835d430770" exec auto/ruby "${@}"

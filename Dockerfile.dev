@@ -1,0 +1,18 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+ARG TARGETARCH
+ENV BUNDLE_JOBS=3
+
+RUN mkdir -p /work/
+WORKDIR /work/
+
+COPY examples /work/examples
+COPY bin /work/bin
+COPY stackup.gemspec /work/
+COPY Gemfile /work/
+COPY spec /work/spec
+COPY lib /work/lib
+RUN bundle install
+
+CMD ["/usr/bin/env", "bash"]
