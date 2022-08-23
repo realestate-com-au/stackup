@@ -24,7 +24,8 @@ module Stackup
       #   `!Foo blah` as a shortcut for `{ "Fn::Foo" => blah }`
       #
       def load(yaml, filename = nil)
-        tree = ::YAML.parse(yaml, filename)
+        legacy_yaml = Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.0")
+        tree = legacy_yaml ? ::YAML.parse(yaml, filename) : ::YAML.parse(yaml, :filename => filename)
         return tree unless tree
 
         CloudFormationToRuby.create.accept(tree)

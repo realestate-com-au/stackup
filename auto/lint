@@ -1,8 +1,8 @@
-#! /bin/bash -eu
-#
-# Run linter
+#!/usr/bin/env bash
 
+set -eu -o pipefail
 cd $(dirname $0)/..
 
 echo "+++ Running linter"
-./auto/dev-environment rake rubocop
+# We lint on the lowest supported ruby version
+./auto/ruby-2.7 rubocop
