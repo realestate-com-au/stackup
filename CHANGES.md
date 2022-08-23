@@ -1,5 +1,12 @@
 # CHANGES
 
+## 1.8.0 (2022-08-23)
+
+* Feature: Add support for ruby 3.1
+* Dev: Upgrade dev setup and base docker image to ruby 3.1
+* Dev: Replace docker-compose dev setup with normal docker
+* Dev: Add helpers to easily test all supported ruby versions locally
+
 ## 1.7.2 (2021-12-24)
 
 * Upgrade dev setup and base docker image to ruby 3.0

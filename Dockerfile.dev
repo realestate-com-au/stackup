@@ -7,6 +7,8 @@ ENV BUNDLE_JOBS=3
 RUN mkdir -p /work/
 WORKDIR /work/
 
+COPY .rubocop.yml /work/
+COPY .rspec /work/
 COPY examples /work/examples
 COPY bin /work/bin
 COPY stackup.gemspec /work/
