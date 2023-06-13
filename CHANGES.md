@@ -1,5 +1,11 @@
 # CHANGES
 
+## 1.9.0 (2023-06-13)
+
+* Feature: Switch to ruby 3.2
+* Feature: Remove support for ruby 2.7 (end of life)
+* Dev: Upgrade dev setup and base docker image to ruby 3.2
+
 ## 1.8.0 (2022-08-23)
 
 * Feature: Add support for ruby 3.1
