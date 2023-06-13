@@ -3,11 +3,11 @@
 set -eu -o pipefail
 cd $(dirname $0)/..
 
+echo "+++ Running specs for ruby 3.2"
+./auto/ruby-3.2 rspec
+
 echo "+++ Running specs for ruby 3.1"
 ./auto/ruby-3.1 rspec
 
 echo "+++ Running specs for ruby 3.0"
 ./auto/ruby-3.0 rspec
-
-echo "+++ Running specs for ruby 2.7"
-./auto/ruby-2.7 rspec
