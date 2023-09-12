@@ -90,12 +90,18 @@ module Stackup
       Stackup(aws_config)
     end
 
+    # In standard retry_mode max_attempts = 3 so the SDK will only retry twice (initial request + 2 retries)
+    # Now we're setting max_attempts = 50 (initial request + 49 retries) which gives us some breathing room
+    MAX_SDK_ATTEMPTS = 50
+
     def base_aws_config
       {
         :log_level => :debug,
         :logger => logger,
         :region => region,
-        :retry_limit => retry_limit
+        :retry_limit => retry_limit,
+        :max_attempts => MAX_SDK_ATTEMPTS,
+        :retry_mode => "standard"
       }.reject { |_k, v| v.nil? }
     end
 
