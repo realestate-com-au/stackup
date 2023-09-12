@@ -1,5 +1,11 @@
 # CHANGES
 
+## 1.8.1 (2023-09-12)
+
+* Addresses rate limiting errors in #87 by configuring the following retry behaviours:
+  * Updates `retry_mode` from `legacy` to `standard`
+  * Increase the value of `max_attempts` to 50
+
 ## 1.8.0 (2022-08-23)
 
 * Feature: Add support for ruby 3.1
