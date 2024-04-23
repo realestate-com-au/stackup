@@ -45,7 +45,7 @@ module Stackup
           if value == :use_previous_value
             record[:use_previous_value] = true
           else
-            record[:parameter_value] = value
+            record[:parameter_value] = value.to_s
           end
         end
       end
@@ -75,7 +75,7 @@ module Stackup
       if use_previous_value
         :use_previous_value
       else
-        parameter_value
+        parameter_value.to_s
       end
     end
 

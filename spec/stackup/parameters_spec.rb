@@ -146,6 +146,30 @@ describe Stackup::Parameters do
 
     end
 
+    context "with Integer values" do
+
+      let(:input_records) do
+        [{ :parameter_key => "SomeInteger", :parameter_value => 123_456_789 }]
+      end
+
+      subject(:parameters) { Stackup::Parameters.new(input_records) }
+
+      describe "#to_hash" do
+        it "converts the Integer to a String" do
+          expected = { "SomeInteger" => "123456789" }
+          expect(parameters.to_hash).to eql(expected)
+        end
+      end
+
+      describe "#to_a" do
+        it "converts the Integer to a String" do
+          expected = [{ :parameter_key => "SomeInteger", :parameter_value => "123456789" }]
+          expect(parameters.to_a).to eql(expected)
+        end
+      end
+
+    end
+
     context "with empty parameter file" do
 
       let(:input_records) { false }
