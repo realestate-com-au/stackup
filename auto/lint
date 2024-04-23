@@ -5,4 +5,4 @@ cd $(dirname $0)/..
 
 echo "+++ Running linter"
 # We lint on the lowest supported ruby version
-./auto/ruby-2.7 rubocop
+./auto/ruby-3.1 rubocop
