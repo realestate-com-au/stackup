@@ -45,7 +45,7 @@ module Stackup
           if value == :use_previous_value
             record[:use_previous_value] = true
           else
-            record[:parameter_value] = value.to_s
+            record[:parameter_value] = ParameterValue.new(value).to_param
           end
         end
       end
@@ -75,7 +75,26 @@ module Stackup
       if use_previous_value
         :use_previous_value
       else
-        parameter_value.to_s
+        ParameterValue.new(parameter_value).to_param
+      end
+    end
+
+  end
+
+  class ParameterValue
+
+    def initialize(value)
+      @value = value
+    end
+
+    def to_param
+      case @value
+      when TrueClass, FalseClass, Integer then
+        @value.to_s
+      when Array
+        @value.map { |v| ParameterValue.new(v).to_param }.join(",")
+      else
+        @value
       end
     end
 
