@@ -3,4 +3,4 @@
 set -eu -o pipefail
 cd $(dirname $0)/..
 
-RUBY_IMAGE="ruby:3.0@sha256:dfb439f51e6ba58810fed23e4c4582f3e3c24e6a972ec505de27217f5036c567" exec auto/ruby "${@}"
+RUBY_IMAGE="ruby:3.0@sha256:3d4f1647953941c19b6d0176c0a3e1f373aa7b0553d1c8aba51789721151f953" exec auto/ruby "${@}"
