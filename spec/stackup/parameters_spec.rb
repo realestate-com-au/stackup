@@ -146,6 +146,51 @@ describe Stackup::Parameters do
 
     end
 
+    context "with non-string values" do
+
+      let(:input_records) do
+        [
+          { :parameter_key => "Integer", :parameter_value => 123_456_789 },
+          { :parameter_key => "Truthy", :parameter_value => true },
+          { :parameter_key => "Falsey", :parameter_value => false },
+          { :parameter_key => "Null", :parameter_value => nil },
+          { :parameter_key => "Array", :parameter_value => ["one", 2] },
+          { :parameter_key => "String", :parameter_value => "string" }
+        ]
+      end
+
+      subject(:parameters) { Stackup::Parameters.new(input_records) }
+
+      describe "#to_hash" do
+        it "converts the to strings where appropriate" do
+          expected = {
+            "Integer" => "123456789",
+            "Truthy" => "true",
+            "Falsey" => "false",
+            "Null" => nil,
+            "Array" => "one,2",
+            "String" => "string"
+          }
+          expect(parameters.to_hash).to eql(expected)
+        end
+      end
+
+      describe "#to_a" do
+        it "converts the to strings where appropriate" do
+          expected = [
+            { :parameter_key => "Integer", :parameter_value => "123456789" },
+            { :parameter_key => "Truthy", :parameter_value => "true" },
+            { :parameter_key => "Falsey", :parameter_value => "false" },
+            { :parameter_key => "Null", :parameter_value => nil },
+            { :parameter_key => "Array", :parameter_value => "one,2" },
+            { :parameter_key => "String", :parameter_value => "string" }
+          ]
+          expect(parameters.to_a).to eql(expected)
+        end
+      end
+
+    end
+
     context "with empty parameter file" do
 
       let(:input_records) { false }
