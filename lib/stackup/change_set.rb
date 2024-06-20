@@ -65,7 +65,8 @@ module Stackup
           when /COMPLETE/
             return current.status
           when "FAILED"
-            if allow_empty_change_set && (current.status_reason == "The submitted information didn't contain changes. Submit different information to create a change set.")
+            # following the AWS CLI way: https://github.com/aws/aws-cli/blob/develop/awscli/customizations/cloudformation/deployer.py#L171
+            if allow_empty_change_set && (current.status_reason.include? "The submitted information didn't contain changes." or current.status_reason.include? "No updates are to be performed")
               return current.status_reason
             end
 
