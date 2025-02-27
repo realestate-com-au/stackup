@@ -1,5 +1,9 @@
 # CHANGES
 
+## 1.9.0 (2025-02-27)
+
+* Fix: Convert param input to String [#105](https://github.com/realestate-com-au/stackup/pull/105)
+
 ## 1.8.1 (2023-09-12)
 
 * Addresses rate limiting errors in #87 by configuring the following retry behaviours:
